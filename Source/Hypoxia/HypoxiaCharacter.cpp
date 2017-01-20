@@ -75,6 +75,9 @@ AHypoxiaCharacter::AHypoxiaCharacter()
 	VR_MuzzleLocation->SetupAttachment(VR_Gun);
 	VR_MuzzleLocation->SetRelativeLocation(FVector(0.000004, 53.999992, 10.000000));
 	VR_MuzzleLocation->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f));		// Counteract the rotation of the VR gun model.
+
+	Flashlight = CreateDefaultSubobject<USpotLightComponent>(TEXT("Flashlight"));
+	Flashlight->SetupAttachment(VR_MuzzleLocation);
 	
 }
 
@@ -130,6 +133,7 @@ void AHypoxiaCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerI
 	PlayerInputComponent->BindAxis("TurnRate", this, &AHypoxiaCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AHypoxiaCharacter::LookUpAtRate);
+	PlayerInputComponent->BindAction("Flashlight", IE_Pressed, this, &AHypoxiaCharacter::FlashlightOnOff);
 }
 
 void AHypoxiaCharacter::OnFire()
@@ -144,6 +148,10 @@ void AHypoxiaCharacter::OnFire()
 			{
 				const FRotator SpawnRotation = VR_MuzzleLocation->GetComponentRotation();
 				const FVector SpawnLocation = VR_MuzzleLocation->GetComponentLocation();
+				World->SpawnActor<AHypoxiaProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);
+				World->SpawnActor<AHypoxiaProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);
+				World->SpawnActor<AHypoxiaProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);
+				World->SpawnActor<AHypoxiaProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);
 				World->SpawnActor<AHypoxiaProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);
 			}
 			else
@@ -291,4 +299,17 @@ bool AHypoxiaCharacter::EnableTouchscreenMovement(class UInputComponent* PlayerI
 		//PlayerInputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AHypoxiaCharacter::TouchUpdate);
 	}
 	return bResult;
+}
+void AHypoxiaCharacter::FlashlightOnOff() {
+
+	float intensity = Flashlight->Intensity;
+
+	if (intensity == 0.0f) {
+		Flashlight->SetIntensity(100000.0f);
+	}
+	else
+	{
+		Flashlight->SetIntensity(0.0f);
+	}
+
 }

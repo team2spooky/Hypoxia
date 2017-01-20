@@ -30,6 +30,9 @@ class AHypoxiaCharacter : public ACharacter
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	class USceneComponent* VR_MuzzleLocation;
 
+	UPROPERTY(VisibleDefaultsOnly, Category = Light)
+	class USpotLightComponent* Flashlight;
+
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FirstPersonCameraComponent;
@@ -99,6 +102,8 @@ protected:
 	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
 	 */
 	void LookUpAtRate(float Rate);
+	
+	void FlashlightOnOff();
 
 	struct TouchData
 	{
