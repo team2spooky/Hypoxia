@@ -246,13 +246,13 @@ void AHypoxiaCharacter::EndTouch(const ETouchIndex::Type FingerIndex, const FVec
 void AHypoxiaCharacter::MoveForward(float Value)
 {
 	SetActorRotation(FRotator(GetCapsuleComponent()->RelativeRotation.Pitch, FirstPersonCameraComponent->RelativeRotation.Yaw, GetCapsuleComponent()->RelativeRotation.Roll));
+	//SetActorLocation(FVector(FirstPersonCameraComponent->RelativeLocation.X, FirstPersonCameraComponent->RelativeLocation.Y, GetCapsuleComponent()->RelativeLocation.Z));
 	//SetActorRotation(FirstPersonCameraComponent->RelativeRotation);
 	//GetCapsuleComponent()->SetRelativeRotation(FRotator(FirstPersonCameraComponent->RelativeRotation.Pitch, FirstPersonCameraComponent->RelativeRotation.Roll, GetCapsuleComponent()->RelativeRotation.Yaw));
 	//FirstPersonCameraComponent->RelativeRotation.Roll
 	if (Value != 0.0f)
 	{
-		// add movement in that direction
-		//AddMovementInput(FRotator(FirstPersonCameraComponent->RelativeRotation.Pitch, FirstPersonCameraComponent->RelativeRotation.Roll, GetCapsuleComponent()->RelativeRotation.Yaw).RotateVector(GetActorRightVector()), Value);
+		// add movement in that direction		
 		AddMovementInput(GetActorForwardVector(), Value);
 	}
 }
@@ -261,6 +261,7 @@ void AHypoxiaCharacter::MoveRight(float Value)
 {
 
 	SetActorRotation(FRotator(GetCapsuleComponent()->RelativeRotation.Pitch, FirstPersonCameraComponent->RelativeRotation.Yaw, GetCapsuleComponent()->RelativeRotation.Roll));
+	//SetActorLocation(FVector(FirstPersonCameraComponent->RelativeLocation.X, FirstPersonCameraComponent->RelativeLocation.Y, GetCapsuleComponent()->RelativeLocation.Z));
 	//SetActorRotation(FirstPersonCameraComponent->RelativeRotation);
 	//SetActorLocation(FRotator(FirstPersonCameraComponent->RelativeRotation.Pitch, FirstPersonCameraComponent->RelativeRotation.Yaw, FirstPersonCameraComponent->RelativeRotation.Roll));
 
