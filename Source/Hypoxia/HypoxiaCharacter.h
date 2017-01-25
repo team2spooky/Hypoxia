@@ -1,6 +1,7 @@
 // Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
 #pragma once
 #include "GameFramework/Character.h"
+#include "Item.h"
 #include "HypoxiaCharacter.generated.h"
 
 class UInputComponent;
@@ -48,6 +49,8 @@ public:
 	AHypoxiaCharacter();
 
 	virtual void BeginPlay();
+
+	void SetHeldItem(AItem*);
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)

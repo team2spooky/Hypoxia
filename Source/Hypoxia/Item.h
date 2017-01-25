@@ -10,22 +10,22 @@ class HYPOXIA_API AItem : public AActor
 {
 	GENERATED_BODY()
 
+protected:
+
 	UPROPERTY(VisibleAnywhere, Category = Mesh)
 	class USceneComponent* Item_Base;
 
 	UPROPERTY(VisibleAnywhere, Category = Mesh)
-	class USkeletalMeshComponent* VR_Gun;
+	class USkeletalMeshComponent* Item;
 
 	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
-	class UMotionControllerComponent* R_MotionController;
-
-	
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	//class UCameraComponent* FirstPersonCameraComponent;
+	class UMotionControllerComponent* MotionController;
 	
 public:	
 	// Sets default values for this actor's properties
 	AItem();
+
+	void Drop();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -33,6 +33,4 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
-	
-	
 };
