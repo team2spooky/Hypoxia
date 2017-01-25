@@ -10,8 +10,18 @@ class HYPOXIA_API AItem : public AActor
 {
 	GENERATED_BODY()
 
-	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+	UPROPERTY(VisibleAnywhere, Category = Mesh)
+	class USceneComponent* Item_Base;
+
+	UPROPERTY(VisibleAnywhere, Category = Mesh)
 	class USkeletalMeshComponent* VR_Gun;
+
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
+	class UMotionControllerComponent* R_MotionController;
+
+	
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	//class UCameraComponent* FirstPersonCameraComponent;
 	
 public:	
 	// Sets default values for this actor's properties
