@@ -9,8 +9,11 @@ class AHypoxiaGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 public:
+	float VoiceCaptureFinalVolume;
+
 	AHypoxiaGameMode();
+
+	virtual void BeginPlay() override;
+	virtual void Tick(float) override;
 };
-
-
 
