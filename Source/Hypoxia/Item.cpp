@@ -4,6 +4,7 @@
 #include "Item.h"
 #include "MotionControllerComponent.h"
 #include "HypoxiaCharacter.h"
+#include "EngineUtils.h"
 
 AHypoxiaCharacter *HypoxiaCharacter;
 
@@ -20,10 +21,10 @@ AItem::AItem()
 	MotionController->SetupAttachment(Item_Base);
 
 	Item = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Item"));
-	Item->SetupAttachment(MotionController);
+	Item->SetupAttachment(Item_Base);
 	Item->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
 
-	MotionController->Hand = EControllerHand::Right;
+	//MotionController->Hand = EControllerHand::Right;
 
 }
 
@@ -32,21 +33,32 @@ void AItem::BeginPlay()
 {
 	Super::BeginPlay();
 
-	for (TObjectIterator<AHypoxiaCharacter> Itr; Itr; ++Itr)
+	for (TActorIterator<AHypoxiaCharacter> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
 
-		HypoxiaCharacter = *Itr;
+		HypoxiaCharacter = *ActorItr;
 		//break;
 	}
 
-	if (Item_Base->AttachToComponent(HypoxiaCharacter->GetCapsuleComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale)) {
-		UE_LOG(LogTemp, Warning, TEXT("It worked :)"));
-		HypoxiaCharacter->SetHeldItem(this);
-	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("It no worked :("));
-	}
+}
 
+void AItem::Pickup() {
+	//MotionController->Hand = Hand;
+	//FVector HandLocation = MotionController->GetComponentLocation();
+
+	if (FVector::Dist(MotionController->GetComponentLocation(), Item_Base->GetComponentLocation()) < 100000.0f) {
+
+		UE_LOG(LogTemp, Warning, TEXT("Thing"));
+
+		if (Item_Base->AttachToComponent(HypoxiaCharacter->GetCapsuleComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale)) {
+			HypoxiaCharacter->SetHeldItem(this);
+			Item->AttachToComponent(MotionController, FAttachmentTransformRules::SnapToTargetIncludingScale);
+			UE_LOG(LogTemp, Warning, TEXT("It worked :)"));
+		}
+		else {
+			UE_LOG(LogTemp, Warning, TEXT("It no worked :("));
+		}
+	}
 }
 
 void AItem::Drop() {

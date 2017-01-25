@@ -8,10 +8,11 @@
 #include "Kismet/HeadMountedDisplayFunctionLibrary.h"
 #include "MotionControllerComponent.h"
 #include "Item.h"
+#include "EngineUtils.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
-AItem *HeldItem;
+AItem *HeldItem = NULL;
 
 //////////////////////////////////////////////////////////////////////////
 // AHypoxiaCharacter
@@ -307,9 +308,21 @@ void AHypoxiaCharacter::FlashlightOnOff() {
 
 	float intensity = Flashlight->Intensity;
 
-
-
-	HeldItem->Drop();
+	if (HeldItem == NULL) {
+		for (TActorIterator<AItem> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+		{
+			ActorItr->Pickup();
+		//	break;
+		//	/*AItem *Item = *Itr;
+		//	FVector Item_Location = Item->GetActorLocation();
+		//	if(Item->GetActorLocation)*/
+		//	//break;
+		}
+		
+	} else {
+		HeldItem->Drop();
+		HeldItem = NULL;
+	}
 
 	/*if (intensity == 0.0f) {
 		Flashlight->SetIntensity(100000.0f);

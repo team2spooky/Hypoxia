@@ -11,6 +11,6 @@ AFlashlight::AFlashlight()
 	//Light_MotionController = GetDefaultSubobjectByName(TEXT("MotionController"));
 
 	Light = CreateDefaultSubobject<USpotLightComponent>(TEXT("Light"));
-	Light->SetupAttachment(MotionController);
+	Light->SetupAttachment(Item);
 }
 
