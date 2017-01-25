@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
+#include "MotionControllerComponent.h"
 #include "Item.generated.h"
 
 UCLASS()
@@ -27,7 +28,7 @@ public:
 
 	void Drop();
 
-	void Pickup();
+	void Pickup(UMotionControllerComponent*);
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

@@ -16,15 +16,18 @@ AItem::AItem()
 
 	Item_Base = CreateDefaultSubobject<USceneComponent>(TEXT("Item_Base"));
 
+	//Item_Base->bAbsoluteLocation = true;
+
 	MotionController = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("MotionController"));
 	MotionController->Hand = EControllerHand::Right;
 	MotionController->SetupAttachment(Item_Base);
+	//MotionController->bAbsoluteLocation = true;
 
 	Item = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Item"));
 	Item->SetupAttachment(Item_Base);
-	Item->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
+	//Item->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
 
-	//MotionController->Hand = EControllerHand::Right;
+	MotionController->Hand = EControllerHand::Left;
 
 }
 
@@ -42,13 +45,13 @@ void AItem::BeginPlay()
 
 }
 
-void AItem::Pickup() {
+void AItem::Pickup(UMotionControllerComponent* Controller) {
 	//MotionController->Hand = Hand;
 	//FVector HandLocation = MotionController->GetComponentLocation();
 
-	if (FVector::Dist(MotionController->GetComponentLocation(), Item_Base->GetComponentLocation()) < 100000.0f) {
+	UE_LOG(LogTemp, Warning, TEXT("Dist %f"), FVector::Dist(Controller->GetComponentLocation(), Item_Base->GetComponentLocation()));
 
-		UE_LOG(LogTemp, Warning, TEXT("Thing"));
+	if (FVector::Dist(Controller->GetComponentLocation(), Item_Base->GetComponentLocation()) < 250.0f) {
 
 		if (Item_Base->AttachToComponent(HypoxiaCharacter->GetCapsuleComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale)) {
 			HypoxiaCharacter->SetHeldItem(this);
