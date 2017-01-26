@@ -50,7 +50,7 @@ public:
 
 	virtual void BeginPlay();
 
-	void SetHeldItem(AItem*);
+	void SetHeldItem(AItem*, EControllerHand);
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
@@ -106,7 +106,13 @@ protected:
 	 */
 	void LookUpAtRate(float Rate);
 	
-	void FlashlightOnOff();
+	void ItemPickupRight();
+
+	void ItemPickupLeft();
+
+	void ItemUseRight();
+
+	void ItemUseLeft();
 
 	struct TouchData
 	{

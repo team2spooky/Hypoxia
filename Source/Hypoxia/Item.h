@@ -24,16 +24,19 @@ protected:
 	
 public:	
 	// Sets default values for this actor's properties
-	AItem();
 
 	void Drop();
+
+	virtual void Use();
 
 	void Pickup(UMotionControllerComponent*);
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
-	// Called every frame
-	virtual void Tick( float DeltaSeconds ) override;
+
+protected:
+
+	//Portected constuctor as AItem should never be instantiated
+	AItem();
 
 };

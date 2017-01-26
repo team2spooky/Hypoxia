@@ -15,12 +15,11 @@ class HYPOXIA_API AFlashlight : public AItem
 	
 	UPROPERTY(VisibleAnywhere, Category = Light)
 	class USpotLightComponent* Light;
-	
-	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
-	class UMotionControllerComponent* Light_MotionController;
 
 public:
 
 	AFlashlight();
+
+	virtual void Use();
 
 };

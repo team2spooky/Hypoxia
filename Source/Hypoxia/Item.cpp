@@ -8,24 +8,19 @@
 
 AHypoxiaCharacter *HypoxiaCharacter;
 
+bool Held = false;
+
 // Sets default values
 AItem::AItem()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	//PrimaryActorTick.bCanEverTick = true;
-
 	Item_Base = CreateDefaultSubobject<USceneComponent>(TEXT("Item_Base"));
-
-	//Item_Base->bAbsoluteLocation = true;
 
 	MotionController = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("MotionController"));
 	MotionController->Hand = EControllerHand::Right;
 	MotionController->SetupAttachment(Item_Base);
-	//MotionController->bAbsoluteLocation = true;
 
 	Item = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Item"));
 	Item->SetupAttachment(Item_Base);
-	//Item->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
 
 	MotionController->Hand = EControllerHand::Left;
 
@@ -38,40 +33,41 @@ void AItem::BeginPlay()
 
 	for (TActorIterator<AHypoxiaCharacter> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
-
+		//This may need adjusting to ensure it gets the right one
 		HypoxiaCharacter = *ActorItr;
-		//break;
 	}
 
 }
 
 void AItem::Pickup(UMotionControllerComponent* Controller) {
-	//MotionController->Hand = Hand;
-	//FVector HandLocation = MotionController->GetComponentLocation();
+	//UE_LOG(LogTemp, Warning, TEXT("Dist %f"), FVector::Dist(Controller->GetComponentLocation(), Item_Base->GetComponentLocation()));
 
-	UE_LOG(LogTemp, Warning, TEXT("Dist %f"), FVector::Dist(Controller->GetComponentLocation(), Item_Base->GetComponentLocation()));
+	if (!Held) {
 
-	if (FVector::Dist(Controller->GetComponentLocation(), Item_Base->GetComponentLocation()) < 250.0f) {
+		//If the item is within the given distance of the given controller, pick it up
+		if (FVector::Dist(Controller->GetComponentLocation(), Item_Base->GetComponentLocation()) < 350.0f) {
 
-		if (Item_Base->AttachToComponent(HypoxiaCharacter->GetCapsuleComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale)) {
-			HypoxiaCharacter->SetHeldItem(this);
-			Item->AttachToComponent(MotionController, FAttachmentTransformRules::SnapToTargetIncludingScale);
-			UE_LOG(LogTemp, Warning, TEXT("It worked :)"));
-		}
-		else {
-			UE_LOG(LogTemp, Warning, TEXT("It no worked :("));
+			//Attach the components, don't move the item if something fails with that
+			if (Item_Base->AttachToComponent(HypoxiaCharacter->GetCapsuleComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale)) {
+				HypoxiaCharacter->SetHeldItem(this, Controller->Hand);
+				Item->AttachToComponent(MotionController, FAttachmentTransformRules::SnapToTargetIncludingScale);
+				MotionController->Hand = Controller->Hand;
+				Held = true;
+				//UE_LOG(LogTemp, Warning, TEXT("It worked :)"));
+			}// else {
+				//UE_LOG(LogTemp, Warning, TEXT("It no worked :("));
+			//}
 		}
 	}
 }
 
 void AItem::Drop() {
-	Item_Base->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-	Item->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+	if (Held) {
+		Item_Base->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+		Item->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+		Held = false;
+	}
 }
 
-// Called every frame
-void AItem::Tick( float DeltaTime )
-{
-	Super::Tick( DeltaTime );
-}
+void AItem::Use() {}
 
