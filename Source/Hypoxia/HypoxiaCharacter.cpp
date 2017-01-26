@@ -12,8 +12,11 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
-AItem *HeldItemRight = NULL;
-AItem *HeldItemLeft  = NULL;
+AItem *HeldItemRight;
+AItem *HeldItemLeft;
+
+bool HeldRight;
+bool HeldLeft;
 
 //////////////////////////////////////////////////////////////////////////
 // AHypoxiaCharacter
@@ -49,6 +52,12 @@ void AHypoxiaCharacter::BeginPlay() {
 	//UE_LOG(LogTemp, Warning, TEXT("Your message"));
 
 	bUsingMotionControllers = true;
+
+	HeldRight = false;
+	HeldLeft  = false;
+
+	HeldItemRight = NULL;
+	HeldItemLeft  = NULL;
 
 }
 
@@ -127,32 +136,34 @@ void AHypoxiaCharacter::MoveRight(float Value) {
 
 void AHypoxiaCharacter::ItemPickupRight() {
 
-	if (HeldItemRight == NULL) {
-		for (TActorIterator<AItem> ActorItr(GetWorld()); ActorItr; ++ActorItr)
-		{
+	if (!HeldRight) {
+		for (TActorIterator<AItem> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
 			ActorItr->Pickup(R_MotionController);
+			HeldRight = true;
 		    break;
 		}
-		
 	} else {
 		HeldItemRight->Drop();
 		HeldItemRight = NULL;
+		HeldRight = false;
 	}
 }
 
 void AHypoxiaCharacter::ItemPickupLeft() {
 
-	if (HeldItemLeft == NULL) {
-		for (TActorIterator<AItem> ActorItr(GetWorld()); ActorItr; ++ActorItr)
-		{
-			ActorItr->Pickup(L_MotionController);
-			break;
-		}
+	UE_LOG(LogTemp, Error, TEXT("Held Left  %d"), HeldLeft);
 
-	}
-	else {
+	if (!HeldLeft) {
+		for (TActorIterator<AItem> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
+			UE_LOG(LogTemp, Error, TEXT("Held Left  %d"), HeldLeft);
+			ActorItr->Pickup(L_MotionController);
+			HeldLeft = true;
+			//break;
+		}
+	} else {
 		HeldItemLeft->Drop();
 		HeldItemLeft = NULL;
+		HeldLeft = false;
 	}
 
 }
@@ -173,7 +184,7 @@ void AHypoxiaCharacter::SetHeldItem(AItem* Item, EControllerHand Hand) {
 	if (Hand == EControllerHand::Right) {
 		HeldItemRight = Item;
 	} else if(Hand == EControllerHand::Left) {
-		HeldItemLeft = Item;
+		HeldItemLeft  = Item;
 	} else {
 		UE_LOG(LogTemp, Error, TEXT("Invaild Hand to hold Item"));
 	}

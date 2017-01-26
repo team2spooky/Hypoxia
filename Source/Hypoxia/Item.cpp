@@ -8,7 +8,7 @@
 
 AHypoxiaCharacter *HypoxiaCharacter;
 
-bool Held = false;
+bool Held;
 
 // Sets default values
 AItem::AItem()
@@ -21,15 +21,14 @@ AItem::AItem()
 
 	Item = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Item"));
 	Item->SetupAttachment(Item_Base);
-
-	MotionController->Hand = EControllerHand::Left;
-
 }
 
 // Called when the game starts or when spawned
 void AItem::BeginPlay()
 {
 	Super::BeginPlay();
+
+	Held = false;
 
 	for (TActorIterator<AHypoxiaCharacter> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
@@ -48,9 +47,9 @@ void AItem::Pickup(UMotionControllerComponent* Controller) {
 		if (FVector::Dist(Controller->GetComponentLocation(), Item_Base->GetComponentLocation()) < 350.0f) {
 
 			//Attach the components, don't move the item if something fails with that
-			if (Item_Base->AttachToComponent(HypoxiaCharacter->GetCapsuleComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale)) {
+			if (Item_Base->AttachToComponent(HypoxiaCharacter->GetCapsuleComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale)) {
 				HypoxiaCharacter->SetHeldItem(this, Controller->Hand);
-				Item->AttachToComponent(MotionController, FAttachmentTransformRules::SnapToTargetIncludingScale);
+				Item->AttachToComponent(MotionController, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 				MotionController->Hand = Controller->Hand;
 				Held = true;
 				//UE_LOG(LogTemp, Warning, TEXT("It worked :)"));
