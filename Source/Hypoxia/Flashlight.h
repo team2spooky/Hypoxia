@@ -2,18 +2,24 @@
 
 #pragma once
 
-#include "Components/SpotLightComponent.h"
+#include "Item.h"
 #include "Flashlight.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class HYPOXIA_API UFlashlight : public USpotLightComponent
+class HYPOXIA_API AFlashlight : public AItem
 {
 	GENERATED_BODY()
 	
-	
-	
-	
+	UPROPERTY(VisibleAnywhere, Category = Light)
+	class USpotLightComponent* Light;
+
+public:
+
+	AFlashlight();
+
+	virtual void Use();
+
 };

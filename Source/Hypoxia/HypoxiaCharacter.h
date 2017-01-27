@@ -1,6 +1,7 @@
 // Copyright 1998-2016 Epic Games, Inc. All Rights Reserved.
 #pragma once
 #include "GameFramework/Character.h"
+#include "Item.h"
 #include "HypoxiaCharacter.generated.h"
 
 class UInputComponent;
@@ -49,6 +50,8 @@ public:
 
 	virtual void BeginPlay();
 
+	void SetHeldItem(AItem*, EControllerHand);
+
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseTurnRate;
@@ -62,12 +65,12 @@ public:
 	FVector GunOffset;
 
 	/** Projectile class to spawn */
-	UPROPERTY(EditDefaultsOnly, Category=Projectile)
-	TSubclassOf<class AHypoxiaProjectile> ProjectileClass;
+	//UPROPERTY(EditDefaultsOnly, Category=Projectile)
+	//TSubclassOf<class AHypoxiaProjectile> ProjectileClass;
 
 	/** Sound to play each time we fire */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
-	class USoundBase* FireSound;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
+	//class USoundBase* FireSound;
 
 	/** AnimMontage to play each time we fire */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
@@ -103,7 +106,13 @@ protected:
 	 */
 	void LookUpAtRate(float Rate);
 	
-	void FlashlightOnOff();
+	void ItemPickupRight();
+
+	void ItemPickupLeft();
+
+	void ItemUseRight();
+
+	void ItemUseLeft();
 
 	struct TouchData
 	{
