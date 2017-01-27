@@ -65,12 +65,12 @@ public:
 	FVector GunOffset;
 
 	/** Projectile class to spawn */
-	UPROPERTY(EditDefaultsOnly, Category=Projectile)
-	TSubclassOf<class AHypoxiaProjectile> ProjectileClass;
+	//UPROPERTY(EditDefaultsOnly, Category=Projectile)
+	//TSubclassOf<class AHypoxiaProjectile> ProjectileClass;
 
 	/** Sound to play each time we fire */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
-	class USoundBase* FireSound;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)
+	//class USoundBase* FireSound;
 
 	/** AnimMontage to play each time we fire */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)

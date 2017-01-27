@@ -13,7 +13,7 @@ class HYPOXIA_API AItem : public AActor
 
 protected:
 
-	UPROPERTY(VisibleAnywhere, Category = Mesh)
+	UPROPERTY(EditAnywhere, Category = Mesh)
 	class USceneComponent* Item_Base;
 
 	UPROPERTY(VisibleAnywhere, Category = Mesh)

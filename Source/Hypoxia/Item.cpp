@@ -21,6 +21,7 @@ AItem::AItem()
 
 	Item = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Item"));
 	Item->SetupAttachment(Item_Base);
+	Item->SetSimulatePhysics(true);
 }
 
 // Called when the game starts or when spawned
@@ -30,8 +31,9 @@ void AItem::BeginPlay()
 
 	Held = false;
 
-	for (TActorIterator<AHypoxiaCharacter> ActorItr(GetWorld()); ActorItr; ++ActorItr)
-	{
+	Item->SetSimulatePhysics(true);
+
+	for (TActorIterator<AHypoxiaCharacter> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
 		//This may need adjusting to ensure it gets the right one
 		HypoxiaCharacter = *ActorItr;
 	}
@@ -44,7 +46,9 @@ void AItem::Pickup(UMotionControllerComponent* Controller) {
 	if (!Held) {
 
 		//If the item is within the given distance of the given controller, pick it up
-		if (FVector::Dist(Controller->GetComponentLocation(), Item_Base->GetComponentLocation()) < 350.0f) {
+		if (FVector::Dist(Controller->GetComponentLocation(), Item->GetComponentLocation()) < 350.0f) {
+
+			Item->SetSimulatePhysics(false);
 
 			//Attach the components, don't move the item if something fails with that
 			if (Item_Base->AttachToComponent(HypoxiaCharacter->GetCapsuleComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale)) {
@@ -53,15 +57,17 @@ void AItem::Pickup(UMotionControllerComponent* Controller) {
 				MotionController->Hand = Controller->Hand;
 				Held = true;
 				//UE_LOG(LogTemp, Warning, TEXT("It worked :)"));
-			}// else {
+			} else {
 				//UE_LOG(LogTemp, Warning, TEXT("It no worked :("));
-			//}
+			}
 		}
 	}
 }
 
 void AItem::Drop() {
 	if (Held) {
+		Item->SetSimulatePhysics(true);
+		//Item->SetPhysicsLinearVelocity(Item->GetPhysicsLinearVelocity() * 2);
 		Item_Base->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 		Item->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 		Held = false;
