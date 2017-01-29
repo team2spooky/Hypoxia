@@ -166,9 +166,10 @@ void AHypoxiaCharacter::ItemPickupRight() {
 
 	if (!HeldRight) {
 		for (TActorIterator<AItem> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
-			ActorItr->Pickup(R_MotionTracker, EControllerHand::Right);
-			HeldRight = true;
-		    break;
+			if (ActorItr->Pickup(R_MotionTracker, EControllerHand::Right)) {
+				HeldRight = true;
+				break;
+			}
 		}
 	} else {
 		HeldItemRight->Drop();
@@ -181,9 +182,10 @@ void AHypoxiaCharacter::ItemPickupLeft() {
 
 	if (!HeldLeft) {
 		for (TActorIterator<AItem> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
-			ActorItr->Pickup(L_MotionTracker, EControllerHand::Left);
-			HeldLeft = true;
-			//break;
+			if (ActorItr->Pickup(L_MotionTracker, EControllerHand::Left)) {
+				HeldLeft = true;
+				break;
+			}
 		}
 	} else {
 		HeldItemLeft->Drop();

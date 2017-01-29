@@ -9,8 +9,6 @@
 
 AHypoxiaCharacter *HypoxiaCharacter;
 
-bool Held;
-
 // Sets default values
 AItem::AItem()
 {
@@ -27,7 +25,7 @@ AItem::AItem()
 	MotionTracker = CreateDefaultSubobject<USceneComponent>(TEXT("MotionTracker"));
 	MotionTracker->SetupAttachment(Item_Base);
 
-	Item = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Item"));
+	Item = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Item"));
 	Item->SetupAttachment(Item_Base);
 	Item->SetSimulatePhysics(true);
 }
@@ -48,16 +46,16 @@ void AItem::BeginPlay() {
 
 }
 
-void AItem::Pickup(USceneComponent* Controller, EControllerHand Hand) {
+bool AItem::Pickup(USceneComponent* Controller, EControllerHand Hand) {
 	//UE_LOG(LogTemp, Warning, TEXT("Dist %f"), FVector::Dist(Controller->GetComponentLocation(), Item_Base->GetComponentLocation()));
 
 	if (!Held) {
 
 		//If the item is within the given distance of the given controller, pick it up
-		if (FVector::Dist(Controller->GetComponentLocation(), Item->GetComponentLocation()) < 350.0f) {
+		if (FVector::Dist(Controller->GetComponentLocation(), Item->GetComponentLocation()) < 250.0f) {
 
-			Item->SetSimulatePhysics(false);
-			//Item->SetEnableGravity(false);
+			//Item->SetSimulatePhysics(false);
+			Item->SetEnableGravity(false);
 
 			//Attach the components, don't move the item if something fails with that
 			if (Item_Base->AttachToComponent(HypoxiaCharacter->GetRootComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale)) {
@@ -65,19 +63,23 @@ void AItem::Pickup(USceneComponent* Controller, EControllerHand Hand) {
 				Item->AttachToComponent(MotionTracker, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 				MotionController->Hand = Hand;
 				Held = true;
+				return true;
 				//UE_LOG(LogTemp, Warning, TEXT("It worked :)"));
 			} else {
 				Item->SetSimulatePhysics(true);
 			}
 		}
 	}
+
+	return false;
+
 }
 
 void AItem::Drop() {
 
 	if (Held) {
 		Item->SetSimulatePhysics(true);
-		//Item->SetEnableGravity(true);
+		Item->SetEnableGravity(true);
 		//Item->SetPhysicsLinearVelocity(Item->GetPhysicsLinearVelocity() * 2);
 		Item_Base->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 		Item->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
@@ -97,25 +99,17 @@ void AItem::Tick(float DeltaTime) {
 
 		UHeadMountedDisplayFunctionLibrary::GetOrientationAndPosition(DeviceRotation, DevicePosition);
 
-		//HMDPositionDelta = DevicePosition - LastHMDPosition;
-		//LastHMDPosition = DevicePosition;
-
-		//AddMovementInput(HMDPositionDelta, MOVEMENT_SCALE);
-
-		//FirstPersonCameraComponent->SetWorldRotation(DeviceRotation);
-
-		//RootComponent->SetWorldLocation(DevicePosition);
-
-		//R_MotionController->SetWorldLocation(RootComponent->GetComponentLocation());
-
-		//UE_LOG(LogTemp, Error, TEXT("Position  X: %f"), RootComponent->GetComponentLocation().X);
-
-		/*UE_LOG(LogTemp, Error, TEXT("Component X: %f"), R_MotionController->GetComponentLocation().X);
-		UE_LOG(LogTemp, Error, TEXT("Component Y: %f"), R_MotionController->GetComponentLocation().Y);
-		UE_LOG(LogTemp, Error, TEXT("Component Z: %f"), R_MotionController->GetComponentLocation().Z);*/
-
-		MotionTracker->SetWorldLocation(MotionController->GetComponentLocation() + RootComponent->GetComponentLocation() - DevicePosition + FVector(0.0f, 0.0f, 60.0f));
+		MotionTracker->SetWorldLocation(MotionController->GetComponentLocation() + RootComponent->GetComponentLocation() - DevicePosition + FVector(0.0f, 0.0f, 60.0f), false, (FHitResult*)nullptr, ETeleportType::TeleportPhysics);
 		MotionTracker->SetWorldRotation(MotionController->GetComponentRotation() + RootComponent->GetComponentRotation() - FRotator(0.0f, DeviceRotation.Yaw, 0.0f));
+
+		Item->SetWorldLocation(MotionTracker->GetComponentLocation(), true, (FHitResult*)nullptr, ETeleportType::TeleportPhysics);
+		Item->SetWorldRotation(MotionTracker->GetComponentRotation(), true, (FHitResult*)nullptr, ETeleportType::TeleportPhysics);
+
+		//false, (FHitResult*)nullptr, ETeleportType::TeleportPhysics
+
+		if (FVector::Dist(MotionTracker->GetComponentLocation(), Item->GetComponentLocation()) > 250.0f) {
+			Drop();
+		}
 	}
 
 }

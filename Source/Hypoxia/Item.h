@@ -17,22 +17,24 @@ protected:
 	class USceneComponent* Item_Base;
 
 	UPROPERTY(VisibleAnywhere, Category = Mesh)
-	class USkeletalMeshComponent* Item;
+	class UStaticMeshComponent* Item;
 
 	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
 	class UMotionControllerComponent* MotionController;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	class USceneComponent* MotionTracker;
+
+	bool Held;
 	
-public:	
+public:
 	// Sets default values for this actor's properties
 
 	void Drop();
 
 	virtual void Use();
 
-	void Pickup(USceneComponent*, EControllerHand);
+	virtual bool Pickup(USceneComponent*, EControllerHand);
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

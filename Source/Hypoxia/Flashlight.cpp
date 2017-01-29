@@ -4,8 +4,6 @@
 #include "Flashlight.h"
 #include "MotionControllerComponent.h"
 
-int Rotation_Time = 0;
-
 AFlashlight::AFlashlight()
 {
 
