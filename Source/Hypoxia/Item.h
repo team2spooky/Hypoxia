@@ -21,6 +21,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
 	class UMotionControllerComponent* MotionController;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+	class USceneComponent* MotionTracker;
 	
 public:	
 	// Sets default values for this actor's properties
@@ -29,7 +32,7 @@ public:
 
 	virtual void Use();
 
-	void Pickup(UMotionControllerComponent*);
+	void Pickup(USceneComponent*, EControllerHand);
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -38,5 +41,7 @@ protected:
 
 	//Portected constuctor as AItem should never be instantiated
 	AItem();
+
+	virtual void Tick(float) override;
 
 };

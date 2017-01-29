@@ -22,4 +22,8 @@ public:
 
 	virtual void Use();
 
+protected:
+
+	virtual void Tick(float) override;
+
 };

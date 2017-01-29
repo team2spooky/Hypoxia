@@ -2,7 +2,6 @@
 
 #include "Hypoxia.h"
 #include "HypoxiaGameMode.h"
-#include "HypoxiaHUD.h"
 #include "HypoxiaCharacter.h"
 
 AHypoxiaGameMode::AHypoxiaGameMode()
@@ -13,5 +12,5 @@ AHypoxiaGameMode::AHypoxiaGameMode()
 	DefaultPawnClass = PlayerPawnClassFinder.Class;
 
 	// use our custom HUD class
-	HUDClass = AHypoxiaHUD::StaticClass();
+	//HUDClass = AHypoxiaHUD::StaticClass();
 }
