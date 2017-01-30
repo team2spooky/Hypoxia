@@ -38,6 +38,7 @@ void AItem::BeginPlay() {
 	Held = false;
 
 	Item->SetSimulatePhysics(true);
+	Item->SetEnableGravity(true);
 
 	for (TActorIterator<AHypoxiaCharacter> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
 		//This may need adjusting to ensure it gets the right one
@@ -56,6 +57,8 @@ bool AItem::Pickup(USceneComponent* Controller, EControllerHand Hand) {
 
 			//Item->SetSimulatePhysics(false);
 			Item->SetEnableGravity(false);
+			Item->SetPhysicsLinearVelocity(FVector(0.0f, 0.0f, 0.0f));
+			Item->SetPhysicsAngularVelocity(FVector(0.0f, 0.0f, 0.0f));
 
 			//Attach the components, don't move the item if something fails with that
 			if (Item_Base->AttachToComponent(HypoxiaCharacter->GetRootComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale)) {
@@ -66,7 +69,7 @@ bool AItem::Pickup(USceneComponent* Controller, EControllerHand Hand) {
 				return true;
 				//UE_LOG(LogTemp, Warning, TEXT("It worked :)"));
 			} else {
-				Item->SetSimulatePhysics(true);
+				//Item->SetSimulatePhysics(true);
 			}
 		}
 	}
@@ -78,9 +81,10 @@ bool AItem::Pickup(USceneComponent* Controller, EControllerHand Hand) {
 void AItem::Drop() {
 
 	if (Held) {
-		Item->SetSimulatePhysics(true);
+		//Item->SetSimulatePhysics(true);
+		//Item->SetPhysicsLinearVelocity(FVector(0.0f, 0.0f, 0.0f));
 		Item->SetEnableGravity(true);
-		//Item->SetPhysicsLinearVelocity(Item->GetPhysicsLinearVelocity() * 2);
+		//Item->SetPhysicsLinearVelocity(Item->GetPhysicsLinearVelocity() * FVector(20.0f, 20.0f, 2.0f));
 		Item_Base->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 		Item->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 		Held = false;
@@ -99,7 +103,7 @@ void AItem::Tick(float DeltaTime) {
 
 		UHeadMountedDisplayFunctionLibrary::GetOrientationAndPosition(DeviceRotation, DevicePosition);
 
-		MotionTracker->SetWorldLocation(MotionController->GetComponentLocation() + RootComponent->GetComponentLocation() - DevicePosition + FVector(0.0f, 0.0f, 60.0f), false, (FHitResult*)nullptr, ETeleportType::TeleportPhysics);
+		MotionTracker->SetWorldLocation(MotionController->GetComponentLocation() + RootComponent->GetComponentLocation() - DevicePosition + FVector(0.0f, 0.0f, DevicePosition.Z - 105.f), false, (FHitResult*)nullptr, ETeleportType::TeleportPhysics);
 		MotionTracker->SetWorldRotation(MotionController->GetComponentRotation() + RootComponent->GetComponentRotation() - FRotator(0.0f, DeviceRotation.Yaw, 0.0f));
 
 		Item->SetWorldLocation(MotionTracker->GetComponentLocation(), true, (FHitResult*)nullptr, ETeleportType::TeleportPhysics);

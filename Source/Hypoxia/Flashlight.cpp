@@ -28,12 +28,12 @@ void AFlashlight::Use() {
 	//Item->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f), false, (FHitResult*)nullptr, ETeleportType::TeleportPhysics);
 }
 
-void AFlashlight::Tick(float DeltaTime) {
-	
-	Super::Tick(DeltaTime);
-
-	/*if (Rotation_Time >= 0) {
-		Rotation_Time--;
-		Item->SetRelativeRotation(FRotator(Item->GetComponentRotation().Pitch + 1.0f, 0.0f, 0.0f), false, (FHitResult*)nullptr, ETeleportType::TeleportPhysics);
-	}*/
-}
+//void AFlashlight::Tick(float DeltaTime) {
+//	
+//	Super::Tick(DeltaTime);
+//
+//	/*if (Rotation_Time >= 0) {
+//		Rotation_Time--;
+//		Item->SetRelativeRotation(FRotator(Item->GetComponentRotation().Pitch + 1.0f, 0.0f, 0.0f), false, (FHitResult*)nullptr, ETeleportType::TeleportPhysics);
+//	}*/
+//}

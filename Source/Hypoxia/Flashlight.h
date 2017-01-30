@@ -24,6 +24,6 @@ public:
 
 protected:
 
-	virtual void Tick(float) override;
+	//virtual void Tick(float) override;
 
 };
