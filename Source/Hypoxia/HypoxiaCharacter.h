@@ -32,6 +32,13 @@ class AHypoxiaCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FirstPersonCameraComponent;
 
+public:
+	AHypoxiaCharacter();
+
+	virtual void BeginPlay();
+
+	void SetHeldItem(AItem*, EControllerHand);
+
 	/** Motion controller (right hand) */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UMotionControllerComponent* R_MotionController;
@@ -39,12 +46,6 @@ class AHypoxiaCharacter : public ACharacter
 	/** Motion controller (left hand) */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UMotionControllerComponent* L_MotionController;
-public:
-	AHypoxiaCharacter();
-
-	virtual void BeginPlay();
-
-	void SetHeldItem(AItem*, EControllerHand);
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)

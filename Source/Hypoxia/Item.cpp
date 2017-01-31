@@ -9,6 +9,11 @@
 
 AHypoxiaCharacter *HypoxiaCharacter;
 
+const float ARM_STRENGTH = 400.0f; //Applifies the velocity of objects when dropped
+
+FVector OldLocation;
+FVector NewLocation;
+
 // Sets default values
 AItem::AItem()
 {
@@ -84,13 +89,13 @@ bool AItem::Pickup(USceneComponent* Controller, EControllerHand Hand) {
 void AItem::Drop() {
 
 	if (Held) {
+		Held = false;
 		//Item->SetSimulatePhysics(true);
-		//Item->SetPhysicsLinearVelocity(FVector(0.0f, 0.0f, 0.0f));
 		Item->SetEnableGravity(true);
-		//Item->SetPhysicsLinearVelocity(Item->GetPhysicsLinearVelocity() * FVector(20.0f, 20.0f, 2.0f));
+		Item->SetPhysicsLinearVelocity(MotionController->GetPhysicsLinearVelocity());
 		Item_Base->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 		Item->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-		Held = false;
+		Item->SetPhysicsLinearVelocity(FVector(((NewLocation - OldLocation) * ARM_STRENGTH).X, ((NewLocation - OldLocation) * ARM_STRENGTH).Y, ((NewLocation - OldLocation) * ARM_STRENGTH).Z));
 	}
 }
 
@@ -106,11 +111,16 @@ void AItem::Tick(float DeltaTime) {
 
 		UHeadMountedDisplayFunctionLibrary::GetOrientationAndPosition(DeviceRotation, DevicePosition);
 
-		MotionTracker->SetWorldLocation(MotionController->GetComponentLocation() + RootComponent->GetComponentLocation() - DevicePosition + FVector(0.0f, 0.0f, DevicePosition.Z - 105.f), false, (FHitResult*)nullptr, ETeleportType::TeleportPhysics);
+		MotionTracker->SetWorldLocation(MotionController->GetComponentLocation() + RootComponent->GetComponentLocation() - DevicePosition + FVector(0.0f, 0.0f, DevicePosition.Z - 105.f), false, (FHitResult*)nullptr, ETeleportType::None);
 		MotionTracker->SetWorldRotation(MotionController->GetComponentRotation() + RootComponent->GetComponentRotation() - FRotator(0.0f, DeviceRotation.Yaw, 0.0f));
 
+		OldLocation = NewLocation;
+		NewLocation = MotionTracker->GetComponentLocation();
+
+		//UE_LOG(LogTemp, Warning, TEXT("Velox: %f"), ((NewLocation - OldLocation) * 10.0f).X);
+
 		if (!Item->GetBodyInstance()->bLockTranslation) {
-			Item->SetWorldLocation(MotionTracker->GetComponentLocation(), true, (FHitResult*)nullptr, ETeleportType::TeleportPhysics);
+			Item->SetWorldLocation(MotionTracker->GetComponentLocation(), true, (FHitResult*)nullptr, ETeleportType::None);
 		}
 
 		if (!Item->GetBodyInstance()->bLockRotation) {
