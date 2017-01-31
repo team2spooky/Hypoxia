@@ -28,6 +28,9 @@ AItem::AItem()
 	Item = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Item"));
 	Item->SetupAttachment(Item_Base);
 	Item->SetSimulatePhysics(true);
+
+	Item->GetBodyInstance()->bLockTranslation = false;
+	Item->GetBodyInstance()->bLockRotation    = false;
 }
 
 // Called when the game starts or when spawned
@@ -106,8 +109,37 @@ void AItem::Tick(float DeltaTime) {
 		MotionTracker->SetWorldLocation(MotionController->GetComponentLocation() + RootComponent->GetComponentLocation() - DevicePosition + FVector(0.0f, 0.0f, DevicePosition.Z - 105.f), false, (FHitResult*)nullptr, ETeleportType::TeleportPhysics);
 		MotionTracker->SetWorldRotation(MotionController->GetComponentRotation() + RootComponent->GetComponentRotation() - FRotator(0.0f, DeviceRotation.Yaw, 0.0f));
 
-		Item->SetWorldLocation(MotionTracker->GetComponentLocation(), true, (FHitResult*)nullptr, ETeleportType::TeleportPhysics);
-		Item->SetWorldRotation(MotionTracker->GetComponentRotation(), true, (FHitResult*)nullptr, ETeleportType::TeleportPhysics);
+		if (!Item->GetBodyInstance()->bLockTranslation) {
+			Item->SetWorldLocation(MotionTracker->GetComponentLocation(), true, (FHitResult*)nullptr, ETeleportType::TeleportPhysics);
+		}
+
+		if (!Item->GetBodyInstance()->bLockRotation) {
+			FRotator NewRotator = FRotator(0.0f, 0.0f, 0.0f);
+
+			//If someone's bored, make these use the ? operator
+			if (!Item->GetBodyInstance()->bLockXRotation) {
+				NewRotator.Pitch = MotionTracker->GetComponentRotation().Pitch;
+			} else {
+				NewRotator.Pitch = Item->GetComponentRotation().Pitch;
+			}
+
+			if (!Item->GetBodyInstance()->bLockZRotation) {
+				NewRotator.Yaw = MotionTracker->GetComponentRotation().Yaw;
+			} else {
+				NewRotator.Yaw = Item->GetComponentRotation().Yaw;
+			}
+
+			if (!Item->GetBodyInstance()->bLockYRotation) {
+				NewRotator.Roll = MotionTracker->GetComponentRotation().Roll;
+			} else {
+				NewRotator.Roll = Item->GetComponentRotation().Roll;
+			}
+
+			Item->SetWorldRotation(NewRotator, true, (FHitResult*)nullptr, ETeleportType::None);
+
+			//Item->SetWorldRotation(FRotator(MotionTracker->GetComponentRotation().Pitch, Item->GetComponentRotation().Yaw, Item->GetComponentRotation().Roll), true, (FHitResult*)nullptr, ETeleportType::TeleportPhysics);
+			//Item->SetWorldRotation(MotionTracker->GetComponentRotation(), true, (FHitResult*)nullptr, ETeleportType::TeleportPhysics);
+		}
 
 		//false, (FHitResult*)nullptr, ETeleportType::TeleportPhysics
 
