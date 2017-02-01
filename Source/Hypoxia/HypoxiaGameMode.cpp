@@ -5,9 +5,11 @@
 #include "HypoxiaCharacter.h"
 #include "HypoxiaMonster.h"
 #include "HypoxiaAIController.h"
+#include "HypoxiaSound.h"
 #include <EngineGlobals.h>
 #include "Runtime/Online/Voice/Public/Voice.h"
 #include "Sound/SoundWaveProcedural.h"
+#include "Sound/SoundCue.h"
 
 TSharedPtr<IVoiceCapture> VoiceCapture;
 TArray<uint8> VoiceCaptureBuffer;
@@ -19,6 +21,8 @@ USoundWaveProcedural* VoiceCaptureSoundWaveProcedural;
 bool PlayVoiceCaptureFlag;
 FTimerHandle PlayVoiceCaptureTimer;
 */
+USoundCue* testSound;
+USoundAttenuation* testAttenuation;
 
 AHypoxiaGameMode::AHypoxiaGameMode()
 	: Super()
@@ -36,7 +40,8 @@ AHypoxiaGameMode::AHypoxiaGameMode()
 
 	// initializes and starts voice capture
 	VoiceCapture = FVoiceModule::Get().CreateVoiceCapture();
-	VoiceCapture->Start();
+	if(VoiceCapture.IsValid())
+		VoiceCapture->Start();
 
 	// creates voice capture component
 	/*
@@ -56,6 +61,11 @@ AHypoxiaGameMode::AHypoxiaGameMode()
 	VoiceCaptureSoundWaveProcedural->bProcedural = true;
 	VoiceCaptureSoundWaveProcedural->Volume = 5.f;
 	*/
+
+	static ConstructorHelpers::FObjectFinder<USoundCue> test(TEXT("'/Game/StarterContent/Audio/Explosion_Cue.Explosion_Cue'"));
+	testSound = test.Object;
+	static ConstructorHelpers::FObjectFinder<USoundAttenuation> test2(TEXT("'/Game/TestAttenuation.TestAttenuation'"));
+	testAttenuation = test2.Object;
 }
 
 void AHypoxiaGameMode::BeginPlay() {
@@ -106,6 +116,7 @@ void AHypoxiaGameMode::Tick(float DeltaSeconds) {
 			UGameplayStatics::GetAllActorsOfClass(GetWorld(), AHypoxiaMonster::StaticClass(), monsters);
 			for (AActor * monster : monsters) {
 				Cast<AHypoxiaAIController>(Cast<APawn>(monster)->Controller)->TrackPlayer(VoiceCaptureFinalVolume);
+				UHypoxiaSound::PlaySoundAtLocationRefract(this, testSound, monster->GetActorLocation(), 1.0f, 1.0f, 0.0f, testAttenuation);
 			}
 		}
 	}

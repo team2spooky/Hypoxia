@@ -147,7 +147,6 @@ void AHypoxiaCharacter::MoveForward(float Value) {
 void AHypoxiaCharacter::MoveRight(float Value) {
 
 	//SetActorRotation(FRotator(GetCapsuleComponent()->RelativeRotation.Pitch, FirstPersonCameraComponent->RelativeRotation.Yaw, GetCapsuleComponent()->RelativeRotation.Roll));
-	
 	//SetActorLocation(FVector(FirstPersonCameraComponent->RelativeLocation.X, FirstPersonCameraComponent->RelativeLocation.Y, GetCapsuleComponent()->RelativeLocation.Z));
 	//SetActorRotation(FirstPersonCameraComponent->RelativeRotation);
 	//SetActorLocation(FRotator(FirstPersonCameraComponent->RelativeRotation.Pitch, FirstPersonCameraComponent->RelativeRotation.Yaw, FirstPersonCameraComponent->RelativeRotation.Roll));
