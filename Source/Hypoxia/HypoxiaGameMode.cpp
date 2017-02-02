@@ -115,8 +115,10 @@ void AHypoxiaGameMode::Tick(float DeltaSeconds) {
 			TArray<AActor *> monsters;
 			UGameplayStatics::GetAllActorsOfClass(GetWorld(), AHypoxiaMonster::StaticClass(), monsters);
 			for (AActor * monster : monsters) {
-				Cast<AHypoxiaAIController>(Cast<APawn>(monster)->Controller)->TrackPlayer(VoiceCaptureFinalVolume);
-				UHypoxiaSound::PlaySoundAtLocationRefract(this, testSound, monster->GetActorLocation(), 1.0f, 1.0f, 0.0f, testAttenuation);
+				//Cast<AHypoxiaAIController>(Cast<APawn>(monster)->Controller)->TrackPlayer(VoiceCaptureFinalVolume);
+				FVector Loc;
+				UHypoxiaSound::PathSoundTo(this, monster->GetActorLocation(), UGameplayStatics::GetPlayerCharacter(this, 0)->GetActorLocation(), Loc);
+				UHypoxiaSound::PlaySoundAtLocationRefract(this, testSound, Loc, 1.0f, 1.0f, 0.0f, testAttenuation);
 			}
 		}
 	}
