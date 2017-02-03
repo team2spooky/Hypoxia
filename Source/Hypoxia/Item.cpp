@@ -11,9 +11,6 @@ AHypoxiaCharacter *HypoxiaCharacter;
 
 const float ARM_STRENGTH = 400.0f; //Applifies the velocity of objects when dropped
 
-FVector OldLocation;
-FVector NewLocation;
-
 // Sets default values
 AItem::AItem()
 {
@@ -45,8 +42,11 @@ void AItem::BeginPlay() {
 
 	Held = false;
 
+	OldLocation = FVector();
+	NewLocation = FVector();
+
 	Item->SetSimulatePhysics(true);
-	Item->SetEnableGravity(true);
+	//Item->SetEnableGravity(true);
 
 	for (TActorIterator<AHypoxiaCharacter> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
 		//This may need adjusting to ensure it gets the right one
@@ -75,9 +75,6 @@ bool AItem::Pickup(USceneComponent* Controller, EControllerHand Hand) {
 				MotionController->Hand = Hand;
 				Held = true;
 				return true;
-				//UE_LOG(LogTemp, Warning, TEXT("It worked :)"));
-			} else {
-				//Item->SetSimulatePhysics(true);
 			}
 		}
 	}
@@ -90,8 +87,8 @@ void AItem::Drop() {
 
 	if (Held) {
 		Held = false;
-		//Item->SetSimulatePhysics(true);
-		Item->SetEnableGravity(true);
+		UE_LOG(LogTemp, Warning, TEXT("Dropped"));
+		//Item->SetEnableGravity(true);
 		Item->SetPhysicsLinearVelocity(MotionController->GetPhysicsLinearVelocity());
 		Item_Base->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 		Item->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
@@ -101,61 +98,92 @@ void AItem::Drop() {
 
 void AItem::Use() {}
 
+void AItem::UpdatePosition(FVector DevicePosition) {
+
+	MotionTracker->SetWorldLocation(MotionController->GetComponentLocation() + RootComponent->GetComponentLocation() - DevicePosition + FVector(0.0f, 0.0f, DevicePosition.Z - 105.f), false, (FHitResult*)nullptr, ETeleportType::None);
+
+	OldLocation = NewLocation;
+	NewLocation = MotionTracker->GetComponentLocation();
+
+	if (!Item->GetBodyInstance()->bLockTranslation) {
+		Item->SetWorldLocation(MotionTracker->GetComponentLocation(), true, (FHitResult*)nullptr, ETeleportType::None);
+	}
+
+}
+
+void AItem::UpdateRotation(FRotator DeviceRotation) {
+	
+	MotionTracker->SetWorldRotation(MotionController->GetComponentRotation() + RootComponent->GetComponentRotation() - FRotator(0.0f, DeviceRotation.Yaw, 0.0f));
+	
+	//FRotator NewRotator = FRotator(0.0f, 0.0f, 0.0f);
+
+	//If someone's bored, make these use the ? operator
+	//if (!Item->GetBodyInstance()->bLockXRotation) {
+	//	NewRotator.Pitch = MotionTracker->GetComponentRotation().Pitch;
+	//}
+	//else {
+	//	NewRotator.Pitch = Item->GetComponentRotation().Pitch;
+	//}
+
+	//if (!Item->GetBodyInstance()->bLockYRotation) {
+	//	NewRotator.Yaw = MotionTracker->GetComponentRotation().Yaw;
+	//}
+	//else {
+	//	NewRotator.Yaw = Item->GetComponentRotation().Yaw;
+	//}
+
+	//if (!Item->GetBodyInstance()->bLockZRotation) {
+	//	NewRotator.Roll = MotionTracker->GetComponentRotation().Pitch * -1.0f;// +FGenericPlatformMath::Abs(((NewLocation - OldLocation) * 20.0f).Y);
+	//}
+	//else {
+	//	NewRotator.Roll = Item->GetComponentRotation().Pitch;
+	//}
+
+	//float YLength = FGenericPlatformMath::Abs(MotionTracker->GetComponentLocation().Y - Item->GetComponentLocation().Y);
+	//float ZLength = FGenericPlatformMath::Abs(MotionTracker->GetComponentLocation().Z - Item->GetComponentLocation().Z);
+
+	//UE_LOG(LogTemp, Warning, TEXT("YLen: %f"), YLength);
+	//UE_LOG(LogTemp, Warning, TEXT("ZLen: %f"), ZLength);
+
+	////UE_LOG(LogTemp, Warning, TEXT("Theta: %f"), FGenericPlatformMath::Tan(ZLength / YLength));
+
+	//NewRotator.Roll = FMath::RadiansToDegrees(FGenericPlatformMath::Tan(ZLength / YLength));
+
+	//if (NewRotator.Roll > 90.0f) {
+	//	NewRotator.Roll = 90.0f;
+	//}
+	//else if (NewRotator.Roll < 0.0f) {
+	//	NewRotator.Roll = 0.0f;
+	//}
+
+	Item->SetWorldRotation(MotionTracker->GetComponentRotation(), true, (FHitResult*)nullptr, ETeleportType::None);
+
+}
+
 void AItem::Tick(float DeltaTime) {
 
 	Super::Tick(DeltaTime);
 
 	if (Held) {
+		
 		FVector  DevicePosition;
 		FRotator DeviceRotation;
 
 		UHeadMountedDisplayFunctionLibrary::GetOrientationAndPosition(DeviceRotation, DevicePosition);
 
-		MotionTracker->SetWorldLocation(MotionController->GetComponentLocation() + RootComponent->GetComponentLocation() - DevicePosition + FVector(0.0f, 0.0f, DevicePosition.Z - 105.f), false, (FHitResult*)nullptr, ETeleportType::None);
-		MotionTracker->SetWorldRotation(MotionController->GetComponentRotation() + RootComponent->GetComponentRotation() - FRotator(0.0f, DeviceRotation.Yaw, 0.0f));
-
-		OldLocation = NewLocation;
-		NewLocation = MotionTracker->GetComponentLocation();
-
-		//UE_LOG(LogTemp, Warning, TEXT("Velox: %f"), ((NewLocation - OldLocation) * 10.0f).X);
-
-		if (!Item->GetBodyInstance()->bLockTranslation) {
-			Item->SetWorldLocation(MotionTracker->GetComponentLocation(), true, (FHitResult*)nullptr, ETeleportType::None);
-		}
+		
+		UpdatePosition(DevicePosition);
 
 		if (!Item->GetBodyInstance()->bLockRotation) {
-			FRotator NewRotator = FRotator(0.0f, 0.0f, 0.0f);
-
-			//If someone's bored, make these use the ? operator
-			if (!Item->GetBodyInstance()->bLockXRotation) {
-				NewRotator.Pitch = MotionTracker->GetComponentRotation().Pitch;
-			} else {
-				NewRotator.Pitch = Item->GetComponentRotation().Pitch;
-			}
-
-			if (!Item->GetBodyInstance()->bLockZRotation) {
-				NewRotator.Yaw = MotionTracker->GetComponentRotation().Yaw;
-			} else {
-				NewRotator.Yaw = Item->GetComponentRotation().Yaw;
-			}
-
-			if (!Item->GetBodyInstance()->bLockYRotation) {
-				NewRotator.Roll = MotionTracker->GetComponentRotation().Roll;
-			} else {
-				NewRotator.Roll = Item->GetComponentRotation().Roll;
-			}
-
-			Item->SetWorldRotation(NewRotator, true, (FHitResult*)nullptr, ETeleportType::None);
-
-			//Item->SetWorldRotation(FRotator(MotionTracker->GetComponentRotation().Pitch, Item->GetComponentRotation().Yaw, Item->GetComponentRotation().Roll), true, (FHitResult*)nullptr, ETeleportType::TeleportPhysics);
-			//Item->SetWorldRotation(MotionTracker->GetComponentRotation(), true, (FHitResult*)nullptr, ETeleportType::TeleportPhysics);
+			UpdateRotation(DeviceRotation);
 		}
-
-		//false, (FHitResult*)nullptr, ETeleportType::TeleportPhysics
 
 		if (FVector::Dist(MotionTracker->GetComponentLocation(), Item->GetComponentLocation()) > 250.0f) {
 			Drop();
 		}
+
+		//false, (FHitResult*)nullptr, ETeleportType::TeleportPhysics
+		//FGenericPlatformMath
 	}
 
 }

@@ -26,6 +26,10 @@ protected:
 	class USceneComponent* MotionTracker;
 
 	bool Held;
+
+	FVector OldLocation;
+
+	FVector NewLocation;
 	
 public:
 	// Sets default values for this actor's properties
@@ -45,5 +49,9 @@ protected:
 	AItem();
 
 	virtual void Tick(float) override;
+
+	virtual void UpdatePosition(FVector);
+
+	virtual void UpdateRotation(FRotator);
 
 };

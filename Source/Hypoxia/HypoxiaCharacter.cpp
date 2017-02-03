@@ -12,7 +12,7 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
-const float MOVEMENT_SCALE = 0.2f;
+const float MOVEMENT_SCALE = 1.0f; //Scales along with movement speed
 const float CAMERA_HEIGHT_OFFSET = 60.0f;
 
 AItem *HeldItemRight;
