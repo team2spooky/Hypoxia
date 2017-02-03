@@ -25,6 +25,9 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	class USceneComponent* MotionTracker;
 
+	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+	class USceneComponent* GrabSpot;
+
 	bool Held;
 
 	FVector OldLocation;
@@ -45,6 +48,8 @@ public:
 
 protected:
 
+	bool bHasGravity;
+
 	//Portected constuctor as AItem should never be instantiated
 	AItem();
 
@@ -53,5 +58,7 @@ protected:
 	virtual void UpdatePosition(FVector);
 
 	virtual void UpdateRotation(FRotator);
+
+	void SelfDrop();
 
 };

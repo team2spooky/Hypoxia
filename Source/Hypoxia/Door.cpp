@@ -38,7 +38,6 @@ void ADoor::BeginPlay() {
 
 	DoorRotation = 0.0f;
 
-
 	//Item->SetEnableGravity(false);
 	Item->GetBodyInstance()->bLockTranslation = true;
 	Item->GetBodyInstance()->bLockRotation = false;
@@ -64,12 +63,15 @@ void ADoor::Use() {
 void ADoor::Open() {
 	Opened = true;
 	Moving = true;
+	Item->SetWorldRotation(FRotator(0.0f, 0.0f, 0.0f));
+	Item->SetPhysicsAngularVelocity(FVector(0.0f, 0.0f, 0.0f));
 	//DoorRotation = 0.0f;
 }
 
 void ADoor::Close() {
 	Opened = false;
 	Moving = true;
+	Item->SetWorldRotation(FRotator(0.0f, 0.0f, 90.0f));
 	//DoorRotation = 0.0f;
 }
 
@@ -104,19 +106,38 @@ void ADoor::UpdateRotation(FRotator DeviceRotation) {
 	float YLength = FGenericPlatformMath::Abs(MotionTracker->GetComponentLocation().Y - Item->GetComponentLocation().Y);
 	float ZLength = FGenericPlatformMath::Abs(MotionTracker->GetComponentLocation().Z - Item->GetComponentLocation().Z);
 
-	//UE_LOG(LogTemp, Warning, TEXT("YLen: %f"), YLength);
-	//UE_LOG(LogTemp, Warning, TEXT("ZLen: %f"), ZLength);
-	//UE_LOG(LogTemp, Warning, TEXT("Theta: %f"), FMath::RadiansToDegrees(FGenericPlatformMath::Tan(ZLength / YLength)));
+	UE_LOG(LogTemp, Warning, TEXT("YLen: %f"), YLength);
+	UE_LOG(LogTemp, Warning, TEXT("ZLen: %f"), ZLength);
+	UE_LOG(LogTemp, Warning, TEXT("Theta: %f"), FMath::RadiansToDegrees(FGenericPlatformMath::Atan(ZLength / YLength)));
 
-	NewRotator.Roll = FMath::RadiansToDegrees(FGenericPlatformMath::Tan(ZLength / YLength));
 
-	if (NewRotator.Roll > 90.0f) {
+	NewRotator.Roll = FMath::RadiansToDegrees(FGenericPlatformMath::Atan(ZLength / YLength));
+
+	/*while (NewRotator.Roll < 0.0f) {
+		NewRotator.Roll += 360.0f;
+	}
+
+	while (NewRotator.Roll > 360.0f) {
+		NewRotator.Roll -= 360.0f;
+	}*/
+
+	/*if (NewRotator.Roll > 90.0f) {
 		NewRotator.Roll = 90.0f;
 	} else if (NewRotator.Roll < 0.0f) {
 		NewRotator.Roll = 0.0f;
+	}*/
+
+	bool Sign = NewRotator.Roll - Item->GetComponentRotation().Roll > 0.0f;
+
+	if (FGenericPlatformMath::Abs(NewRotator.Roll - Item->GetComponentRotation().Roll) > 1.0f) {
+		if (Sign) {
+			NewRotator.Roll = Item->GetComponentRotation().Roll + 1.0f;
+		} else {
+			NewRotator.Roll = Item->GetComponentRotation().Roll - 1.0f;
+		}
 	}
 
-	Item->SetWorldRotation(NewRotator, true, (FHitResult*)nullptr, ETeleportType::None);
+	Item->SetWorldRotation(NewRotator, true, (FHitResult*)nullptr, ETeleportType::TeleportPhysics);
 
 }
 
@@ -126,20 +147,26 @@ void ADoor::Tick(float DeltaTime) {
 
 	if (Held) {
 		if (!Opened) {
-			if (Item->GetComponentRotation().Roll < 20.0f) {
+			if (Item->GetComponentRotation().Roll < 5.0f) {
 				Open();
-				Drop();
+				SelfDrop();
 			}
 		}
 		else if (Opened) {
-			if (Item->GetComponentRotation().Roll > 70.0f) {
+			if (Item->GetComponentRotation().Roll > 85.0f) {
 				Close();
-				Drop();
+				SelfDrop();
 			}
 		}
 		else {
 			UE_LOG(LogTemp, Error, TEXT("DOOR_IS_NOT_OPEN_OR_CLOSED"));
 		}
+	}
+
+	if (Item->GetComponentRotation().Roll > 90.0f) {
+		Item->SetWorldRotation(FRotator(0.0f, 0.0f, 90.0f));
+	} else if (Item->GetComponentRotation().Roll < 0.0f) {
+		Item->SetWorldRotation(FRotator(0.0f, 0.0f, 0.0f));
 	}
 
 	if (Moving) {
@@ -152,7 +179,6 @@ void ADoor::Tick(float DeltaTime) {
 		if (DoorRotation >= 90.0f || DoorRotation <= -0.0f) {
 			Moving = false;
 		}
-		UE_LOG(LogTemp, Warning, TEXT("Door Rotation: %f"), Door->GetActorRotation().Yaw);
 	}
 
 }

@@ -100,10 +100,6 @@ protected:
 	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
 	 */
 	void LookUpAtRate(float Rate);
-	
-	void ItemPickupRight();
-
-	void ItemPickupLeft();
 
 	void ItemUseRight();
 
@@ -136,6 +132,12 @@ protected:
 	bool EnableTouchscreenMovement(UInputComponent* InputComponent);
 
 	virtual void Tick(float) override;
+
+public:
+
+	void ItemPickupRight();
+
+	void ItemPickupLeft();
 
 public:
 	/** Returns Mesh1P subobject **/

@@ -32,7 +32,11 @@ AItem::AItem()
 	Item->SetSimulatePhysics(true);
 
 	Item->GetBodyInstance()->bLockTranslation = false;
-	Item->GetBodyInstance()->bLockRotation    = false;
+	Item->GetBodyInstance()->bLockRotation = false;
+
+	GrabSpot = CreateDefaultSubobject<USceneComponent>(TEXT("GrabSpot"));
+	GrabSpot->SetupAttachment(Item);
+
 }
 
 // Called when the game starts or when spawned
@@ -45,7 +49,8 @@ void AItem::BeginPlay() {
 	OldLocation = FVector();
 	NewLocation = FVector();
 
-	Item->SetSimulatePhysics(true);
+	bHasGravity = Item->IsGravityEnabled();
+
 	//Item->SetEnableGravity(true);
 
 	for (TActorIterator<AHypoxiaCharacter> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
@@ -61,7 +66,7 @@ bool AItem::Pickup(USceneComponent* Controller, EControllerHand Hand) {
 	if (!Held) {
 
 		//If the item is within the given distance of the given controller, pick it up
-		if (FVector::Dist(Controller->GetComponentLocation(), Item->GetComponentLocation()) < 50.0f) {
+		if (FVector::Dist(Controller->GetComponentLocation(), GrabSpot->GetComponentLocation()) < 50.0f) {
 
 			//Item->SetSimulatePhysics(false);
 			Item->SetEnableGravity(false);
@@ -88,11 +93,21 @@ void AItem::Drop() {
 	if (Held) {
 		Held = false;
 		UE_LOG(LogTemp, Warning, TEXT("Dropped"));
-		Item->SetEnableGravity(true);
+		Item->SetEnableGravity(bHasGravity);
 		Item->SetPhysicsLinearVelocity(MotionController->GetPhysicsLinearVelocity());
 		Item_Base->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 		Item->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 		Item->SetPhysicsLinearVelocity(FVector(((NewLocation - OldLocation) * ARM_STRENGTH).X, ((NewLocation - OldLocation) * ARM_STRENGTH).Y, ((NewLocation - OldLocation) * ARM_STRENGTH).Z));
+	}
+}
+
+void AItem::SelfDrop() {
+	if (Held) {
+		if (MotionController->Hand == EControllerHand::Right) {
+			HypoxiaCharacter->ItemPickupRight();
+		} else if (MotionController->Hand == EControllerHand::Left) {
+			HypoxiaCharacter->ItemPickupLeft();
+		}
 	}
 }
 
@@ -179,7 +194,7 @@ void AItem::Tick(float DeltaTime) {
 		}
 
 		if (FVector::Dist(MotionTracker->GetComponentLocation(), Item->GetComponentLocation()) > 250.0f) {
-			Drop();
+			SelfDrop();
 		}
 
 		//false, (FHitResult*)nullptr, ETeleportType::TeleportPhysics
