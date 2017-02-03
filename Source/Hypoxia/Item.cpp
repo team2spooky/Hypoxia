@@ -61,7 +61,7 @@ bool AItem::Pickup(USceneComponent* Controller, EControllerHand Hand) {
 	if (!Held) {
 
 		//If the item is within the given distance of the given controller, pick it up
-		if (FVector::Dist(Controller->GetComponentLocation(), Item->GetComponentLocation()) < 250.0f) {
+		if (FVector::Dist(Controller->GetComponentLocation(), Item->GetComponentLocation()) < 50.0f) {
 
 			//Item->SetSimulatePhysics(false);
 			Item->SetEnableGravity(false);
@@ -88,7 +88,7 @@ void AItem::Drop() {
 	if (Held) {
 		Held = false;
 		UE_LOG(LogTemp, Warning, TEXT("Dropped"));
-		//Item->SetEnableGravity(true);
+		Item->SetEnableGravity(true);
 		Item->SetPhysicsLinearVelocity(MotionController->GetPhysicsLinearVelocity());
 		Item_Base->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 		Item->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
@@ -100,7 +100,7 @@ void AItem::Use() {}
 
 void AItem::UpdatePosition(FVector DevicePosition) {
 
-	MotionTracker->SetWorldLocation(MotionController->GetComponentLocation() + RootComponent->GetComponentLocation() - DevicePosition + FVector(0.0f, 0.0f, DevicePosition.Z - 105.f), false, (FHitResult*)nullptr, ETeleportType::None);
+	MotionTracker->SetWorldLocation(MotionController->GetComponentLocation() + RootComponent->GetComponentLocation() - DevicePosition + FVector(0.0f, 0.0f, DevicePosition.Z - 100.f), false, (FHitResult*)nullptr, ETeleportType::None);
 
 	OldLocation = NewLocation;
 	NewLocation = MotionTracker->GetComponentLocation();
