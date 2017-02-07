@@ -9,6 +9,8 @@
 #include "MotionControllerComponent.h"
 #include "Item.h"
 #include "EngineUtils.h"
+#include "HypoxiaSound.h"
+#include "Engine/StaticMeshActor.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
@@ -62,7 +64,8 @@ AHypoxiaCharacter::AHypoxiaCharacter() {
 	R_MotionController->bAbsoluteRotation = true;
 	L_MotionController->bAbsoluteLocation = true;
 	L_MotionController->bAbsoluteRotation = true;
-	
+
+	UHypoxiaSound::InitializeVoiceCapture();
 }
 
 void AHypoxiaCharacter::BeginPlay() {
@@ -81,7 +84,6 @@ void AHypoxiaCharacter::BeginPlay() {
 
 	HeldItemRight = NULL;
 	HeldItemLeft  = NULL;
-
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -231,8 +233,8 @@ void AHypoxiaCharacter::Tick(float DeltaTime) {
 
 	AddMovementInput(HMDPositionDelta, MOVEMENT_SCALE);
 
-	FirstPersonCameraComponent->SetWorldRotation(DeviceRotation);
-	FirstPersonCameraComponent->SetWorldLocation(FVector(FirstPersonCameraComponent->GetComponentLocation().X, FirstPersonCameraComponent->GetComponentLocation().Y, DevicePosition.Z + CAMERA_HEIGHT_OFFSET));
+	//FirstPersonCameraComponent->SetWorldRotation(DeviceRotation);
+	//FirstPersonCameraComponent->SetWorldLocation(FVector(FirstPersonCameraComponent->GetComponentLocation().X, FirstPersonCameraComponent->GetComponentLocation().Y, DevicePosition.Z + CAMERA_HEIGHT_OFFSET));
 
 	//RootComponent->SetWorldLocation(DevicePosition);
 
@@ -269,4 +271,17 @@ void AHypoxiaCharacter::Tick(float DeltaTime) {
 	//UE_LOG(LogTemp, Error, TEXT("RMotionLocation %f"), R_MotionController->GetComponentLocation().X);
 
 	//FirstPersonCameraComponent->SetWorldLocation(FVector(0.0f, 0.0f, 0.0f));
+
+	/*AStaticMeshActor* Emitter = nullptr;
+	for (TActorIterator<AStaticMeshActor> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
+		if (ActorItr->GetActorLabel() == "soundEmitter") {
+			Emitter = *ActorItr;
+			break;
+		}
+	}
+	FVector Loc;
+	if (Emitter != nullptr && FMath::RandRange(0, 10) < 2) {
+		UHypoxiaSound::PathSoundTo(this, Emitter->GetActorLocation(), GetActorLocation(), Loc);
+		UHypoxiaSound::PlaySoundAtLocationRefract(this, nullptr, Loc, 1.0f, 1.0f, 0.0f, nullptr);
+	}*/
 }

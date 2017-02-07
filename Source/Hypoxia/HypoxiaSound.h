@@ -14,6 +14,11 @@ class HYPOXIA_API UHypoxiaSound : public UObject
 	GENERATED_BODY()
 	
 public:
+	/* Initializes voice capture */
+	static void InitializeVoiceCapture();
+
+	static void CaptureVoice(UObject* WorldContextObject);
+
 	/* Refracts sound to player */
 	static void PlaySoundAtLocationRefract(const UObject* WorldContextObject, USoundBase* Sound, FVector Location, float VolumeMultiplier, float PitchMultiplier, float StartTime, USoundAttenuation* Attenuation);
 	
