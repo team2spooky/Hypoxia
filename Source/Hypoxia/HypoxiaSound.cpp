@@ -112,19 +112,26 @@ void UHypoxiaSound::PlaySoundAtLocationRefract(const UObject* WorldContextObject
 	UGameplayStatics::PlaySoundAtLocation(WorldContextObject, testSound, Location, VolumeMultiplier, PitchMultiplier, StartTime, testAttenuation);
 }
 
-void UHypoxiaSound::PathSoundTo(UObject* WorldContextObject, FVector StartLoc, FVector EndLoc, FVector& Loc_Out) {
+void UHypoxiaSound::PathSoundTo(UObject* WorldContextObject, FVector StartLoc, FVector EndLoc, FVector& Loc_Out, float& Vol_Out) {
 	FVector ProjectedLocation;
 	UNavigationSystem* NavSys = UNavigationSystem::GetCurrent(WorldContextObject);
 	FNavPathSharedPtr Path = NavSys->FindPathToLocationSynchronously(WorldContextObject, StartLoc, EndLoc)->GetPath();
 	if (!Path.IsValid())
 		return;
 	TArray<FNavPathPoint> PathPoints = Path->GetPathPoints();
+	if (PathPoints.Num() <= 2) {
+		Loc_Out = StartLoc;
+		Vol_Out = 0.0f;
+		return;
+	}
 	FVector Projection = PathPoints[PathPoints.Num() - 2].Location - PathPoints[PathPoints.Num() - 1].Location;
-	Projection.Normalize();
+	//Projection.Normalize();
 	// Projects sound location according to distance original sound would have traveled
-	ProjectedLocation = EndLoc + Projection * Path->GetLength();
-	UE_LOG(LogTemp, Warning, TEXT("Sound at = %f, %f, %f"), Projection.X, Projection.Y, Projection.Z);
+	ProjectedLocation = EndLoc + Projection /** Path->GetLength()*/;
+	//UE_LOG(LogTemp, Warning, TEXT("Sound at = %f, %f, %f"), Projection.X, Projection.Y, Projection.Z);
 	Loc_Out = ProjectedLocation;
+	Vol_Out = 1.0f - ((Path->GetLength() - Projection.Size()) / 6000.0f);
+	UE_LOG(LogTemp, Warning, TEXT("Volume = %f"), Vol_Out);
 }
 
 

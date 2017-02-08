@@ -23,7 +23,7 @@ public:
 	static void PlaySoundAtLocationRefract(const UObject* WorldContextObject, USoundBase* Sound, FVector Location, float VolumeMultiplier, float PitchMultiplier, float StartTime, USoundAttenuation* Attenuation);
 	
 	/* Processes any sounds made by player*/
-	static void PathSoundTo(UObject* WorldContextObject, FVector StartLoc, FVector EndLoc, FVector& Loc_Out);
+	static void PathSoundTo(UObject* WorldContextObject, FVector StartLoc, FVector EndLoc, FVector& Loc_Out, float& Vol_Out);
 
-
+	static UAudioComponent* CreateAudio();
 };
