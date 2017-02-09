@@ -5,6 +5,7 @@
 #include "MotionControllerComponent.h"
 #include "HypoxiaCharacter.h"
 #include "EngineUtils.h"
+#include "Door.h"
 #include "Kismet/HeadMountedDisplayFunctionLibrary.h"
 
 AHypoxiaCharacter *HypoxiaCharacter;
@@ -33,6 +34,9 @@ AItem::AItem()
 
 	Item->GetBodyInstance()->bLockTranslation = false;
 	Item->GetBodyInstance()->bLockRotation = false;
+
+	Item->SetNotifyRigidBodyCollision(true);
+	Item->OnComponentHit.AddDynamic(this, &AItem::OnHit);
 
 	GrabSpot = CreateDefaultSubobject<USceneComponent>(TEXT("GrabSpot"));
 	GrabSpot->SetupAttachment(Item);
@@ -193,7 +197,7 @@ void AItem::Tick(float DeltaTime) {
 			UpdateRotation(DeviceRotation);
 		}
 
-		if (FVector::Dist(MotionTracker->GetComponentLocation(), Item->GetComponentLocation()) > 250.0f) {
+		if (FVector::Dist(MotionTracker->GetComponentLocation(), GrabSpot->GetComponentLocation()) > 250.0f) {
 			SelfDrop();
 		}
 
@@ -201,4 +205,12 @@ void AItem::Tick(float DeltaTime) {
 		//FGenericPlatformMath
 	}
 
+}
+
+void AItem::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit) {
+	//UE_LOG(LogTemp, Warning, TEXT("I'm hit, I'm hit"));
+
+	/*if (OtherActor->IsA(ADoor::StaticClass())) {
+		UE_LOG(LogTemp, Warning, TEXT("I'm hit, I'm hit"));
+	}*/
 }

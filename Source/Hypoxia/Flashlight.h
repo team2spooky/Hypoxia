@@ -16,6 +16,10 @@ class HYPOXIA_API AFlashlight : public AItem
 	UPROPERTY(VisibleAnywhere, Category = Light)
 	class USpotLightComponent* Light;
 
+	UPROPERTY(VisibleAnywhere, Category = Text)
+	class UTextRenderComponent* Text;
+	
+
 public:
 
 	AFlashlight();
