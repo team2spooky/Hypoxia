@@ -18,4 +18,10 @@ public:
 	
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float, ELevelTick, FActorComponentTickFunction*) override;
+
+private:
+	UAudioComponent* VirtualAudioComponent;
+
+	bool TestOcclusion();
+	void DiffractSound(FVector GoalLoc, FVector& Out_Loc, float& Out_Vol);
 };

@@ -1,28 +1,19 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Hypoxia.h"
-#include "HypoxiaSound.h"
 #include "ComplexAudioComponent.h"
-
-UAudioComponent* VirtualAudioComponent;
+#include "DrawDebugHelpers.h"
+#include "Runtime/Engine/Classes/AI/Navigation/NavigationPath.h"
 
 UComplexAudioComponent::UComplexAudioComponent() : Super() {
 	PrimaryComponentTick.bCanEverTick = true;
-	this->bAlwaysPlay = true;
 
-	static ConstructorHelpers::FObjectFinder<USoundBase> SoundAsset((TEXT("/Game/StarterContent/Audio/Starter_Music_Cue.Starter_Music_Cue")));
 	static ConstructorHelpers::FObjectFinder<USoundAttenuation> AttenuationAsset((TEXT("/Game/TestAttenuation.TestAttenuation")));
 
 	VirtualAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("VirtualAudioComponent"));
 	VirtualAudioComponent->bAutoActivate = true;
-	VirtualAudioComponent->bAlwaysPlay = true;
-	VirtualAudioComponent->SetSound(SoundAsset.Object);
 	VirtualAudioComponent->AttenuationSettings = AttenuationAsset.Object;
-	//VirtualAudioComponent->SetSound(SoundAsset.Object);
-	//VirtualAudioComponent->AttenuationSettings = AttenuationAsset.Object;
-	//VirtualAudioComponent->SetupAttachment(this);
 	VirtualAudioComponent->SetWorldLocation(this->GetComponentLocation());
-	//VirtualAudioComponent->RegisterComponent();
 
 	// Debug Sphere
 	UStaticMeshComponent* VirtualDebugSphere = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DEBUGVIRTUAL"));
@@ -36,15 +27,40 @@ UComplexAudioComponent::UComplexAudioComponent() : Super() {
 }
 
 void UComplexAudioComponent::BeginPlay() {
+	VirtualAudioComponent->SetSound(this->Sound);
 }
 
 void UComplexAudioComponent::TickComponent(float deltaSeconds, ELevelTick type, FActorComponentTickFunction* tickFunction) {
-	//if(!VirtualAudioComponent->IsPlaying())
-		//VirtualAudioComponent->Play();
-	if (FVector::Dist(this->GetComponentLocation(), UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->GetActorLocation()) > 6000.0f) return;
-	FVector EndLoc;
-	float Vol;
-	UHypoxiaSound::PathSoundTo(GetWorld(), this->GetComponentLocation(), UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->GetActorLocation(), EndLoc, Vol);
-	VirtualAudioComponent->SetWorldLocation(EndLoc);
+	FVector Loc = this->GetComponentLocation();
+	float Vol = 0.0f;
+	if (TestOcclusion()) 
+		DiffractSound(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->GetActorLocation(), Loc, Vol);
+	VirtualAudioComponent->SetWorldLocation(Loc);
 	VirtualAudioComponent->SetVolumeMultiplier(Vol);
+}
+
+bool UComplexAudioComponent::TestOcclusion() {
+	ACharacter* PC = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	bool Obstructed = GetWorld()->LineTraceTestByChannel(GetComponentLocation(), PC->GetActorLocation(), ECC_Visibility);
+#if !UE_BUILD_SHIPPING	
+	::DrawDebugLine(GetWorld(), this->GetComponentLocation(), PC->GetActorLocation(), FColor::Red);
+#endif
+	return Obstructed;
+}
+
+void UComplexAudioComponent::DiffractSound(FVector GoalLoc, FVector& Out_Loc, float& Out_Vol) {
+	UNavigationSystem* NavSys = UNavigationSystem::GetCurrent(GetWorld());
+	FNavPathSharedPtr Path = NavSys->FindPathToLocationSynchronously(GetWorld(), this->GetComponentLocation(), GoalLoc)->GetPath();
+	if (!Path.IsValid())
+		return;
+	TArray<FNavPathPoint> PathPoints = Path->GetPathPoints();
+	if (PathPoints.Num() <= 2) {
+		return;
+	}
+	FVector Target = PathPoints[PathPoints.Num() - 2].Location;
+	Target.Z = GoalLoc.Z;
+	FVector Projection = Target - GoalLoc;
+	Out_Loc = Target;
+	Out_Vol = FMath::Max(1.0f - ((Path->GetLength() - Projection.Size()) / 1000.0f), 0.0f);
+	//UE_LOG(LogTemp, Warning, TEXT("Volume = %f"), Out_Vol);
 }
