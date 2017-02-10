@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Hypoxia.h"
+#include "ListeningItem.h"
 #include "VoiceCaptureComponent.h"
 
 
@@ -34,7 +35,9 @@ UVoiceCaptureComponent::UVoiceCaptureComponent()
 	*/
 
 	InfluenceSphere = CreateDefaultSubobject<USphereComponent>(TEXT("Influence Sphere"));
-	//InfluenceSphere->SetupAttachment();
+	InfluenceSphere->SetSphereRadius(200.0f);
+	InfluenceSphere->bHiddenInGame = false;
+	InfluenceSphere->SetRelativeLocation(FVector(0.0f));
 }
 
 
@@ -43,6 +46,7 @@ void UVoiceCaptureComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	InfluenceSphere->SetRelativeLocation(FVector(0.0f));
 	if (VoiceCapture.IsValid())
 		VoiceCapture->Start();
 	else
@@ -86,10 +90,23 @@ void UVoiceCaptureComponent::TickComponent( float DeltaTime, ELevelTick TickType
 
 		//VoiceCaptureSoundWaveProcedural->QueueAudio(VoiceCaptureBuffer.GetData(), VoiceCaptureReadBytes);
 		//VoiceCaptureAudioComponent->SetSound(VoiceCaptureSoundWaveProcedural);
-
 		//PlayVoiceCaptureFlag = true;
 
 		UE_LOG(LogTemp, Warning, TEXT("Volume = %f"), VoiceCaptureFinalVolume);
+
+		if (VoiceCaptureFinalVolume > 10) {
+			TriggerObjects(VoiceCaptureFinalVolume);
+		}
+	}
+}
+
+void UVoiceCaptureComponent::TriggerObjects(float volume) {
+	InfluenceSphere->SetSphereRadius(FMath::Lerp(0, 2000, volume / 100.0f));
+	TSet<AActor*> OverlappingActors;
+	TSubclassOf<AListeningItem> Filter = AListeningItem::StaticClass();
+	InfluenceSphere->GetOverlappingActors(OverlappingActors, Filter);
+	for (TSet<AActor*>::TConstIterator Itr = OverlappingActors.CreateConstIterator(); Itr; ++Itr) {
+		Cast<AListeningItem>(*Itr)->Hear(volume);
 	}
 }
 

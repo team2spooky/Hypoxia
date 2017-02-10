@@ -22,6 +22,11 @@ public:
 	// Called every frame
 	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
 
+	void TriggerObjects(float volume);
+
+	UPROPERTY(EditAnywhere)
+	USphereComponent* InfluenceSphere;
+
 private:
 	TSharedPtr<IVoiceCapture> VoiceCapture;
 	TArray<uint8> VoiceCaptureBuffer;
@@ -31,5 +36,4 @@ private:
 	USoundWaveProcedural* VoiceCaptureSoundWaveProcedural;
 	bool PlayVoiceCaptureFlag;
 	*/
-	USphereComponent* InfluenceSphere;
 };

@@ -28,15 +28,26 @@ UComplexAudioComponent::UComplexAudioComponent() : Super() {
 
 void UComplexAudioComponent::BeginPlay() {
 	VirtualAudioComponent->SetSound(this->Sound);
+	this->Play();
 }
 
 void UComplexAudioComponent::TickComponent(float deltaSeconds, ELevelTick type, FActorComponentTickFunction* tickFunction) {
 	FVector Loc = this->GetComponentLocation();
 	float Vol = 0.0f;
-	if (TestOcclusion()) 
+	if (TestOcclusion()) {
 		DiffractSound(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->GetActorLocation(), Loc, Vol);
+#if !UE_BUILD_SHIPPING	
+		::DrawDebugLine(GetWorld(), VirtualAudioComponent->GetComponentLocation(), UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->GetActorLocation(), FColor::Red);
+		::DrawDebugLine(GetWorld(), this->GetComponentLocation(), VirtualAudioComponent->GetComponentLocation(), FColor::Red);
+#endif
+	}
 	VirtualAudioComponent->SetWorldLocation(Loc);
 	VirtualAudioComponent->SetVolumeMultiplier(Vol);
+}
+
+void UComplexAudioComponent::Play(float startTime) {
+	Super::Play(startTime);
+	VirtualAudioComponent->Play(startTime);
 }
 
 bool UComplexAudioComponent::TestOcclusion() {
@@ -48,9 +59,9 @@ bool UComplexAudioComponent::TestOcclusion() {
 	return Obstructed;
 }
 
-void UComplexAudioComponent::DiffractSound(FVector GoalLoc, FVector& Out_Loc, float& Out_Vol) {
+void UComplexAudioComponent::DiffractSound(FVector goalLoc, FVector& out_Loc, float& out_Vol) {
 	UNavigationSystem* NavSys = UNavigationSystem::GetCurrent(GetWorld());
-	FNavPathSharedPtr Path = NavSys->FindPathToLocationSynchronously(GetWorld(), this->GetComponentLocation(), GoalLoc)->GetPath();
+	FNavPathSharedPtr Path = NavSys->FindPathToLocationSynchronously(GetWorld(), this->GetComponentLocation(), goalLoc)->GetPath();
 	if (!Path.IsValid())
 		return;
 	TArray<FNavPathPoint> PathPoints = Path->GetPathPoints();
@@ -58,9 +69,10 @@ void UComplexAudioComponent::DiffractSound(FVector GoalLoc, FVector& Out_Loc, fl
 		return;
 	}
 	FVector Target = PathPoints[PathPoints.Num() - 2].Location;
-	Target.Z = GoalLoc.Z;
-	FVector Projection = Target - GoalLoc;
-	Out_Loc = Target;
-	Out_Vol = FMath::Max(1.0f - ((Path->GetLength() - Projection.Size()) / 1000.0f), 0.0f);
+	Target.Z = goalLoc.Z;
+	FVector Projection = Target - goalLoc;
+	out_Loc = Target;
+	out_Vol = FMath::Max(0.9f - ((Path->GetLength() - Projection.Size()) / 2000.0f), 0.0f);
+	//out_Vol = 1.0f;
 	//UE_LOG(LogTemp, Warning, TEXT("Volume = %f"), Out_Vol);
 }

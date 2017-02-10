@@ -23,5 +23,6 @@ private:
 	UAudioComponent* VirtualAudioComponent;
 
 	bool TestOcclusion();
-	void DiffractSound(FVector GoalLoc, FVector& Out_Loc, float& Out_Vol);
+	void DiffractSound(FVector goalLoc, FVector& out_Loc, float& out_Vol);
+	void Play(float startTime = 0.f);
 };
