@@ -55,6 +55,9 @@ protected:
 
 	virtual void Tick(float) override;
 
+	UFUNCTION()
+	virtual void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
+	
 	virtual void UpdatePosition(FVector);
 
 	virtual void UpdateRotation(FRotator);

@@ -9,6 +9,16 @@
 /**
  * 
  */
+
+UENUM(BlueprintType)
+enum class EDoorDirection : uint8 {
+	DD_North 	UMETA(DisplayName = "North"), //-Y
+	DD_South 	UMETA(DisplayName = "South"), //+Y
+	DD_East		UMETA(DisplayName = "East"),  //+X
+	DD_West		UMETA(DisplayName = "West")   //-X
+};
+
+
 UCLASS()
 class HYPOXIA_API ADoor : public AItem
 {
@@ -16,6 +26,11 @@ class HYPOXIA_API ADoor : public AItem
 
 	//UPROPERTY(VisibleAnywhere, Category = Mesh)
 	//class UStaticMeshComponent* Door;
+
+protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enum)
+	EDoorDirection DoorHandleDirection;
 	
 protected:
 
