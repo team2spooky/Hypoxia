@@ -9,6 +9,7 @@
 #include "MotionControllerComponent.h"
 #include "Item.h"
 #include "EngineUtils.h"
+#include "Engine/StaticMeshActor.h"
 
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
@@ -63,7 +64,6 @@ AHypoxiaCharacter::AHypoxiaCharacter() {
 	R_MotionController->bAbsoluteRotation = true;
 	L_MotionController->bAbsoluteLocation = true;
 	L_MotionController->bAbsoluteRotation = true;
-	
 }
 
 void AHypoxiaCharacter::BeginPlay() {
@@ -82,7 +82,6 @@ void AHypoxiaCharacter::BeginPlay() {
 
 	HeldItemRight = NULL;
 	HeldItemLeft  = NULL;
-
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -232,8 +231,8 @@ void AHypoxiaCharacter::Tick(float DeltaTime) {
 
 	AddMovementInput(HMDPositionDelta, MOVEMENT_SCALE);
 
-	FirstPersonCameraComponent->SetWorldRotation(DeviceRotation);
-	FirstPersonCameraComponent->SetWorldLocation(FVector(FirstPersonCameraComponent->GetComponentLocation().X, FirstPersonCameraComponent->GetComponentLocation().Y, DevicePosition.Z + CAMERA_HEIGHT_OFFSET));
+	//FirstPersonCameraComponent->SetWorldRotation(DeviceRotation);
+	//FirstPersonCameraComponent->SetWorldLocation(FVector(FirstPersonCameraComponent->GetComponentLocation().X, FirstPersonCameraComponent->GetComponentLocation().Y, DevicePosition.Z + CAMERA_HEIGHT_OFFSET));
 
 	//RootComponent->SetWorldLocation(DevicePosition);
 
