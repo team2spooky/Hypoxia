@@ -34,15 +34,16 @@ void UComplexAudioComponent::BeginPlay() {
 void UComplexAudioComponent::TickComponent(float deltaSeconds, ELevelTick type, FActorComponentTickFunction* tickFunction) {
 	FVector Loc = this->GetComponentLocation();
 	float Vol = 0.0f;
-	if (TestOcclusion()) {
+	float Occlusion = TestOcclusion();
+	if (Occlusion) {
 		DiffractSound(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->GetActorLocation(), Loc, Vol);
 #if !UE_BUILD_SHIPPING	
-		::DrawDebugLine(GetWorld(), VirtualAudioComponent->GetComponentLocation(), UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->GetActorLocation(), FColor::Red);
-		::DrawDebugLine(GetWorld(), this->GetComponentLocation(), VirtualAudioComponent->GetComponentLocation(), FColor::Red);
+		::DrawDebugLine(GetWorld(), VirtualAudioComponent->GetComponentLocation(), UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->GetActorLocation(), FColor::Red, false, -1.0f, (uint8)'\000', 0.1f);
+		::DrawDebugLine(GetWorld(), this->GetComponentLocation(), VirtualAudioComponent->GetComponentLocation(), FColor::Red, false, -1.0f, (uint8)'\000', 0.1f);
 #endif
 	}
 	VirtualAudioComponent->SetWorldLocation(Loc);
-	VirtualAudioComponent->SetVolumeMultiplier(Vol);
+	VirtualAudioComponent->SetVolumeMultiplier(Vol * Occlusion);
 }
 
 void UComplexAudioComponent::Play(float startTime) {
@@ -50,12 +51,31 @@ void UComplexAudioComponent::Play(float startTime) {
 	VirtualAudioComponent->Play(startTime);
 }
 
-bool UComplexAudioComponent::TestOcclusion() {
+float UComplexAudioComponent::TestOcclusion() {
 	ACharacter* PC = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-	bool Obstructed = GetWorld()->LineTraceTestByChannel(GetComponentLocation(), PC->GetActorLocation(), ECC_Visibility);
+	float Obstructed = GetWorld()->LineTraceTestByChannel(GetComponentLocation(), PC->GetActorLocation(), ECC_Visibility);
 #if !UE_BUILD_SHIPPING	
-	::DrawDebugLine(GetWorld(), this->GetComponentLocation(), PC->GetActorLocation(), FColor::Red);
+	::DrawDebugLine(GetWorld(), this->GetComponentLocation(), PC->GetActorLocation(), FColor::Red, false, -1.0f, (uint8)'\000', 0.1f);
 #endif
+	if (bAdvancedOcclusion) {
+		FVector RVec = PC->GetActorUpVector() * Radius;
+		FVector Axis = PC->GetActorLocation() - GetComponentLocation();
+		Axis.Normalize();
+		for (int i = 0; i < 8; i++) {
+			FVector TestLoc = GetComponentLocation() + RVec.RotateAngleAxis(i * 45.0f, Axis);
+			Obstructed += GetWorld()->LineTraceTestByChannel(TestLoc, PC->GetActorLocation(), ECC_Visibility);
+#if !UE_BUILD_SHIPPING	
+			::DrawDebugLine(GetWorld(), TestLoc, PC->GetActorLocation(), FColor::Green, false, -1.0f, (uint8)'\000', 0.1f);
+#endif
+		}
+#if !UE_BUILD_SHIPPING	
+		FMatrix Transform = FRotationMatrix::MakeFromX(Axis);
+		Transform.SetOrigin(GetComponentLocation());
+		::DrawDebugCircle(GetWorld(), Transform, Radius, 32, FColor::Green, false, -1.0f, (uint8)'\000', 0.1f);
+#endif
+		Obstructed /= 9;
+	}
+	UE_LOG(LogTemp, Warning, TEXT("%f"), Obstructed);
 	return Obstructed;
 }
 
