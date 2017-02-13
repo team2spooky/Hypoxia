@@ -33,6 +33,12 @@ public:
 	UPROPERTY(EditAnywhere)
 	bool bListenToSelf;
 
+	UPROPERTY(EditAnywhere)
+	bool bAdvancedOcclusion;
+	
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.f))
+	float Radius;
+
 private:
 	UAudioComponent* VirtualAudioComponent;
 	USphereComponent* InfluenceSphere;
