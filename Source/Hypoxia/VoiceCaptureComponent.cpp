@@ -92,7 +92,7 @@ void UVoiceCaptureComponent::TickComponent( float DeltaTime, ELevelTick TickType
 		//VoiceCaptureAudioComponent->SetSound(VoiceCaptureSoundWaveProcedural);
 		//PlayVoiceCaptureFlag = true;
 
-		UE_LOG(LogTemp, Warning, TEXT("Volume = %f"), VoiceCaptureFinalVolume);
+		//UE_LOG(LogTemp, Warning, TEXT("Volume = %f"), VoiceCaptureFinalVolume);
 
 		if (VoiceCaptureFinalVolume > 10) {
 			TriggerObjects(VoiceCaptureFinalVolume);
