@@ -42,8 +42,15 @@ void UComplexAudioComponent::TickComponent(float deltaSeconds, ELevelTick type, 
 		::DrawDebugLine(GetWorld(), this->GetComponentLocation(), VirtualAudioComponent->GetComponentLocation(), FColor::Red, false, -1.0f, (uint8)'\000', 0.1f);
 #endif
 	}
+	this->SetVolumeMultiplier(1 - Occlusion);
 	VirtualAudioComponent->SetWorldLocation(Loc);
 	VirtualAudioComponent->SetVolumeMultiplier(Vol * Occlusion);
+	if (this->IsPlaying()) {
+		if (Vol > 0.0f) {
+			// Virtual Audio is Playing
+
+		}
+	}
 }
 
 void UComplexAudioComponent::Play(float startTime) {
@@ -51,31 +58,32 @@ void UComplexAudioComponent::Play(float startTime) {
 	VirtualAudioComponent->Play(startTime);
 }
 
+void UComplexAudioComponent::Stop() {
+	Super::Stop();
+	VirtualAudioComponent->Stop();
+}
+
 float UComplexAudioComponent::TestOcclusion() {
 	ACharacter* PC = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-	float Obstructed = GetWorld()->LineTraceTestByChannel(GetComponentLocation(), PC->GetActorLocation(), ECC_Visibility);
+	float Obstructed = 0.0f;
+	if (!bAdvancedOcclusion) {
+		Obstructed = GetWorld()->LineTraceTestByChannel(GetComponentLocation(), PC->GetActorLocation(), ECC_Visibility);
 #if !UE_BUILD_SHIPPING	
-	::DrawDebugLine(GetWorld(), this->GetComponentLocation(), PC->GetActorLocation(), FColor::Red, false, -1.0f, (uint8)'\000', 0.1f);
+		::DrawDebugLine(GetWorld(), this->GetComponentLocation(), PC->GetActorLocation(), FColor::Red, false, -1.0f, (uint8)'\000', 0.1f);
 #endif
-	if (bAdvancedOcclusion) {
+	} else {
 		FVector RVec = PC->GetActorUpVector() * Radius;
 		FVector Axis = PC->GetActorLocation() - GetComponentLocation();
 		Axis.Normalize();
-		for (int i = 0; i < 8; i++) {
-			FVector TestLoc = GetComponentLocation() + RVec.RotateAngleAxis(i * 45.0f, Axis);
+		for (int i = 0; i < 7; i++) {
+			FVector TestLoc = GetComponentLocation() + RVec.RotateAngleAxis(i * 360.0f / 7, Axis);
 			Obstructed += GetWorld()->LineTraceTestByChannel(TestLoc, PC->GetActorLocation(), ECC_Visibility);
 #if !UE_BUILD_SHIPPING	
 			::DrawDebugLine(GetWorld(), TestLoc, PC->GetActorLocation(), FColor::Green, false, -1.0f, (uint8)'\000', 0.1f);
 #endif
 		}
-#if !UE_BUILD_SHIPPING	
-		FMatrix Transform = FRotationMatrix::MakeFromX(Axis);
-		Transform.SetOrigin(GetComponentLocation());
-		::DrawDebugCircle(GetWorld(), Transform, Radius, 32, FColor::Green, false, -1.0f, (uint8)'\000', 0.1f);
-#endif
-		Obstructed /= 9;
+		Obstructed /= 7;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("%f"), Obstructed);
 	return Obstructed;
 }
 
@@ -92,7 +100,7 @@ void UComplexAudioComponent::DiffractSound(FVector goalLoc, FVector& out_Loc, fl
 	Target.Z = goalLoc.Z;
 	FVector Projection = Target - goalLoc;
 	out_Loc = Target;
-	out_Vol = FMath::Max(0.9f - ((Path->GetLength() - Projection.Size()) / 2000.0f), 0.0f);
+	out_Vol = FMath::Clamp(1.0f - ((Path->GetLength() - Projection.Size()) / 2000.0f), 0.0f, 1.0f);
 	//out_Vol = 1.0f;
-	//UE_LOG(LogTemp, Warning, TEXT("Volume = %f"), Out_Vol);
+	UE_LOG(LogTemp, Warning, TEXT("Volume = %f"), out_Vol);
 }
