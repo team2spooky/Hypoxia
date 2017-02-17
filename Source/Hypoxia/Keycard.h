@@ -3,6 +3,8 @@
 #pragma once
 
 #include "Item.h"
+#include "Door.h"
+
 #include "Keycard.generated.h"
 
 /**
@@ -18,9 +20,11 @@ public:
 		// Called when the game starts or when spawned
 		virtual void BeginPlay() override;
 
-		void UnlockLock();
+		//void UnlockLock();
 	
 protected:
+
+	ADoor *Door;
 
 	virtual void Tick(float) override;
 };

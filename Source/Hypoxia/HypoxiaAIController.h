@@ -3,6 +3,7 @@
 #pragma once
 
 #include "AIController.h"
+#include "HypoxiaCharacter.h"
 #include "HypoxiaAIController.generated.h"
 
 /**
@@ -13,8 +14,20 @@ class HYPOXIA_API AHypoxiaAIController : public AAIController
 {
 	GENERATED_BODY()
 
+	//UPROPERTY(VisibleDefaultsOnly, Category = AI)
+	//class UBlackboardComponent* MotionTracker;
+		//public:
+			//void TrackPlayer(float Volume);
+
+	AHypoxiaCharacter *HypoxiaCharacter;
+
+	AHypoxiaAIController();
+
+	virtual void BeginPlay() override;
+
+	virtual void Tick(float) override;
+
 public:
-	void TrackPlayer(float Volume);
-	
-	
+	void HearSound(FVector, float);
+
 };

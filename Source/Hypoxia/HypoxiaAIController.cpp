@@ -2,14 +2,82 @@
 
 #include "Hypoxia.h"
 #include "HypoxiaAIController.h"
+#include "HypoxiaCharacter.h"
+#include "EngineUtils.h"
+#include "Runtime/AIModule/Classes/Blueprint/AIBlueprintHelperLibrary.h"
+#include "Runtime/AIModule/Classes/BehaviorTree/BlackboardComponent.h"
 
-void AHypoxiaAIController::TrackPlayer(float volume) {
-	auto playerLocation = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->GetActorLocation();
-	auto vector = new FVector(FMath::Lerp(400, 50, volume/100), 0.0f, 0.0f);
-	vector->RotateAngleAxis(FMath::Lerp(0, 359, FMath::Rand() / RAND_MAX), vector->UpVector);
-	MoveToLocation(playerLocation + *vector, 5.0f);
+//void AHypoxiaAIController::TrackPlayer(float volume) {
+//	FVector playerLocation = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->GetActorLocation();
+//	FVector* vector = new FVector(FMath::Lerp(400, 50, volume/100), 0.0f, 0.0f);
+//	vector->RotateAngleAxis(FMath::Lerp(0, 359, FMath::Rand() / RAND_MAX), vector->UpVector);
+//	MoveToLocation(playerLocation + *vector, 5.0f);
+//
+//	UE_LOG(LogTemp, Warning, TEXT("Chase!"));
+//}
 
-	UE_LOG(LogTemp, Warning, TEXT("Chase!"));
+float MoveTimer = 500.0f;
+float Looktime  = 500.0f;
+
+AHypoxiaAIController::AHypoxiaAIController() {
+	//Blackboard = CreateDefaultSubobject<UBlackboardComponent>(TEXT("Blackboard"));
+	//Blackboard->SetupAttachment(Item_Base);
+	
 }
 
+void AHypoxiaAIController::BeginPlay() {
+	Super::BeginPlay();
 
+	for (TActorIterator<AHypoxiaCharacter> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
+		//This may need adjusting to ensure it gets the right one
+		HypoxiaCharacter = *ActorItr;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("LoS %d"), LineOfSightTo(HypoxiaCharacter));
+
+	UBlackboardComponent* AIBlackboard = UAIBlueprintHelperLibrary::GetBlackboard(this);
+
+	AIBlackboard->SetValueAsVector(FName("WanderLocation"), FVector(1050.0f, 500.0f, 90.0f));
+	//AIBlackboard->SetValueAsVector(FName("WanderLocation"), FVector(-700.0f, -1040.0f, 118.0f));
+
+}
+
+void AHypoxiaAIController::Tick(float DeltaTime) {
+
+	Super::Tick(DeltaTime);
+
+	UE_LOG(LogTemp, Warning, TEXT("Dist %F"), FVector::Dist(HypoxiaCharacter->GetActorLocation(), GetPawn()->GetActorLocation()));
+
+	UE_LOG(LogTemp, Warning, TEXT("LoS %d"), LineOfSightTo(HypoxiaCharacter) && FVector::Dist(HypoxiaCharacter->GetActorLocation(), GetPawn()->GetActorLocation()) < 200.0f);
+
+	UBlackboardComponent* AIBlackboard = UAIBlueprintHelperLibrary::GetBlackboard(this);
+
+	if (AIBlackboard->GetValueAsBool(FName("SeenPlayer"))) {
+		AIBlackboard->SetValueAsVector(FName("PlayerLocation"), HypoxiaCharacter->GetActorLocation());
+	} else if (LineOfSightTo(HypoxiaCharacter) && FVector::Dist(HypoxiaCharacter->GetActorLocation(), GetPawn()->GetActorLocation()) < 200.0f) {
+		AIBlackboard->SetValueAsBool(FName("SeenPlayer"), true);
+		//AIBlackboard->SetValueAsVector(FName("PlayerLocation"), HypoxiaCharacter->GetActorLocation());
+	}
+
+	MoveTimer -= 1.0f;
+	Looktime  -= 1.0f;
+
+	if (MoveTimer <= 0.0f) {
+		MoveTimer = 500.0f;
+		AIBlackboard->SetValueAsVector(FName("WanderLocation"), FVector(FMath::RandRange(-1100.f, 1100.0f), FMath::RandRange(-1200.f, 650.0f), 90.0f));
+	}
+
+	if (Looktime <= 0.0f) {
+		AIBlackboard->SetValueAsBool(FName("HeardSound"), false);
+	}
+}
+
+void AHypoxiaAIController::HearSound(FVector Location, float Amplitude) {
+	
+	UBlackboardComponent* AIBlackboard = UAIBlueprintHelperLibrary::GetBlackboard(this);
+	AIBlackboard->SetValueAsBool(FName("HeardSound"), true);
+	AIBlackboard->SetValueAsVector(FName("SoundLocation"), Location);
+
+	Looktime = 20.0f;
+
+}

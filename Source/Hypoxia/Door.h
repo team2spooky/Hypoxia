@@ -40,11 +40,18 @@ protected:
 
 	bool Opened = false;
 
-	bool Moving = false;
+	//bool Moving = false;
+
+	FVector InitialPosition;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Bool)
+	bool Locked;
 
 public:
 
 	virtual void BeginPlay() override;
+	
+	void Unlock();
 	
 protected:
 
@@ -58,6 +65,6 @@ protected:
 
 	void Close();
 
-	virtual void UpdateRotation(FRotator) override;
+	virtual void UpdatePosition(FVector) override;
 
 };

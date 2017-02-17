@@ -249,6 +249,8 @@ void AHypoxiaCharacter::Tick(float DeltaTime) {
 	L_MotionTracker->SetWorldLocation(L_MotionController->GetComponentLocation() + RootComponent->GetComponentLocation() - FVector(DevicePosition.X, DevicePosition.Y, 100.0f));
 	L_MotionTracker->SetWorldRotation(L_MotionController->GetComponentRotation() + RootComponent->GetComponentRotation() - FRotator(0.0f, DeviceRotation.Yaw, 0.0f));
 
+	//UE_LOG(LogTemp, Error, TEXT("Tracker %f"), R_MotionTracker->GetComponentLocation().Z);
+
 	/*UE_LOG(LogTemp, Error, TEXT("Component X: %f"), R_MotionTracker->GetComponentLocation().X);
 	UE_LOG(LogTemp, Error, TEXT("Component Y: %f"), R_MotionTracker->GetComponentLocation().Y);
 	UE_LOG(LogTemp, Error, TEXT("Component Z: %f"), R_MotionTracker->GetComponentLocation().Z);*/

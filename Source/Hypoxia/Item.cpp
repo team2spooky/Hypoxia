@@ -189,7 +189,6 @@ void AItem::Tick(float DeltaTime) {
 		FRotator DeviceRotation;
 
 		UHeadMountedDisplayFunctionLibrary::GetOrientationAndPosition(DeviceRotation, DevicePosition);
-
 		
 		UpdatePosition(DevicePosition);
 
