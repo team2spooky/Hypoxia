@@ -4,6 +4,7 @@
 
 #include "GameFramework/Actor.h"
 #include "MotionControllerComponent.h"
+#include "ComplexAudioComponent.h"
 #include "Item.generated.h"
 
 UCLASS()
@@ -27,6 +28,9 @@ protected:
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	class USceneComponent* GrabSpot;
+
+	UPROPERTY(EditAnywhere)
+	USoundBase* OnHitSound;
 
 	bool Held;
 
@@ -64,4 +68,7 @@ protected:
 
 	void SelfDrop();
 
+private:
+	UComplexAudioComponent* HitSoundComponent;
+	FVector LastVelocity;
 };
