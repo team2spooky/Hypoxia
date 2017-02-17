@@ -12,6 +12,8 @@ AHypoxiaCharacter *HypoxiaCharacter;
 
 const float ARM_STRENGTH = 400.0f; //Applifies the velocity of objects when dropped
 
+USoundAttenuation* DefaultAttenuation;
+
 // Sets default values
 AItem::AItem()
 {
@@ -41,6 +43,12 @@ AItem::AItem()
 	GrabSpot = CreateDefaultSubobject<USceneComponent>(TEXT("GrabSpot"));
 	GrabSpot->SetupAttachment(Item);
 
+	/*HitSoundComponent = CreateDefaultSubobject<UComplexAudioComponent>(TEXT("HitSoundComponent"));
+	HitSoundComponent->SetupAttachment(Item_Base);
+	HitSoundComponent->SetSound(OnHitSound);*/
+	static ConstructorHelpers::FObjectFinder<USoundAttenuation> AttenuationAsset((TEXT("/Game/DefaultAttenuation.DefaultAttenuation")));
+	if (AttenuationAsset.Succeeded())
+		DefaultAttenuation = AttenuationAsset.Object;
 }
 
 // Called when the game starts or when spawned
@@ -212,4 +220,19 @@ void AItem::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimit
 	/*if (OtherActor->IsA(ADoor::StaticClass())) {
 		UE_LOG(LogTemp, Warning, TEXT("I'm hit, I'm hit"));
 	}*/
+	if ((Item->GetPhysicsLinearVelocity() - LastVelocity).Size() > 100) {
+		LastVelocity = Item->GetPhysicsLinearVelocity();
+		if (OnHitSound) {
+			HitSoundComponent = ConstructObject<UComplexAudioComponent>(UComplexAudioComponent::StaticClass(), this, FName("DynamicHitSoundComponent"));
+			HitSoundComponent->bAutoDestroy = true;
+			HitSoundComponent->bAdvancedOcclusion = true;
+			HitSoundComponent->Radius = 50;
+			HitSoundComponent->RegisterComponent();
+			HitSoundComponent->SetupAttachment(Item);
+			HitSoundComponent->SetWorldLocation(Item->GetComponentLocation());
+			HitSoundComponent->SetAttenuationSettings(DefaultAttenuation);
+			HitSoundComponent->SetSound(OnHitSound);
+			HitSoundComponent->Play();
+		}
+	}
 }
