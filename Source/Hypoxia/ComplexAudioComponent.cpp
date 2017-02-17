@@ -125,23 +125,14 @@ float UComplexAudioComponent::TestOcclusion() {
 		FVector RVec = PC->GetActorUpVector() * Radius;
 		FVector Axis = PC->GetActorLocation() - GetComponentLocation();
 		Axis.Normalize();
-<<<<<<< HEAD
 		for (int i = 0; i < 8; i++) {
 			FVector TestLoc = GetComponentLocation() + RVec.RotateAngleAxis(i * 360.0f / 8, Axis);
-=======
-		for (int i = 0; i < 7; i++) {
-			FVector TestLoc = GetComponentLocation() + RVec.RotateAngleAxis(i * 360.0f / 7, Axis);
->>>>>>> pc change
 			Obstructed += GetWorld()->LineTraceTestByChannel(TestLoc, PC->GetActorLocation(), ECC_Visibility);
 #if !UE_BUILD_SHIPPING	
 			::DrawDebugLine(GetWorld(), TestLoc, PC->GetActorLocation(), FColor::Green, false, -1.0f, (uint8)'\000', 0.1f);
 #endif
 		}
-<<<<<<< HEAD
 		Obstructed /= 8;
-=======
-		Obstructed /= 7;
->>>>>>> pc change
 	}
 	return Obstructed;
 }
@@ -161,9 +152,6 @@ void UComplexAudioComponent::DiffractSound(FVector goalLoc, FVector& out_Loc, fl
 	out_Loc = Target;
 	out_Vol = FMath::Clamp(1.0f - ((Path->GetLength() - Projection.Size()) / 2000.0f), 0.0f, 1.0f);
 	//out_Vol = 1.0f;
-<<<<<<< HEAD
 	UE_LOG(LogTemp, Warning, TEXT("Volume = %f, Loc = (%f, %f, %f)"), out_Vol, out_Loc.X, out_Loc.Y, out_Loc.Z);
-=======
-	UE_LOG(LogTemp, Warning, TEXT("Volume = %f"), out_Vol);
->>>>>>> pc change
+
 }
