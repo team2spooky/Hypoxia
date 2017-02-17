@@ -4,16 +4,21 @@
 #include "ComplexAudioComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Runtime/Engine/Classes/AI/Navigation/NavigationPath.h"
+#include "ListeningItem.h"
 
 UComplexAudioComponent::UComplexAudioComponent() : Super() {
 	PrimaryComponentTick.bCanEverTick = true;
 
-	static ConstructorHelpers::FObjectFinder<USoundAttenuation> AttenuationAsset((TEXT("/Game/TestAttenuation.TestAttenuation")));
+	//static ConstructorHelpers::FObjectFinder<USoundAttenuation> AttenuationAsset((TEXT("/Game/TestAttenuation.TestAttenuation")));
 
 	VirtualAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("VirtualAudioComponent"));
 	VirtualAudioComponent->bAutoActivate = true;
-	VirtualAudioComponent->AttenuationSettings = AttenuationAsset.Object;
+	//VirtualAudioComponent->AttenuationSettings = AttenuationAsset.Object; // Old way of applying attenuation
+	//VirtualAudioComponent->AttenuationSettings = this->AttenuationSettings; // Does not work
 	VirtualAudioComponent->SetWorldLocation(this->GetComponentLocation());
+
+	InfluenceSphere = CreateDefaultSubobject<USphereComponent>(TEXT("Influence Sphere"));
+	InfluenceSphere->SetupAttachment(this);
 
 	// Debug Sphere
 	UStaticMeshComponent* VirtualDebugSphere = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DEBUGVIRTUAL"));
@@ -28,6 +33,15 @@ UComplexAudioComponent::UComplexAudioComponent() : Super() {
 
 void UComplexAudioComponent::BeginPlay() {
 	VirtualAudioComponent->SetSound(this->Sound);
+	//this->Stop();
+	
+	// Copy Attenuation settings
+	VirtualAudioComponent->AttenuationSettings = this->AttenuationSettings;
+	//VirtualAudioComponent->AdjustAttenuation(*this->GetAttenuationSettingsToApply());
+
+	// Setup Influence Sphere
+	InfluenceSphere->SetSphereRadius(this->GetAttenuationSettingsToApply()->GetMaxDimension());
+
 	this->Play();
 }
 
@@ -46,9 +60,18 @@ void UComplexAudioComponent::TickComponent(float deltaSeconds, ELevelTick type, 
 	VirtualAudioComponent->SetWorldLocation(Loc);
 	VirtualAudioComponent->SetVolumeMultiplier(Vol * Occlusion);
 	if (this->IsPlaying()) {
-		if (Vol > 0.0f) {
-			// Virtual Audio is Playing
-
+		//USoundWave* temp = Cast<USoundWave>(this->Sound);
+		//Cast<USoundCue>(this->Sound);
+		//if(temp != nullptr)
+		//UE_LOG(LogTemp, Warning, TEXT("Volume = %f"), this->GetAttenuationSettingsToApply()->GetMaxDimension());
+		TSet<AActor*> OverlappingActors;
+		TSubclassOf<AListeningItem> Filter = AListeningItem::StaticClass();
+		float MaxDist = this->GetAttenuationSettingsToApply()->GetMaxDimension();
+		InfluenceSphere->GetOverlappingActors(OverlappingActors, Filter);
+		for (TSet<AActor*>::TConstIterator Itr = OverlappingActors.CreateConstIterator(); Itr; ++Itr) {
+			AListeningItem* Item = Cast<AListeningItem>(*Itr);
+			float Dist = FVector::Dist(Item->GetActorLocation(), this->GetComponentLocation());
+			Item->Hear(FMath::Lerp(100.f, 0.f, Dist / MaxDist) - 50.f);
 		}
 	}
 }
@@ -75,14 +98,14 @@ float UComplexAudioComponent::TestOcclusion() {
 		FVector RVec = PC->GetActorUpVector() * Radius;
 		FVector Axis = PC->GetActorLocation() - GetComponentLocation();
 		Axis.Normalize();
-		for (int i = 0; i < 7; i++) {
-			FVector TestLoc = GetComponentLocation() + RVec.RotateAngleAxis(i * 360.0f / 7, Axis);
+		for (int i = 0; i < 8; i++) {
+			FVector TestLoc = GetComponentLocation() + RVec.RotateAngleAxis(i * 360.0f / 8, Axis);
 			Obstructed += GetWorld()->LineTraceTestByChannel(TestLoc, PC->GetActorLocation(), ECC_Visibility);
 #if !UE_BUILD_SHIPPING	
 			::DrawDebugLine(GetWorld(), TestLoc, PC->GetActorLocation(), FColor::Green, false, -1.0f, (uint8)'\000', 0.1f);
 #endif
 		}
-		Obstructed /= 7;
+		Obstructed /= 8;
 	}
 	return Obstructed;
 }

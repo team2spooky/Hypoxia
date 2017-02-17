@@ -6,7 +6,7 @@
 
 
 // Sets default values for this component's properties
-UVoiceCaptureComponent::UVoiceCaptureComponent()
+UVoiceCaptureComponent::UVoiceCaptureComponent() : Super()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -36,8 +36,7 @@ UVoiceCaptureComponent::UVoiceCaptureComponent()
 
 	InfluenceSphere = CreateDefaultSubobject<USphereComponent>(TEXT("Influence Sphere"));
 	InfluenceSphere->SetSphereRadius(200.0f);
-	InfluenceSphere->bHiddenInGame = false;
-	InfluenceSphere->SetRelativeLocation(FVector(0.0f));
+	//InfluenceSphere->bHiddenInGame = false;
 }
 
 
@@ -46,7 +45,14 @@ void UVoiceCaptureComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	InfluenceSphere->SetRelativeLocation(FVector(0.0f));
+	/*try {
+		InfluenceSphere->SetupAttachment(this->GetOwner()->GetRootComponent());
+		//InfluenceSphere->SetWorldLocation(this->GetOwner()->GetActorLocation());
+	}
+	catch (...) {
+		UE_LOG(LogTemp, Warning, TEXT("Error"));
+	}*/
+
 	if (VoiceCapture.IsValid())
 		VoiceCapture->Start();
 	else
@@ -103,10 +109,13 @@ void UVoiceCaptureComponent::TickComponent( float DeltaTime, ELevelTick TickType
 void UVoiceCaptureComponent::TriggerObjects(float volume) {
 	InfluenceSphere->SetSphereRadius(FMath::Lerp(0, 2000, volume / 100.0f));
 	TSet<AActor*> OverlappingActors;
+	float MaxDist = 2000;
 	TSubclassOf<AListeningItem> Filter = AListeningItem::StaticClass();
 	InfluenceSphere->GetOverlappingActors(OverlappingActors, Filter);
 	for (TSet<AActor*>::TConstIterator Itr = OverlappingActors.CreateConstIterator(); Itr; ++Itr) {
-		Cast<AListeningItem>(*Itr)->Hear(volume);
+		AListeningItem* Item = Cast<AListeningItem>(*Itr);
+		float Dist = FVector::Dist(Item->GetActorLocation(), InfluenceSphere->GetComponentLocation());
+		Item->Hear(FMath::Lerp(1.f, 0.f, Dist / MaxDist) * volume);
 	}
 }
 
