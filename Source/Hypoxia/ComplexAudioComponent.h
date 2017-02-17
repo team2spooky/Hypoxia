@@ -25,8 +25,12 @@ public:
 	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.f))
 	float Radius;
 
+	UPROPERTY(EditAnywhere)
+	bool bListenToSelf;
+
 private:
 	UAudioComponent* VirtualAudioComponent;
+	USphereComponent* InfluenceSphere;
 
 	float TestOcclusion();
 	void DiffractSound(FVector goalLoc, FVector& out_Loc, float& out_Vol);
