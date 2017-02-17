@@ -18,6 +18,11 @@ public:
 	
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float, ELevelTick, FActorComponentTickFunction*) override;
+	void DestroyComponent(bool bPromoteChildren = false);
+	void Play(float startTime = 0.f);
+	void Stop();
+	void SetSound(USoundBase*);
+	void SetAttenuationSettings(USoundAttenuation*);
 
 	UPROPERTY(EditAnywhere)
 	bool bAdvancedOcclusion;
@@ -34,6 +39,4 @@ private:
 
 	float TestOcclusion();
 	void DiffractSound(FVector goalLoc, FVector& out_Loc, float& out_Vol);
-	void Play(float startTime = 0.f);
-	void Stop();
 };

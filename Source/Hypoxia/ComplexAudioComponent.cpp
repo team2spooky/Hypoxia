@@ -32,17 +32,19 @@ UComplexAudioComponent::UComplexAudioComponent() : Super() {
 }
 
 void UComplexAudioComponent::BeginPlay() {
-	VirtualAudioComponent->SetSound(this->Sound);
+	this->SetSound(this->Sound);
 	//this->Stop();
 	
 	// Copy Attenuation settings
-	VirtualAudioComponent->AttenuationSettings = this->AttenuationSettings;
-	//VirtualAudioComponent->AdjustAttenuation(*this->GetAttenuationSettingsToApply());
+	if (this->AttenuationSettings != nullptr) {
+		VirtualAudioComponent->AttenuationSettings = this->AttenuationSettings;
+		//VirtualAudioComponent->AdjustAttenuation(*this->GetAttenuationSettingsToApply());
 
-	// Setup Influence Sphere
-	InfluenceSphere->SetSphereRadius(this->GetAttenuationSettingsToApply()->GetMaxDimension());
+		// Setup Influence Sphere
+		InfluenceSphere->SetSphereRadius(this->GetAttenuationSettingsToApply()->GetMaxDimension());
+	}
 
-	this->Play();
+	//this->Play();
 }
 
 void UComplexAudioComponent::TickComponent(float deltaSeconds, ELevelTick type, FActorComponentTickFunction* tickFunction) {
@@ -76,14 +78,34 @@ void UComplexAudioComponent::TickComponent(float deltaSeconds, ELevelTick type, 
 	}
 }
 
+void UComplexAudioComponent::DestroyComponent(bool bPromoteChildren) {
+	VirtualAudioComponent->DestroyComponent(false);
+	InfluenceSphere->DestroyComponent(false);
+	Super::DestroyComponent(bPromoteChildren);
+}
+
 void UComplexAudioComponent::Play(float startTime) {
 	Super::Play(startTime);
 	VirtualAudioComponent->Play(startTime);
+	UE_LOG(LogTemp, Warning, TEXT("%d"), VirtualAudioComponent->IsPlaying());
 }
 
 void UComplexAudioComponent::Stop() {
 	Super::Stop();
 	VirtualAudioComponent->Stop();
+}
+
+void UComplexAudioComponent::SetSound(USoundBase* newSound) {
+	VirtualAudioComponent->SetSound(newSound);
+	Super::SetSound(newSound);
+}
+
+void UComplexAudioComponent::SetAttenuationSettings(USoundAttenuation* newAttenuation) {
+	this->AttenuationSettings = newAttenuation;
+	VirtualAudioComponent->AttenuationSettings = this->AttenuationSettings;
+
+	// Setup Influence Sphere
+	InfluenceSphere->SetSphereRadius(this->GetAttenuationSettingsToApply()->GetMaxDimension());
 }
 
 float UComplexAudioComponent::TestOcclusion() {
@@ -125,5 +147,5 @@ void UComplexAudioComponent::DiffractSound(FVector goalLoc, FVector& out_Loc, fl
 	out_Loc = Target;
 	out_Vol = FMath::Clamp(1.0f - ((Path->GetLength() - Projection.Size()) / 2000.0f), 0.0f, 1.0f);
 	//out_Vol = 1.0f;
-	UE_LOG(LogTemp, Warning, TEXT("Volume = %f"), out_Vol);
+	UE_LOG(LogTemp, Warning, TEXT("Volume = %f, Loc = (%f, %f, %f)"), out_Vol, out_Loc.X, out_Loc.Y, out_Loc.Z);
 }
