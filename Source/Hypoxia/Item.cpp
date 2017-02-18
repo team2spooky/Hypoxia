@@ -119,7 +119,7 @@ void AItem::Use() {}
 
 void AItem::UpdatePosition(FVector DevicePosition) {
 
-	MotionTracker->SetWorldLocation(MotionController->GetComponentLocation() + RootComponent->GetComponentLocation() - DevicePosition + FVector(0.0f, 0.0f, DevicePosition.Z - 100.f), false, (FHitResult*)nullptr, ETeleportType::None);
+	MotionTracker->SetWorldLocation(MotionController->GetComponentLocation() + RootComponent->GetComponentLocation() - DevicePosition + FVector(0.0f, 0.0f, DevicePosition.Z - 110.f), false, (FHitResult*)nullptr, ETeleportType::None);
 
 	OldLocation = NewLocation;
 	NewLocation = MotionTracker->GetComponentLocation();
