@@ -108,11 +108,6 @@ void UComplexAudioComponent::SetAttenuationSettings(USoundAttenuation* newAttenu
 	InfluenceSphere->SetSphereRadius(this->GetAttenuationSettingsToApply()->GetMaxDimension());
 }
 
-void UComplexAudioComponent::Stop() {
-	Super::Stop();
-	VirtualAudioComponent->Stop();
-}
-
 float UComplexAudioComponent::TestOcclusion() {
 	ACharacter* PC = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	float Obstructed = 0.0f;
@@ -153,5 +148,4 @@ void UComplexAudioComponent::DiffractSound(FVector goalLoc, FVector& out_Loc, fl
 	out_Vol = FMath::Clamp(1.0f - ((Path->GetLength() - Projection.Size()) / 2000.0f), 0.0f, 1.0f);
 	//out_Vol = 1.0f;
 	UE_LOG(LogTemp, Warning, TEXT("Volume = %f, Loc = (%f, %f, %f)"), out_Vol, out_Loc.X, out_Loc.Y, out_Loc.Z);
-
 }
