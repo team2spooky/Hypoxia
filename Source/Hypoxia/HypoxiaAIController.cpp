@@ -64,7 +64,7 @@ void AHypoxiaAIController::Tick(float DeltaTime) {
 
 	if (MoveTimer <= 0.0f) {
 		MoveTimer = 500.0f;
-		AIBlackboard->SetValueAsVector(FName("WanderLocation"), FVector(FMath::RandRange(-1100.f, 1100.0f), FMath::RandRange(-1200.f, 650.0f), 90.0f));
+		AIBlackboard->SetValueAsVector(FName("WanderLocation"), FVector(FMath::RandRange(-1100.f, 1100.0f), FMath::RandRange(-1200.f, 650.0f), 390.0f));
 	}
 
 	if (Looktime <= 0.0f) {

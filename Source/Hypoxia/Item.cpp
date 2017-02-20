@@ -98,10 +98,10 @@ void AItem::Drop() {
 		Held = false;
 		UE_LOG(LogTemp, Warning, TEXT("Dropped"));
 		Item->SetEnableGravity(bHasGravity);
-		Item->SetPhysicsLinearVelocity(MotionController->GetPhysicsLinearVelocity());
+		//Item->SetPhysicsLinearVelocity(MotionController->GetPhysicsLinearVelocity());
 		Item_Base->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 		Item->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-		Item->SetPhysicsLinearVelocity(FVector(((NewLocation - OldLocation) * ARM_STRENGTH).X, ((NewLocation - OldLocation) * ARM_STRENGTH).Y, ((NewLocation - OldLocation) * ARM_STRENGTH).Z));
+		Item->AddImpulse(FVector(((NewLocation - OldLocation) * ARM_STRENGTH).X, ((NewLocation - OldLocation) * ARM_STRENGTH).Y, ((NewLocation - OldLocation) * ARM_STRENGTH).Z));
 	}
 }
 
@@ -119,7 +119,7 @@ void AItem::Use() {}
 
 void AItem::UpdatePosition(FVector DevicePosition) {
 
-	MotionTracker->SetWorldLocation(MotionController->GetComponentLocation() + RootComponent->GetComponentLocation() - DevicePosition + FVector(0.0f, 0.0f, DevicePosition.Z - 110.f), false, (FHitResult*)nullptr, ETeleportType::None);
+	MotionTracker->SetWorldLocation(MotionController->GetComponentLocation() + RootComponent->GetComponentLocation() - DevicePosition + FVector(0.0f, 0.0f, DevicePosition.Z - 130.f), false, (FHitResult*)nullptr, ETeleportType::None);
 
 	OldLocation = NewLocation;
 	NewLocation = MotionTracker->GetComponentLocation();
