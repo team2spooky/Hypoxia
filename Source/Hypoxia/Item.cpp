@@ -20,6 +20,7 @@ AItem::AItem()
 	PrimaryActorTick.bCanEverTick = true;
 
 	Item_Base = CreateDefaultSubobject<USceneComponent>(TEXT("Item_Base"));
+	RootComponent = Item_Base;
 
 	MotionController = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("MotionController"));
 	MotionController->Hand = EControllerHand::Right;
@@ -229,7 +230,7 @@ void AItem::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimit
 			HitSoundComponent->Radius = 50;
 			HitSoundComponent->SetupAttachment(Item);
 			HitSoundComponent->RegisterComponent();
-			HitSoundComponent->InfluenceSphere->SetWorldLocation(HitSoundComponent->GetComponentLocation());
+			//HitSoundComponent->InfluenceSphere->SetWorldLocation(HitSoundComponent->GetComponentLocation());
 			HitSoundComponent->SetAttenuationSettings(DefaultAttenuation);
 			HitSoundComponent->SetSound(OnHitSound);
 			HitSoundComponent->Play();

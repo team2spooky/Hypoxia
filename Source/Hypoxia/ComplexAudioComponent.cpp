@@ -24,8 +24,8 @@ UComplexAudioComponent::UComplexAudioComponent() : Super() {
 
 	InfluenceSphere = CreateDefaultSubobject<USphereComponent>(TEXT("Influence Sphere"));
 	InfluenceSphere->bAutoActivate = true;
-	InfluenceSphere->SetupAttachment(this);
 	InfluenceSphere->SetWorldLocation(this->GetComponentLocation());
+	//InfluenceSphere->SetupAttachment(this);
 	InfluenceSphere->bHiddenInGame = false;
 	InfluenceSphere->RegisterComponent();
 
@@ -46,6 +46,9 @@ void UComplexAudioComponent::BeginPlay() {
 	this->bAutoDestroy = false;
 	this->Stop();
 
+	InfluenceSphere->SetWorldLocation(this->GetComponentLocation());
+	InfluenceSphere->AttachToComponent(this, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
+
 	// Copy Attenuation settings
 	if (this->AttenuationSettings != nullptr) {
 		VirtualAudioComponent->AttenuationSettings = this->AttenuationSettings;
@@ -58,7 +61,7 @@ void UComplexAudioComponent::BeginPlay() {
 	this->bAutoDestroy = AutoDestroy;
 	this->Play();
 
-	UE_LOG(LogTemp, Warning, TEXT("%d"), InfluenceSphere->IsWelded());
+	//UE_LOG(LogTemp, Warning, TEXT("%d"), InfluenceSphere->IsWelded());
 }
 
 void UComplexAudioComponent::TickComponent(float deltaSeconds, ELevelTick type, FActorComponentTickFunction* tickFunction) {
