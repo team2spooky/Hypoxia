@@ -18,6 +18,12 @@ class HYPOXIA_API AFlashlight : public AItem
 
 	UPROPERTY(VisibleAnywhere, Category = Text)
 	class UTextRenderComponent* Text;
+
+	UPROPERTY(EditAnywhere, Category = Sound)
+	class USoundBase* ClickOnSound;
+
+	UPROPERTY(EditAnywhere, Category = Sound)
+	class USoundBase* ClickOffSound;
 	
 
 public:
