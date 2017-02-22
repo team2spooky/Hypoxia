@@ -16,8 +16,8 @@
 //	UE_LOG(LogTemp, Warning, TEXT("Chase!"));
 //}
 
-float MoveTimer = 500.0f;
-float Looktime  = 500.0f;
+float MoveTimer = 10.f;
+float Looktime  = 1.0f;
 
 AHypoxiaAIController::AHypoxiaAIController() {
 	//Blackboard = CreateDefaultSubobject<UBlackboardComponent>(TEXT("Blackboard"));
@@ -33,11 +33,11 @@ void AHypoxiaAIController::BeginPlay() {
 		HypoxiaCharacter = *ActorItr;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("LoS %d"), LineOfSightTo(HypoxiaCharacter));
+	//UE_LOG(LogTemp, Warning, TEXT("LoS %d"), LineOfSightTo(HypoxiaCharacter));
 
-	UBlackboardComponent* AIBlackboard = UAIBlueprintHelperLibrary::GetBlackboard(this);
+	//UBlackboardComponent* AIBlackboard = UAIBlueprintHelperLibrary::GetBlackboard(this);
 
-	AIBlackboard->SetValueAsVector(FName("WanderLocation"), FVector(1050.0f, 500.0f, 90.0f));
+	//AIBlackboard->SetValueAsVector(FName("WanderLocation"), FVector(1050.0f, 500.0f, 90.0f));
 	//AIBlackboard->SetValueAsVector(FName("WanderLocation"), FVector(-700.0f, -1040.0f, 118.0f));
 
 }
@@ -46,9 +46,9 @@ void AHypoxiaAIController::Tick(float DeltaTime) {
 
 	Super::Tick(DeltaTime);
 
-	UE_LOG(LogTemp, Warning, TEXT("Dist %F"), FVector::Dist(HypoxiaCharacter->GetActorLocation(), GetPawn()->GetActorLocation()));
+	//UE_LOG(LogTemp, Warning, TEXT("Dist %F"), FVector::Dist(HypoxiaCharacter->GetActorLocation(), GetPawn()->GetActorLocation()));
 
-	UE_LOG(LogTemp, Warning, TEXT("LoS %d"), LineOfSightTo(HypoxiaCharacter) && FVector::Dist(HypoxiaCharacter->GetActorLocation(), GetPawn()->GetActorLocation()) < 200.0f);
+	//UE_LOG(LogTemp, Warning, TEXT("LoS %d"), LineOfSightTo(HypoxiaCharacter) && FVector::Dist(HypoxiaCharacter->GetActorLocation(), GetPawn()->GetActorLocation()) < 200.0f);
 
 	UBlackboardComponent* AIBlackboard = UAIBlueprintHelperLibrary::GetBlackboard(this);
 
@@ -59,11 +59,11 @@ void AHypoxiaAIController::Tick(float DeltaTime) {
 		//AIBlackboard->SetValueAsVector(FName("PlayerLocation"), HypoxiaCharacter->GetActorLocation());
 	}
 
-	MoveTimer -= 1.0f;
-	Looktime  -= 1.0f;
+	MoveTimer -= DeltaTime;
+	Looktime  -= DeltaTime;
 
 	if (MoveTimer <= 0.0f) {
-		MoveTimer = 500.0f;
+		MoveTimer = 10.f;
 		AIBlackboard->SetValueAsVector(FName("WanderLocation"), FVector(FMath::RandRange(-1100.f, 1100.0f), FMath::RandRange(-1200.f, 650.0f), 90.0f));
 	}
 
@@ -78,6 +78,7 @@ void AHypoxiaAIController::HearSound(FVector Location, float Amplitude) {
 	AIBlackboard->SetValueAsBool(FName("HeardSound"), true);
 	AIBlackboard->SetValueAsVector(FName("SoundLocation"), Location);
 
-	Looktime = 20.0f;
+	Looktime = 1.f;
 
+	//UE_LOG(LogTemp, Warning, TEXT("SOUNDDDDDD!!!!!"));
 }

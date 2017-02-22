@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Hypoxia.h"
+#include "HypoxiaAIController.h"
+#include "HypoxiaMonster.h"
 #include "ListeningItem.h"
 #include "VoiceCaptureComponent.h"
 
@@ -36,7 +38,7 @@ UVoiceCaptureComponent::UVoiceCaptureComponent() : Super()
 
 	InfluenceSphere = CreateDefaultSubobject<USphereComponent>(TEXT("Influence Sphere"));
 	InfluenceSphere->SetSphereRadius(200.0f);
-	//InfluenceSphere->bHiddenInGame = false;
+	InfluenceSphere->bHiddenInGame = false;
 }
 
 
@@ -116,6 +118,12 @@ void UVoiceCaptureComponent::TriggerObjects(float volume) {
 		AListeningItem* Item = Cast<AListeningItem>(*Itr);
 		float Dist = FVector::Dist(Item->GetActorLocation(), InfluenceSphere->GetComponentLocation());
 		Item->Hear(FMath::Lerp(1.f, 0.f, Dist / MaxDist) * volume);
+	}
+	TSubclassOf<AHypoxiaMonster> Monster = AHypoxiaMonster::StaticClass();
+	InfluenceSphere->GetOverlappingActors(OverlappingActors, Monster);
+	for (TSet<AActor*>::TConstIterator Itr = OverlappingActors.CreateConstIterator(); Itr; ++Itr) {
+		AHypoxiaMonster* M = Cast<AHypoxiaMonster>(*Itr);
+		Cast<AHypoxiaAIController>(M->GetController())->HearSound(InfluenceSphere->GetComponentLocation(), volume);
 	}
 }
 

@@ -220,19 +220,26 @@ void AItem::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimit
 	/*if (OtherActor->IsA(ADoor::StaticClass())) {
 		UE_LOG(LogTemp, Warning, TEXT("I'm hit, I'm hit"));
 	}*/
-	if ((Item->GetPhysicsLinearVelocity() - LastVelocity).Size() > 100) {
+	if ((Item->GetPhysicsLinearVelocity() - LastVelocity).Size() > 150) {
 		LastVelocity = Item->GetPhysicsLinearVelocity();
 		if (OnHitSound) {
-			HitSoundComponent = ConstructObject<UComplexAudioComponent>(UComplexAudioComponent::StaticClass(), this, FName("DynamicHitSoundComponent"));
-			HitSoundComponent->bAutoDestroy = true;
+			HitSoundComponent = NewObject<UComplexAudioComponent>(Item, FName("DynamicSound"));
+			//HitSoundComponent->bAutoDestroy = true;
 			HitSoundComponent->bAdvancedOcclusion = true;
 			HitSoundComponent->Radius = 50;
-			HitSoundComponent->RegisterComponent();
 			HitSoundComponent->SetupAttachment(Item);
-			HitSoundComponent->SetWorldLocation(Item->GetComponentLocation());
+			HitSoundComponent->RegisterComponent();
+			HitSoundComponent->InfluenceSphere->SetWorldLocation(HitSoundComponent->GetComponentLocation());
 			HitSoundComponent->SetAttenuationSettings(DefaultAttenuation);
 			HitSoundComponent->SetSound(OnHitSound);
 			HitSoundComponent->Play();
+			/*UE_LOG(LogTemp, Warning, TEXT("%d"), HitSoundComponent->InfluenceSphere->IsRegistered());
+			UE_LOG(LogTemp, Warning, TEXT("%f, %f, %f"), HitSoundComponent->GetComponentLocation().X, HitSoundComponent->GetComponentLocation().Y, HitSoundComponent->GetComponentLocation().Z);
+			UE_LOG(LogTemp, Warning, TEXT("%f, %f, %f"), HitSoundComponent->InfluenceSphere->GetComponentLocation().X, HitSoundComponent->InfluenceSphere->GetComponentLocation().Y, HitSoundComponent->InfluenceSphere->GetComponentLocation().Z);*/
 		}
 	}
+}
+
+UStaticMeshComponent* AItem::GetItem() {
+	return Item;
 }

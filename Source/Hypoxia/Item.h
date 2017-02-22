@@ -43,6 +43,8 @@ public:
 
 	void Drop();
 
+	UStaticMeshComponent* GetItem();
+
 	virtual void Use();
 
 	virtual bool Pickup(USceneComponent*, EControllerHand);

@@ -33,9 +33,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	bool bListenToSelf;
 
+	USphereComponent* InfluenceSphere;
+
 private:
 	UAudioComponent* VirtualAudioComponent;
-	USphereComponent* InfluenceSphere;
 
 	float TestOcclusion();
 	void DiffractSound(FVector goalLoc, FVector& out_Loc, float& out_Vol);
