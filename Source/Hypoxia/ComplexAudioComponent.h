@@ -18,11 +18,26 @@ public:
 	
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float, ELevelTick, FActorComponentTickFunction*) override;
+	void DestroyComponent(bool bPromoteChildren = false);
+	void Play(float startTime = 0.f);
+	void Stop();
+	void SetSound(USoundBase*);
+	void SetAttenuationSettings(USoundAttenuation*);
+
+	UPROPERTY(EditAnywhere)
+	bool bAdvancedOcclusion;
+	
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.f))
+	float Radius;
+
+	UPROPERTY(EditAnywhere)
+	bool bListenToSelf;
+
+	USphereComponent* InfluenceSphere;
 
 private:
 	UAudioComponent* VirtualAudioComponent;
 
-	bool TestOcclusion();
+	float TestOcclusion();
 	void DiffractSound(FVector goalLoc, FVector& out_Loc, float& out_Vol);
-	void Play(float startTime = 0.f);
 };

@@ -4,6 +4,7 @@
 
 #include "GameFramework/Actor.h"
 #include "MotionControllerComponent.h"
+#include "ComplexAudioComponent.h"
 #include "Item.generated.h"
 
 UCLASS()
@@ -28,6 +29,9 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	class USceneComponent* GrabSpot;
 
+	UPROPERTY(EditAnywhere)
+	USoundBase* OnHitSound;
+
 	bool Held;
 
 	FVector OldLocation;
@@ -38,6 +42,8 @@ public:
 	// Sets default values for this actor's properties
 
 	void Drop();
+
+	UStaticMeshComponent* GetItem();
 
 	virtual void Use();
 
@@ -64,4 +70,7 @@ protected:
 
 	void SelfDrop();
 
+private:
+	UComplexAudioComponent* HitSoundComponent;
+	FVector LastVelocity;
 };
