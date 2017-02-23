@@ -12,12 +12,15 @@ AHypoxiaCharacter *HypoxiaCharacter;
 
 const float ARM_STRENGTH = 400.0f; //Applifies the velocity of objects when dropped
 
+USoundAttenuation* DefaultAttenuation;
+
 // Sets default values
 AItem::AItem()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
 	Item_Base = CreateDefaultSubobject<USceneComponent>(TEXT("Item_Base"));
+	RootComponent = Item_Base;
 
 	MotionController = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("MotionController"));
 	MotionController->Hand = EControllerHand::Right;
@@ -41,6 +44,12 @@ AItem::AItem()
 	GrabSpot = CreateDefaultSubobject<USceneComponent>(TEXT("GrabSpot"));
 	GrabSpot->SetupAttachment(Item);
 
+	/*HitSoundComponent = CreateDefaultSubobject<UComplexAudioComponent>(TEXT("HitSoundComponent"));
+	HitSoundComponent->SetupAttachment(Item_Base);
+	HitSoundComponent->SetSound(OnHitSound);*/
+	static ConstructorHelpers::FObjectFinder<USoundAttenuation> AttenuationAsset((TEXT("/Game/DefaultAttenuation.DefaultAttenuation")));
+	if (AttenuationAsset.Succeeded())
+		DefaultAttenuation = AttenuationAsset.Object;
 }
 
 // Called when the game starts or when spawned
@@ -212,4 +221,26 @@ void AItem::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimit
 	/*if (OtherActor->IsA(ADoor::StaticClass())) {
 		UE_LOG(LogTemp, Warning, TEXT("I'm hit, I'm hit"));
 	}*/
+	if ((Item->GetPhysicsLinearVelocity() - LastVelocity).Size() > 150) {
+		LastVelocity = Item->GetPhysicsLinearVelocity();
+		if (OnHitSound) {
+			HitSoundComponent = NewObject<UComplexAudioComponent>(Item, FName("DynamicSound"));
+			//HitSoundComponent->bAutoDestroy = true;
+			HitSoundComponent->bAdvancedOcclusion = true;
+			HitSoundComponent->Radius = 50;
+			HitSoundComponent->SetupAttachment(Item);
+			HitSoundComponent->RegisterComponent();
+			//HitSoundComponent->InfluenceSphere->SetWorldLocation(HitSoundComponent->GetComponentLocation());
+			HitSoundComponent->SetAttenuationSettings(DefaultAttenuation);
+			HitSoundComponent->SetSound(OnHitSound);
+			HitSoundComponent->Play();
+			/*UE_LOG(LogTemp, Warning, TEXT("%d"), HitSoundComponent->InfluenceSphere->IsRegistered());
+			UE_LOG(LogTemp, Warning, TEXT("%f, %f, %f"), HitSoundComponent->GetComponentLocation().X, HitSoundComponent->GetComponentLocation().Y, HitSoundComponent->GetComponentLocation().Z);
+			UE_LOG(LogTemp, Warning, TEXT("%f, %f, %f"), HitSoundComponent->InfluenceSphere->GetComponentLocation().X, HitSoundComponent->InfluenceSphere->GetComponentLocation().Y, HitSoundComponent->InfluenceSphere->GetComponentLocation().Z);*/
+		}
+	}
+}
+
+UStaticMeshComponent* AItem::GetItem() {
+	return Item;
 }
