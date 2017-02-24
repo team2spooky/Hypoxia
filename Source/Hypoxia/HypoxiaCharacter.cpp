@@ -257,7 +257,7 @@ void AHypoxiaCharacter::Tick(float DeltaTime) {
 
 	//FirstPersonCameraComponent->SetWorldLocation(GetCapsuleComponent()->GetComponentLocation());
 	
-	FirstPersonCameraComponent->SetWorldLocation(FVector(FirstPersonCameraComponent->GetComponentLocation().X, FirstPersonCameraComponent->GetComponentLocation().Y, DevicePosition.Z));
+	//FirstPersonCameraComponent->SetWorldLocation(FVector(FirstPersonCameraComponent->GetComponentLocation().X, FirstPersonCameraComponent->GetComponentLocation().Y, DevicePosition.Z));
 	
 	//UE_LOG(LogTemp, Error, TEXT("Camera X: %f"), FirstPersonCameraComponent->GetComponentLocation().X);
 

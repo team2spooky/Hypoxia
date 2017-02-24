@@ -6,6 +6,7 @@
 #include "ListeningItem.h"
 #include "VoiceCaptureComponent.h"
 
+#define VOICE_DEBUG 0
 
 // Sets default values for this component's properties
 UVoiceCaptureComponent::UVoiceCaptureComponent() : Super()
@@ -38,7 +39,9 @@ UVoiceCaptureComponent::UVoiceCaptureComponent() : Super()
 
 	InfluenceSphere = CreateDefaultSubobject<USphereComponent>(TEXT("Influence Sphere"));
 	InfluenceSphere->SetSphereRadius(200.0f);
+#if VOICE_DEBUG
 	InfluenceSphere->bHiddenInGame = false;
+#endif
 }
 
 

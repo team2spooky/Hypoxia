@@ -29,8 +29,14 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	class USceneComponent* GrabSpot;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = Sound)
 	USoundBase* OnHitSound;
+
+	UPROPERTY(EditAnywhere, Category = Sound)
+	bool bAmbientSound;
+
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.f, ClampMax = 100.f), Category = Sound)
+	float ProjectedVolume;
 
 	bool Held;
 
@@ -63,6 +69,8 @@ protected:
 
 	UFUNCTION()
 	virtual void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
+
+	virtual UComplexAudioComponent* GenerateOnHitSound();
 	
 	virtual void UpdatePosition(FVector);
 
@@ -71,6 +79,5 @@ protected:
 	void SelfDrop();
 
 private:
-	UComplexAudioComponent* HitSoundComponent;
 	FVector LastVelocity;
 };
