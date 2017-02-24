@@ -4,6 +4,7 @@
 #include "Flashlight.h"
 #include "Runtime/Engine/Classes/Components/TextRenderComponent.h"
 #include "MotionControllerComponent.h"
+#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 
 AFlashlight::AFlashlight()
 {
@@ -22,8 +23,16 @@ void AFlashlight::Use() {
 	float intensity = Light->Intensity;
 	if (intensity == 0.0f) {
 		Light->SetIntensity(6000.0f);
+		// Play a sound when the flashlight is clicked on
+		if (ClickOnSound != NULL) {
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), ClickOnSound, GetActorLocation());
+		}
 	} else {
 		Light->SetIntensity(0.0f);
+		// Play a sound when the flashlight is clicked off
+		if (ClickOffSound != NULL) {
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), ClickOffSound, GetActorLocation());
+		}
 	}
 
 	//Text->SetText("This is where the text for something long<br>that the player would read<br>could go.<br><br>As you can see the light on it is strange but could be cool<br>right now you have to shine<br>the light on it<br>to really be able to read it.");
