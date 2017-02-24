@@ -15,6 +15,9 @@ class HYPOXIA_API AListeningItem : public AItem
 	
 public:
 	virtual void Hear(float volume);
+
+	virtual UComplexAudioComponent* GenerateOnHitSound() override;
 	
-	
+	UPROPERTY(EditAnywhere, Category = Sound)
+	bool bListenToSelf;
 };

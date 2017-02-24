@@ -24,19 +24,24 @@ public:
 	void SetSound(USoundBase*);
 	void SetAttenuationSettings(USoundAttenuation*);
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = Sound)
 	bool bAdvancedOcclusion;
 	
-	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.f))
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.f), Category = Sound)
 	float Radius;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = Sound)
 	bool bListenToSelf;
 
-	USphereComponent* InfluenceSphere;
+	UPROPERTY(EditAnywhere, Category = Sound)
+	bool bAmbientSound;
+
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.f, ClampMax = 100.f), Category = Sound)
+	float ProjectedVolume;
 
 private:
 	UAudioComponent* VirtualAudioComponent;
+	USphereComponent* InfluenceSphere;
 
 	float TestOcclusion();
 	void DiffractSound(FVector goalLoc, FVector& out_Loc, float& out_Vol);

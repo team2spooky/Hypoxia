@@ -8,7 +8,7 @@
 #include "Runtime/Engine/Classes/AI/Navigation/NavigationPath.h"
 #include "ListeningItem.h"
 
-#define AUDIO_DEBUG 1
+#define AUDIO_DEBUG 0
 
 UComplexAudioComponent::UComplexAudioComponent() : Super() {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -26,18 +26,20 @@ UComplexAudioComponent::UComplexAudioComponent() : Super() {
 	InfluenceSphere->bAutoActivate = true;
 	InfluenceSphere->SetWorldLocation(this->GetComponentLocation());
 	//InfluenceSphere->SetupAttachment(this);
-	InfluenceSphere->bHiddenInGame = false;
 	InfluenceSphere->RegisterComponent();
 
+#if AUDIO_DEBUG
+	InfluenceSphere->bHiddenInGame = false;
 	// Debug Sphere
-	/*UStaticMeshComponent* VirtualDebugSphere = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DEBUGVIRTUAL"));
+	UStaticMeshComponent* VirtualDebugSphere = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DEBUGVIRTUAL"));
 	VirtualDebugSphere->SetupAttachment(VirtualAudioComponent);
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> SphereVisualAsset(TEXT("/Game/Startercontent/Shapes/Shape_Sphere.Shape_Sphere"));
 	if (SphereVisualAsset.Succeeded()) {
 		VirtualDebugSphere->SetStaticMesh(SphereVisualAsset.Object);
 		VirtualDebugSphere->SetWorldScale3D(FVector(0.1f));
 		VirtualDebugSphere->SetCollisionProfileName(TEXT("NoCollision"));
-	}*/
+	}
+#endif
 }
 
 void UComplexAudioComponent::BeginPlay() {
@@ -55,7 +57,7 @@ void UComplexAudioComponent::BeginPlay() {
 		//VirtualAudioComponent->AdjustAttenuation(*this->GetAttenuationSettingsToApply());
 
 		// Setup Influence Sphere
-		InfluenceSphere->SetSphereRadius(this->GetAttenuationSettingsToApply()->GetMaxDimension());
+		InfluenceSphere->SetSphereRadius(this->GetAttenuationSettingsToApply()->GetMaxDimension() * ProjectedVolume / 100.f);
 	}
 
 	this->bAutoDestroy = AutoDestroy;
@@ -78,7 +80,7 @@ void UComplexAudioComponent::TickComponent(float deltaSeconds, ELevelTick type, 
 	this->SetVolumeMultiplier(1 - Occlusion);
 	VirtualAudioComponent->SetWorldLocation(Loc);
 	VirtualAudioComponent->SetVolumeMultiplier(Vol * Occlusion);
-	if (this->IsPlaying()) {
+	if (this->IsPlaying() && !bAmbientSound) {
 		//USoundWave* temp = Cast<USoundWave>(this->Sound);
 		//Cast<USoundCue>(this->Sound);
 		//if(temp != nullptr)
@@ -87,16 +89,19 @@ void UComplexAudioComponent::TickComponent(float deltaSeconds, ELevelTick type, 
 		TSubclassOf<AListeningItem> Filter = AListeningItem::StaticClass();
 		float MaxDist = this->GetAttenuationSettingsToApply()->GetMaxDimension();
 		InfluenceSphere->GetOverlappingActors(OverlappingActors, Filter);
+		if (!bListenToSelf) {
+			OverlappingActors.Remove(this->GetAttachmentRootActor());
+		}
 		for (TSet<AActor*>::TConstIterator Itr = OverlappingActors.CreateConstIterator(); Itr; ++Itr) {
 			AListeningItem* Item = Cast<AListeningItem>(*Itr);
 			float Dist = FVector::Dist(Item->GetItem()->GetComponentLocation(), this->GetComponentLocation());
-			Item->Hear(FMath::Lerp(100.f, 0.f, Dist / MaxDist) - 50.f);
+			Item->Hear(FMath::Lerp(1.f, 0.f, Dist / MaxDist) * ProjectedVolume);
 		}
 		TSubclassOf<AHypoxiaMonster> Monster = AHypoxiaMonster::StaticClass();
 		InfluenceSphere->GetOverlappingActors(OverlappingActors, Monster);
 		for (TSet<AActor*>::TConstIterator Itr = OverlappingActors.CreateConstIterator(); Itr; ++Itr) {
 			AHypoxiaMonster* M = Cast<AHypoxiaMonster>(*Itr);
-			Cast<AHypoxiaAIController>(M->GetController())->HearSound(InfluenceSphere->GetComponentLocation(), 100.f);
+			Cast<AHypoxiaAIController>(M->GetController())->HearSound(InfluenceSphere->GetComponentLocation(), ProjectedVolume);
 		}
 	}
 }
@@ -134,7 +139,7 @@ float UComplexAudioComponent::TestOcclusion() {
 	ACharacter* PC = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	float Obstructed = 0.0f;
 	if (!bAdvancedOcclusion) {
-		Obstructed = GetWorld()->LineTraceTestByChannel(GetComponentLocation(), PC->GetActorLocation(), ECC_Visibility);
+		Obstructed = GetWorld()->LineTraceTestByChannel(GetComponentLocation(), PC->GetActorLocation(), ECC_GameTraceChannel2);
 #if AUDIO_DEBUG	
 		::DrawDebugLine(GetWorld(), this->GetComponentLocation(), PC->GetActorLocation(), FColor::Red, false, -1.0f, (uint8)'\000', 0.1f);
 #endif
@@ -144,7 +149,7 @@ float UComplexAudioComponent::TestOcclusion() {
 		Axis.Normalize();
 		for (int i = 0; i < 8; i++) {
 			FVector TestLoc = GetComponentLocation() + RVec.RotateAngleAxis(i * 360.0f / 8, Axis);
-			Obstructed += GetWorld()->LineTraceTestByChannel(TestLoc, PC->GetActorLocation(), ECC_Visibility);
+			Obstructed += GetWorld()->LineTraceTestByChannel(TestLoc, PC->GetActorLocation(), ECC_GameTraceChannel2);
 #if AUDIO_DEBUG
 			::DrawDebugLine(GetWorld(), TestLoc, PC->GetActorLocation(), FColor::Green, false, -1.0f, (uint8)'\000', 0.1f);
 #endif
@@ -167,7 +172,7 @@ void UComplexAudioComponent::DiffractSound(FVector goalLoc, FVector& out_Loc, fl
 	Target.Z = goalLoc.Z;
 	FVector Projection = Target - goalLoc;
 	out_Loc = Target;
-	out_Vol = FMath::Clamp(1.0f - ((Path->GetLength() - Projection.Size()) / 2000.0f), 0.0f, 1.0f);
+	out_Vol = FMath::Clamp(1.0f - ((Path->GetLength() - Projection.Size()) / this->AttenuationSettings->Attenuation.FalloffDistance), 0.0f, 1.0f);
 	//out_Vol = 1.0f;
 	UE_LOG(LogTemp, Warning, TEXT("Volume = %f, Loc = (%f, %f, %f)"), out_Vol, out_Loc.X, out_Loc.Y, out_Loc.Z);
 }

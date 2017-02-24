@@ -40,6 +40,7 @@ AItem::AItem()
 
 	Item->SetNotifyRigidBodyCollision(true);
 	Item->OnComponentHit.AddDynamic(this, &AItem::OnHit);
+	Item->SetCanEverAffectNavigation(false);
 
 	GrabSpot = CreateDefaultSubobject<USceneComponent>(TEXT("GrabSpot"));
 	GrabSpot->SetupAttachment(Item);
@@ -216,29 +217,27 @@ void AItem::Tick(float DeltaTime) {
 }
 
 void AItem::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit) {
-	//UE_LOG(LogTemp, Warning, TEXT("I'm hit, I'm hit"));
-
-	/*if (OtherActor->IsA(ADoor::StaticClass())) {
-		UE_LOG(LogTemp, Warning, TEXT("I'm hit, I'm hit"));
-	}*/
 	if ((Item->GetPhysicsLinearVelocity() - LastVelocity).Size() > 150) {
 		LastVelocity = Item->GetPhysicsLinearVelocity();
 		if (OnHitSound) {
-			HitSoundComponent = NewObject<UComplexAudioComponent>(Item, FName("DynamicSound"));
-			//HitSoundComponent->bAutoDestroy = true;
-			HitSoundComponent->bAdvancedOcclusion = true;
-			HitSoundComponent->Radius = 50;
-			HitSoundComponent->SetupAttachment(Item);
-			HitSoundComponent->RegisterComponent();
-			//HitSoundComponent->InfluenceSphere->SetWorldLocation(HitSoundComponent->GetComponentLocation());
-			HitSoundComponent->SetAttenuationSettings(DefaultAttenuation);
-			HitSoundComponent->SetSound(OnHitSound);
-			HitSoundComponent->Play();
-			/*UE_LOG(LogTemp, Warning, TEXT("%d"), HitSoundComponent->InfluenceSphere->IsRegistered());
-			UE_LOG(LogTemp, Warning, TEXT("%f, %f, %f"), HitSoundComponent->GetComponentLocation().X, HitSoundComponent->GetComponentLocation().Y, HitSoundComponent->GetComponentLocation().Z);
-			UE_LOG(LogTemp, Warning, TEXT("%f, %f, %f"), HitSoundComponent->InfluenceSphere->GetComponentLocation().X, HitSoundComponent->InfluenceSphere->GetComponentLocation().Y, HitSoundComponent->InfluenceSphere->GetComponentLocation().Z);*/
+			UComplexAudioComponent* HitSound = GenerateOnHitSound();
+			HitSound->Play();
 		}
 	}
+}
+
+UComplexAudioComponent* AItem::GenerateOnHitSound() {
+	UComplexAudioComponent* HitSoundComponent = NewObject<UComplexAudioComponent>(Item, FName("DynamicSound"));
+	HitSoundComponent->bAutoDestroy = true;
+	HitSoundComponent->bAdvancedOcclusion = true;
+	HitSoundComponent->bAmbientSound = this->bAmbientSound;
+	HitSoundComponent->ProjectedVolume = this->ProjectedVolume;
+	HitSoundComponent->Radius = 50;
+	HitSoundComponent->SetupAttachment(Item);
+	HitSoundComponent->RegisterComponent();
+	HitSoundComponent->SetAttenuationSettings(DefaultAttenuation);
+	HitSoundComponent->SetSound(OnHitSound);
+	return HitSoundComponent;
 }
 
 UStaticMeshComponent* AItem::GetItem() {
