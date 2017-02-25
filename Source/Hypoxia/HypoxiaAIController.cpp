@@ -63,7 +63,7 @@ void AHypoxiaAIController::Tick(float DeltaTime) {
 	Looktime  -= DeltaTime;
 
 	if (MoveTimer <= 0.0f) {
-		MoveTimer = 10.f;
+		MoveTimer = 30.f;
 		AIBlackboard->SetValueAsVector(FName("WanderLocation"), FVector(FMath::RandRange(1810.f, 4880.0f), FMath::RandRange(-1770.f, 430.0f), 90.0f));
 	}
 
@@ -78,7 +78,7 @@ void AHypoxiaAIController::HearSound(FVector Location, float Amplitude) {
 	AIBlackboard->SetValueAsBool(FName("HeardSound"), true);
 	AIBlackboard->SetValueAsVector(FName("SoundLocation"), Location);
 
-	Looktime = 1.f;
+	Looktime = 5.0f;
 
 	//UE_LOG(LogTemp, Warning, TEXT("SOUNDDDDDD!!!!!"));
 }
