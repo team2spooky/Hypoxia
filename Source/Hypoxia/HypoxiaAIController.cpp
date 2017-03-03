@@ -3,6 +3,7 @@
 #include "Hypoxia.h"
 #include "HypoxiaAIController.h"
 #include "HypoxiaCharacter.h"
+#include "HypoxiaMonster.h"
 #include "EngineUtils.h"
 #include "Runtime/AIModule/Classes/Blueprint/AIBlueprintHelperLibrary.h"
 #include "Runtime/AIModule/Classes/BehaviorTree/BlackboardComponent.h"
@@ -22,7 +23,6 @@ float Looktime  = 1.0f;
 AHypoxiaAIController::AHypoxiaAIController() {
 	//Blackboard = CreateDefaultSubobject<UBlackboardComponent>(TEXT("Blackboard"));
 	//Blackboard->SetupAttachment(Item_Base);
-	
 }
 
 void AHypoxiaAIController::BeginPlay() {
@@ -56,6 +56,17 @@ void AHypoxiaAIController::Tick(float DeltaTime) {
 		AIBlackboard->SetValueAsVector(FName("PlayerLocation"), HypoxiaCharacter->GetActorLocation());
 	} else if (LineOfSightTo(HypoxiaCharacter) && FVector::Dist(HypoxiaCharacter->GetActorLocation(), GetPawn()->GetActorLocation()) < 200.0f) {
 		AIBlackboard->SetValueAsBool(FName("SeenPlayer"), true);
+		AHypoxiaMonster* Monster = Cast<AHypoxiaMonster>(this->GetPawn());
+		UComplexAudioComponent* DetectSoundComponent = NewObject<UComplexAudioComponent>(Monster, FName("DynamicSound"));
+		DetectSoundComponent->bAutoDestroy = true;
+		DetectSoundComponent->bAdvancedOcclusion = true;
+		DetectSoundComponent->ProjectedVolume = 100;
+		DetectSoundComponent->Radius = 50;
+		DetectSoundComponent->SetupAttachment(Monster->GetRootComponent());
+		DetectSoundComponent->RegisterComponent();
+		DetectSoundComponent->SetAttenuationSettings(Monster->DetectAttenuation);
+		DetectSoundComponent->SetSound(Monster->DetectSound);
+		DetectSoundComponent->Play();
 		//AIBlackboard->SetValueAsVector(FName("PlayerLocation"), HypoxiaCharacter->GetActorLocation());
 	}
 
