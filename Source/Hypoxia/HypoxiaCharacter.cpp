@@ -92,7 +92,8 @@ void AHypoxiaCharacter::BeginPlay() {
 	HeldItemLeft  = NULL;
 
 	StepTimer = 0.0f;
-	FootstepAudioComponent->SetSound(FootstepSound);
+	if(FootstepSound)
+		FootstepAudioComponent->SetSound(FootstepSound);
 }
 
 //////////////////////////////////////////////////////////////////////////

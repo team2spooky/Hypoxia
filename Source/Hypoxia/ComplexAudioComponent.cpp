@@ -8,7 +8,7 @@
 #include "Runtime/Engine/Classes/AI/Navigation/NavigationPath.h"
 #include "ListeningItem.h"
 
-#define AUDIO_DEBUG 0
+#define AUDIO_DEBUG 1
 
 UComplexAudioComponent::UComplexAudioComponent() : Super() {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -172,7 +172,7 @@ void UComplexAudioComponent::DiffractSound(FVector goalLoc, FVector& out_Loc, fl
 	Target.Z = goalLoc.Z;
 	FVector Projection = Target - goalLoc;
 	out_Loc = Target;
-	out_Vol = FMath::Clamp(1.0f - ((Path->GetLength() - Projection.Size()) / this->AttenuationSettings->Attenuation.FalloffDistance), 0.0f, 1.0f);
+	out_Vol = FMath::Clamp(1.0f - ((Path->GetLength()/* - Projection.Size()*/) / this->AttenuationSettings->Attenuation.FalloffDistance), 0.0f, 1.0f);
 	//out_Vol = 1.0f;
 	UE_LOG(LogTemp, Warning, TEXT("Volume = %f, Loc = (%f, %f, %f)"), out_Vol, out_Loc.X, out_Loc.Y, out_Loc.Z);
 }

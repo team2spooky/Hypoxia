@@ -146,12 +146,13 @@ public:
 	FORCEINLINE class UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
 public:
-	UPROPERTY(EditAnywhere, Category = Sound)
+	UPROPERTY(EditAnywhere, Category = "Sound")
 	USoundBase* FootstepSound;
 
-private:
+	UPROPERTY(EditAnywhere)
 	UComplexAudioComponent* FootstepAudioComponent;
 
+private:
 	float StepTimer;
 };
 
