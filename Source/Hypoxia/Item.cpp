@@ -80,7 +80,7 @@ bool AItem::Pickup(USceneComponent* Controller, EControllerHand Hand) {
 	if (!Held) {
 
 		//If the item is within the given distance of the given controller, pick it up
-		if (FVector::Dist(Controller->GetComponentLocation(), GrabSpot->GetComponentLocation()) < 50.0f) {
+		if (FVector::Dist(Controller->GetComponentLocation(), GrabSpot->GetComponentLocation()) < 10.0f) {
 
 			//Item->SetSimulatePhysics(false);
 			Item->SetEnableGravity(false);
