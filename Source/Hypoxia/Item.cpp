@@ -45,9 +45,6 @@ AItem::AItem()
 	GrabSpot = CreateDefaultSubobject<USceneComponent>(TEXT("GrabSpot"));
 	GrabSpot->SetupAttachment(Item);
 
-	/*HitSoundComponent = CreateDefaultSubobject<UComplexAudioComponent>(TEXT("HitSoundComponent"));
-	HitSoundComponent->SetupAttachment(Item_Base);
-	HitSoundComponent->SetSound(OnHitSound);*/
 	static ConstructorHelpers::FObjectFinder<USoundAttenuation> AttenuationAsset((TEXT("/Game/DefaultAttenuation.DefaultAttenuation")));
 	if (AttenuationAsset.Succeeded())
 		DefaultAttenuation = AttenuationAsset.Object;
@@ -232,7 +229,7 @@ UComplexAudioComponent* AItem::GenerateOnHitSound() {
 	HitSoundComponent->bAdvancedOcclusion = true;
 	HitSoundComponent->bAmbientSound = this->bAmbientSound;
 	HitSoundComponent->ProjectedVolume = this->ProjectedVolume;
-	HitSoundComponent->Radius = 50;
+	HitSoundComponent->Radius = 10;
 	HitSoundComponent->SetupAttachment(Item);
 	HitSoundComponent->RegisterComponent();
 	HitSoundComponent->SetAttenuationSettings(DefaultAttenuation);

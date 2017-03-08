@@ -145,5 +145,11 @@ public:
 	/** Returns FirstPersonCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
+public:
+	UPROPERTY(EditAnywhere)
+	UComplexAudioComponent* FootstepAudioComponent;
+
+private:
+	float StepTimer;
 };
 

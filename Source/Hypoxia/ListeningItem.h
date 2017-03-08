@@ -8,7 +8,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(abstract)
 class HYPOXIA_API AListeningItem : public AItem
 {
 	GENERATED_BODY()

@@ -16,6 +16,7 @@ DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
 const float MOVEMENT_SCALE = 1.0f; //Scales along with movement speed
 const float CAMERA_HEIGHT_OFFSET = 60.0f;
+const float STEP_TIME = 100.0f;
 
 AItem *HeldItemRight;
 AItem *HeldItemLeft;
@@ -64,6 +65,13 @@ AHypoxiaCharacter::AHypoxiaCharacter() {
 	R_MotionController->bAbsoluteRotation = true;
 	L_MotionController->bAbsoluteLocation = true;
 	L_MotionController->bAbsoluteRotation = true;
+
+	FootstepAudioComponent = CreateDefaultSubobject<UComplexAudioComponent>(TEXT("FootstepAudio"));
+	FootstepAudioComponent->SetupAttachment(RootComponent);
+	FootstepAudioComponent->bAmbientSound = true;
+	static ConstructorHelpers::FObjectFinder<USoundAttenuation> AttenuationAsset((TEXT("/Game/DefaultAttenuation.DefaultAttenuation")));
+	if (AttenuationAsset.Succeeded())
+		FootstepAudioComponent->SetAttenuationSettings(AttenuationAsset.Object);
 }
 
 void AHypoxiaCharacter::BeginPlay() {
@@ -82,6 +90,8 @@ void AHypoxiaCharacter::BeginPlay() {
 
 	HeldItemRight = NULL;
 	HeldItemLeft  = NULL;
+
+	StepTimer = 0.0f;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -141,6 +151,11 @@ void AHypoxiaCharacter::MoveForward(float Value) {
 		//AddMovementInput(GetActorForwardVector(), Value);
 
 		AddMovementInput(GetActorForwardVector(), Value);
+		StepTimer += FMath::Abs(Value);
+		if (StepTimer > STEP_TIME) {
+			FootstepAudioComponent->Play();
+			StepTimer = 0.f;
+		}
 	}
 }
 
@@ -159,6 +174,11 @@ void AHypoxiaCharacter::MoveRight(float Value) {
 
 		//AddMovementInput(DeviceRotation.RotateVector(GetActorRightVector()), Value);
 		//AddMovementInput(FRotator(FirstPersonCameraComponent->RelativeRotation.Pitch, FirstPersonCameraComponent->RelativeRotation.Roll, GetCapsuleComponent()->RelativeRotation.Yaw).RotateVector(GetActorRightVector()), Value);
+		StepTimer += FMath::Abs(Value);
+		if (StepTimer > STEP_TIME) {
+			FootstepAudioComponent->Play();
+			StepTimer = 0.f;
+		}
 	}
 }
 
