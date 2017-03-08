@@ -8,7 +8,6 @@
 #include "Kismet/HeadMountedDisplayFunctionLibrary.h"
 #include "MotionControllerComponent.h"
 #include "Item.h"
-#include "InteractiveItem.h"
 #include "EngineUtils.h"
 #include "Engine/StaticMeshActor.h"
 
@@ -136,10 +135,6 @@ void AHypoxiaCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerI
 
 void AHypoxiaCharacter::OnResetVR() {
 	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
-
-	for (TActorIterator<AInteractiveItem> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
-		ActorItr->Pickup(this->RootComponent, EControllerHand::Right);
-	}
 }
 
 void AHypoxiaCharacter::MoveForward(float Value) {
