@@ -57,16 +57,18 @@ void AHypoxiaAIController::Tick(float DeltaTime) {
 	} else if (LineOfSightTo(HypoxiaCharacter) && FVector::Dist(HypoxiaCharacter->GetActorLocation(), GetPawn()->GetActorLocation()) < 200.0f) {
 		AIBlackboard->SetValueAsBool(FName("SeenPlayer"), true);
 		AHypoxiaMonster* Monster = Cast<AHypoxiaMonster>(this->GetPawn());
-		UComplexAudioComponent* DetectSoundComponent = NewObject<UComplexAudioComponent>(Monster, FName("DynamicSound"));
-		DetectSoundComponent->bAutoDestroy = true;
-		DetectSoundComponent->bAdvancedOcclusion = true;
-		DetectSoundComponent->ProjectedVolume = 100;
-		DetectSoundComponent->Radius = 50;
-		DetectSoundComponent->SetupAttachment(Monster->GetRootComponent());
-		DetectSoundComponent->RegisterComponent();
-		DetectSoundComponent->SetAttenuationSettings(Monster->DetectAttenuation);
-		DetectSoundComponent->SetSound(Monster->DetectSound);
-		DetectSoundComponent->Play();
+		if (Monster) {
+			UComplexAudioComponent* DetectSoundComponent = NewObject<UComplexAudioComponent>(Monster, FName("DynamicSound"));
+			DetectSoundComponent->bAutoDestroy = true;
+			DetectSoundComponent->bAdvancedOcclusion = true;
+			DetectSoundComponent->ProjectedVolume = 100;
+			DetectSoundComponent->Radius = 50;
+			DetectSoundComponent->SetupAttachment(Monster->GetRootComponent());
+			DetectSoundComponent->RegisterComponent();
+			DetectSoundComponent->SetAttenuationSettings(Monster->DetectAttenuation);
+			DetectSoundComponent->SetSound(Monster->DetectSound);
+			DetectSoundComponent->Play();
+		}
 		//AIBlackboard->SetValueAsVector(FName("PlayerLocation"), HypoxiaCharacter->GetActorLocation());
 	}
 

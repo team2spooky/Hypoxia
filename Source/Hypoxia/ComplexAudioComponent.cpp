@@ -53,8 +53,9 @@ void UComplexAudioComponent::BeginPlay() {
 
 	// Copy Attenuation settings
 	if (this->AttenuationSettings != nullptr) {
-		VirtualAudioComponent->AttenuationSettings = this->AttenuationSettings;
-		//VirtualAudioComponent->AdjustAttenuation(*this->GetAttenuationSettingsToApply());
+		//VirtualAudioComponent->AttenuationSettings = this->AttenuationSettings;
+		VirtualAudioComponent->bOverrideAttenuation = true;
+		VirtualAudioComponent->AttenuationOverrides = this->AttenuationSettings->Attenuation;
 
 		// Setup Influence Sphere
 		InfluenceSphere->SetSphereRadius(this->GetAttenuationSettingsToApply()->GetMaxDimension() * ProjectedVolume / 100.f);
@@ -69,17 +70,21 @@ void UComplexAudioComponent::BeginPlay() {
 void UComplexAudioComponent::TickComponent(float deltaSeconds, ELevelTick type, FActorComponentTickFunction* tickFunction) {
 	FVector Loc = this->GetComponentLocation();
 	float Vol = 0.0f;
-	float Occlusion = TestOcclusion();
-	if (Occlusion) {
-		DiffractSound(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->GetActorLocation(), Loc, Vol);
+	float Occlusion = 0.f;
+	if (FVector::Dist(Loc, UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->GetActorLocation()) <= this->GetAttenuationSettingsToApply()->FalloffDistance) {
+		Occlusion = TestOcclusion();
+		if (Occlusion) {
+			DiffractSound(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->GetActorLocation(), Loc, Vol);
 #if AUDIO_DEBUG	
-		::DrawDebugLine(GetWorld(), VirtualAudioComponent->GetComponentLocation(), UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->GetActorLocation(), FColor::Red, false, -1.0f, (uint8)'\000', 0.1f);
-		::DrawDebugLine(GetWorld(), this->GetComponentLocation(), VirtualAudioComponent->GetComponentLocation(), FColor::Red, false, -1.0f, (uint8)'\000', 0.1f);
+			::DrawDebugLine(GetWorld(), VirtualAudioComponent->GetComponentLocation(), UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->GetActorLocation(), FColor::Red, false, -1.0f, (uint8)'\000', 0.1f);
+			::DrawDebugLine(GetWorld(), this->GetComponentLocation(), VirtualAudioComponent->GetComponentLocation(), FColor::Red, false, -1.0f, (uint8)'\000', 0.1f);
 #endif
+		}
 	}
 	this->SetVolumeMultiplier(1 - Occlusion);
 	VirtualAudioComponent->SetWorldLocation(Loc);
 	VirtualAudioComponent->SetVolumeMultiplier(Vol * Occlusion);
+	
 	if (this->IsPlaying() && !bAmbientSound) {
 		//USoundWave* temp = Cast<USoundWave>(this->Sound);
 		//Cast<USoundCue>(this->Sound);
@@ -94,6 +99,8 @@ void UComplexAudioComponent::TickComponent(float deltaSeconds, ELevelTick type, 
 		}
 		for (TSet<AActor*>::TConstIterator Itr = OverlappingActors.CreateConstIterator(); Itr; ++Itr) {
 			AListeningItem* Item = Cast<AListeningItem>(*Itr);
+			if (GetWorld()->LineTraceTestByChannel(this->GetComponentLocation(), Item->GetItem()->GetComponentLocation(), ECC_GameTraceChannel2))
+				continue;
 			float Dist = FVector::Dist(Item->GetItem()->GetComponentLocation(), this->GetComponentLocation());
 			Item->Hear(FMath::Lerp(1.f, 0.f, Dist / MaxDist) * ProjectedVolume);
 		}
@@ -101,6 +108,8 @@ void UComplexAudioComponent::TickComponent(float deltaSeconds, ELevelTick type, 
 		InfluenceSphere->GetOverlappingActors(OverlappingActors, Monster);
 		for (TSet<AActor*>::TConstIterator Itr = OverlappingActors.CreateConstIterator(); Itr; ++Itr) {
 			AHypoxiaMonster* M = Cast<AHypoxiaMonster>(*Itr);
+			if (GetWorld()->LineTraceTestByChannel(this->GetComponentLocation(), M->GetActorLocation(), ECC_GameTraceChannel2))
+				continue;
 			Cast<AHypoxiaAIController>(M->GetController())->HearSound(InfluenceSphere->GetComponentLocation(), ProjectedVolume);
 		}
 	}
@@ -172,7 +181,12 @@ void UComplexAudioComponent::DiffractSound(FVector goalLoc, FVector& out_Loc, fl
 	Target.Z = goalLoc.Z;
 	FVector Projection = Target - goalLoc;
 	out_Loc = Target;
-	out_Vol = FMath::Clamp(1.0f - ((Path->GetLength()/* - Projection.Size()*/) / this->AttenuationSettings->Attenuation.FalloffDistance), 0.0f, 1.0f);
+	out_Vol = FMath::Clamp(1.0f - ((Path->GetLength() - Projection.Size()) / this->AttenuationSettings->Attenuation.FalloffDistance), 0.0f, 1.0f);
+	FAttenuationSettings AdjustedSettings = FAttenuationSettings(*VirtualAudioComponent->GetAttenuationSettingsToApply());
+	AdjustedSettings.FalloffDistance = this->AttenuationSettings->Attenuation.FalloffDistance - (Path->GetLength() - Projection.Size());
+	VirtualAudioComponent->AdjustAttenuation(AdjustedSettings);
 	//out_Vol = 1.0f;
+#if AUDIO_DEBUG	
 	UE_LOG(LogTemp, Warning, TEXT("Volume = %f, Loc = (%f, %f, %f)"), out_Vol, out_Loc.X, out_Loc.Y, out_Loc.Z);
+#endif
 }

@@ -3,7 +3,7 @@
 #include "Hypoxia.h"
 #include "ListeningItem.h"
 
-void AListeningItem::Hear(float volume) {}
+void AListeningItem::Hear(float Volume) { check(0 && "You must override this function"); }
 
 UComplexAudioComponent* AListeningItem::GenerateOnHitSound() {
 	UComplexAudioComponent* HitSound = Super::GenerateOnHitSound();
