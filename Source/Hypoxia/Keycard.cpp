@@ -27,7 +27,7 @@ void AKeycard::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 
 	if (Held) {
-		if (FVector::Dist(Door->GetActorLocation(), Item->GetComponentLocation()) < 300.0f) {
+		if (FVector::Dist(Door->GetActorLocation(), Item->GetComponentLocation()) < 50.0f) {
 			//UnlockLock();
 			//Door->SetActorLocation(FVector(800.0f, 100.0f, 400.0f));
 			Door->Unlock();

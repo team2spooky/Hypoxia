@@ -8,7 +8,7 @@
 #include "Runtime/Engine/Classes/AI/Navigation/NavigationPath.h"
 #include "ListeningItem.h"
 
-#define AUDIO_DEBUG 1
+#define AUDIO_DEBUG 0
 
 UComplexAudioComponent::UComplexAudioComponent() : Super() {
 	PrimaryComponentTick.bCanEverTick = true;
