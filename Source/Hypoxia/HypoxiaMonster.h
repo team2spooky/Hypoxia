@@ -24,9 +24,25 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	void PlayDetectSound();
+
+private:
+	UComplexAudioComponent* MonsterSound;
+
+	float IdleSoundTimer;
+
+	UPROPERTY(EditAnywhere)
+	USoundAttenuation* SoundAttenuation;
+
+	UPROPERTY(EditAnywhere)
+	USoundBase* IdleSound;
+
 	UPROPERTY(EditAnywhere)
 	USoundBase* DetectSound;
 
-	UPROPERTY(EditAnywhere)
-	USoundAttenuation* DetectAttenuation;
+	UPROPERTY(EditAnywhere, Category="Sound|Idle")
+	float IdleSoundDelay;
+
+	UPROPERTY(EditAnywhere, Category = "Sound|Idle")
+	float IdleSoundDelayRandomness;
 };
