@@ -15,23 +15,23 @@ void ADoor::BeginPlay() {
 
 	Super::BeginPlay();
 
-	//for (TActorIterator<AStaticMeshActor> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
-	//	
-	//	AStaticMeshActor *Mesh = *ActorItr;
+	for (TActorIterator<AStaticMeshActor> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
+		
+		//AStaticMeshActor *Mesh = *ActorItr;
 
-	//	//UE_LOG(LogTemp, Warning, TEXT("Parent: %s"), ActorItr->Tags[0]);
+		//UE_LOG(LogTemp, Warning, TEXT("Parent: %s"), ActorItr->Tags[0]);
 
-	//	//FName Tag = FName()
+		//FName Tag = FName()
 
-	//	if (ActorItr->ActorHasTag(Tags[0])) {
-	//		
-	//		Door = *ActorItr;
-	//		
-	//		UE_LOG(LogTemp, Warning, TEXT("Child: %s"), *ActorItr->GetName());
-	//		UE_LOG(LogTemp, Warning, TEXT("Parent: %s"),  *GetName());
-	//		break;
-	//	}
-	//}
+		if (ActorItr->ActorHasTag(Tags[0])) {
+			
+			Door = *ActorItr;
+			
+			UE_LOG(LogTemp, Warning, TEXT("Child: %s"), *ActorItr->GetName());
+			UE_LOG(LogTemp, Warning, TEXT("Parent: %s"),  *GetName());
+			break;
+		}
+	}
 
 	//Moving = false;
 	Opened = false;
@@ -265,7 +265,11 @@ void ADoor::Tick(float DeltaTime) {
 }
 
 void ADoor::Unlock() {
-	UE_LOG(LogTemp, Warning, TEXT("Unlocked"));
-	Locked = false;
-	UE_LOG(LogTemp, Warning, TEXT("Locked? %d"), Locked);
+	if (Locked) {
+		UE_LOG(LogTemp, Warning, TEXT("Unlocked"));
+		Locked = false;
+		FVector DoorLocation = Door->GetActorLocation();
+		Door->SetActorLocation(FVector(DoorLocation.X + 200.0f, DoorLocation.Y, DoorLocation.Z));
+		UE_LOG(LogTemp, Warning, TEXT("Locked? %d"), Locked);
+	}
 }
