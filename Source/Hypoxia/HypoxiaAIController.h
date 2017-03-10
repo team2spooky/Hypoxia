@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(abstract)
 class HYPOXIA_API AHypoxiaAIController : public AAIController
 {
 	GENERATED_BODY()

@@ -14,7 +14,8 @@
 	"Modules": [
 		{
 			"Name": "UE4Duino",
-			"Type": "Runtime"
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault"
 		}
 	]
 }
