@@ -199,9 +199,14 @@ void ADoor::UpdatePosition(FVector DevicePosition) {
 
 void ADoor::Tick(float DeltaTime) {
 
-//	if (!Locked) {
+	if (!Locked) {
 
-	Super::Tick(DeltaTime);
+		Super::Tick(DeltaTime);
+		if (Moving) {
+			FVector DoorLocation = Door->GetActorLocation();
+			Door->SetActorLocation(FVector(DoorLocation.X + 2.0f, DoorLocation.Y, DoorLocation.Z));
+		}
+	}
 
 		/*if (DoorHandleDirection == EDoorDirection::DD_North || DoorHandleDirection == EDoorDirection::DD_South) {
 			if (Item->GetComponentRotation().Roll > 90.0f) {
@@ -268,8 +273,7 @@ void ADoor::Unlock() {
 	if (Locked) {
 		UE_LOG(LogTemp, Warning, TEXT("Unlocked"));
 		Locked = false;
-		FVector DoorLocation = Door->GetActorLocation();
-		Door->SetActorLocation(FVector(DoorLocation.X + 200.0f, DoorLocation.Y, DoorLocation.Z));
+		Moving = true;
 		UE_LOG(LogTemp, Warning, TEXT("Locked? %d"), Locked);
 	}
 }

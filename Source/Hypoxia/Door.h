@@ -37,8 +37,10 @@ protected:
 	AStaticMeshActor *Door;
 
 	float DoorRotation = 0.0f;
+	float MoveTime = 0.0f;
 
-	bool Opened = false;
+	bool Opened = true;
+	bool Moving = true;
 
 	//bool Moving = false;
 
