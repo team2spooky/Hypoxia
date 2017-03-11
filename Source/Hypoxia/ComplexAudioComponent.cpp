@@ -43,7 +43,7 @@ UComplexAudioComponent::UComplexAudioComponent() : Super() {
 }
 
 void UComplexAudioComponent::BeginPlay() {
-	this->SetSound(this->Sound);
+	SetSound(this->Sound);
 	bool AutoDestroy = this->bAutoDestroy;
 	this->bAutoDestroy = false;
 	this->Stop();

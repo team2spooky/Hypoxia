@@ -78,7 +78,7 @@ void AHypoxiaAIController::Tick(float DeltaTime) {
 
 	UBlackboardComponent* AIBlackboard = UAIBlueprintHelperLibrary::GetBlackboard(this);
 
-	APawn* pawn = GetPawn();
+	APawn* Pawn = GetPawn();
 
 	//UE_LOG(LogTemp, Warning, TEXT("Player X %f"), HypoxiaCharacter->GetActorLocation().X);
 	//UE_LOG(LogTemp, Warning, TEXT("Player Y %f"), HypoxiaCharacter->GetActorLocation().Y);
@@ -86,19 +86,12 @@ void AHypoxiaAIController::Tick(float DeltaTime) {
 
 	if (AIBlackboard->GetValueAsBool(FName("SeenPlayer"))) {
 		AIBlackboard->SetValueAsVector(FName("PlayerLocation"), HypoxiaCharacter->GetActorLocation());
-	}
-	else if (LineOfSightTo(HypoxiaCharacter) && FVector::Dist(HypoxiaCharacter->GetActorLocation(), GetPawn()->GetActorLocation()) < 200.0f) {
+	} else if (LineOfSightTo(HypoxiaCharacter) && FVector::Dist(HypoxiaCharacter->GetActorLocation(), GetPawn()->GetActorLocation()) < 200.0f) {
 		AIBlackboard->SetValueAsBool(FName("SeenPlayer"), true);
 		//AIBlackboard->SetValueAsVector(FName("PlayerLocation"), HypoxiaCharacter->GetActorLocation());
 	}
 
-	if ((HypoxiaCharacter->GetActorLocation().X >= TriggerPtX1)
-		&& (HypoxiaCharacter->GetActorLocation().X <= TriggerPtX2)
-		&& (HypoxiaCharacter->GetActorLocation().Y <= TriggerPtY1)
-		&& (HypoxiaCharacter->GetActorLocation().Y >= TriggerPtY2)) {
-		UE_LOG(LogTemp, Warning, TEXT("Monster's Moving Around"));
-		AIBlackboard->SetValueAsBool(FName("StartMonster"), true);
-	}
+	AIBlackboard->SetValueAsBool(FName("StartMonster"), true);
 
 	if (AIBlackboard->GetValueAsBool(FName("StartMonster"))) {
 
@@ -106,9 +99,10 @@ void AHypoxiaAIController::Tick(float DeltaTime) {
 		Looktime -= DeltaTime;
 		WanderTimer -= DeltaTime;
 		RandNum = FMath::RandRange(1, 5);
+		//RandNum = 6;
 
 		if (MoveTimer <= 0.0f) {
-			MoveTimer = 10.0f;
+			MoveTimer = 20.0f;
 			UE_LOG(LogTemp, Warning, TEXT("Rand %d"), RandNum);
 			switch (RandNum) {
 			case 1:
@@ -128,6 +122,7 @@ void AHypoxiaAIController::Tick(float DeltaTime) {
 				break;
 			default:
 				AIBlackboard->SetValueAsVector(FName("WanderLocation"), FVector(FMath::RandRange(1810.f, 4880.0f), FMath::RandRange(-1770.f, 430.0f), 20.0f));
+				UE_LOG(LogTemp, Warning, TEXT("Path"));
 				break;
 			}
 
@@ -136,6 +131,7 @@ void AHypoxiaAIController::Tick(float DeltaTime) {
 			}
 
 		}
+
 		if (AIBlackboard->GetValueAsBool(FName("AtWanderLocation"))) {
 			UE_LOG(LogTemp, Warning, TEXT("Monster's moving around the Location"));
 			TempX = AIBlackboard->GetValueAsVector(FName("WanderLocation")).X;
@@ -145,9 +141,8 @@ void AHypoxiaAIController::Tick(float DeltaTime) {
 			AIBlackboard->SetValueAsVector(FName("WanderLocation"), FVector(TempX, TempY, 90));
 			AIBlackboard->SetValueAsBool(FName("AtWanderLocation"), false);
 			WanderTimer = 3.0f;
-		}
-		else if ((pawn->GetActorLocation().X >= AIBlackboard->GetValueAsVector(FName("WanderLocation")).X - 10.0f)
-			&& (pawn->GetActorLocation().X <= AIBlackboard->GetValueAsVector(FName("WanderLocation")).X + 10.0f)
+		} else if ((Pawn->GetActorLocation().X >= AIBlackboard->GetValueAsVector(FName("WanderLocation")).X - 50.0f)
+			&& (Pawn->GetActorLocation().X <= AIBlackboard->GetValueAsVector(FName("WanderLocation")).X + 50.0f)
 			&& (WanderTimer <= 0.0f)
 			//&& (pawn->GetActorLocation().Z <= AIBlackboard->GetValueAsVector(FName("WanderLocation")).Z + 1.0f)
 			//&& (pawn->GetActorLocation().Z >= AIBlackboard->GetValueAsVector(FName("WanderLocation")).Z - 71.0f)) {
@@ -155,6 +150,12 @@ void AHypoxiaAIController::Tick(float DeltaTime) {
 			AIBlackboard->SetValueAsBool(FName("AtWanderLocation"), true);
 			UE_LOG(LogTemp, Warning, TEXT("Monster's at the Location"));
 		}
+	} else if ((HypoxiaCharacter->GetActorLocation().X >= TriggerPtX1)
+		&& (HypoxiaCharacter->GetActorLocation().X <= TriggerPtX2)
+		&& (HypoxiaCharacter->GetActorLocation().Y <= TriggerPtY1)
+		&& (HypoxiaCharacter->GetActorLocation().Y >= TriggerPtY2)) {
+		UE_LOG(LogTemp, Warning, TEXT("Monster's Moving Around"));
+		AIBlackboard->SetValueAsBool(FName("StartMonster"), true);
 	}
 
 }
@@ -165,7 +166,7 @@ void AHypoxiaAIController::HearSound(FVector Location, float Amplitude) {
 	AIBlackboard->SetValueAsBool(FName("HeardSound"), true);
 	AIBlackboard->SetValueAsVector(FName("SoundLocation"), Location);
 
-	Looktime = 1.f;
+	Looktime = 1.0f;
 
 	//UE_LOG(LogTemp, Warning, TEXT("SOUNDDDDDD!!!!!"));
 }
