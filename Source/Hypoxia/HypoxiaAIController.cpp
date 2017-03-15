@@ -166,7 +166,7 @@ void AHypoxiaAIController::HearSound(FVector Location, float Amplitude) {
 	AIBlackboard->SetValueAsBool(FName("HeardSound"), true);
 	AIBlackboard->SetValueAsVector(FName("SoundLocation"), Location);
 
-	Looktime = 1.0f;
+	Looktime = 4.0f;
 
 	//UE_LOG(LogTemp, Warning, TEXT("SOUNDDDDDD!!!!!"));
 }

@@ -40,10 +40,9 @@ public:
 	float ProjectedVolume;
 
 private:
-
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
 	UAudioComponent* VirtualAudioComponent;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
 	USphereComponent* InfluenceSphere;
 
 	float TestOcclusion();
