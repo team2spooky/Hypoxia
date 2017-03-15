@@ -25,6 +25,8 @@ ALuminousPlant::ALuminousPlant() {
 
 void ALuminousPlant::BeginPlay() {
 	Super::BeginPlay();
+	Particles->DetachFromParent();
+	Particles->AttachToComponent(Item, FAttachmentTransformRules(EAttachmentRule::KeepRelative, EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, true));
 	DynamicMaterial = Item->CreateAndSetMaterialInstanceDynamic(0);
 	Particles->CreateAndSetMaterialInstanceDynamic(0);
 	Particles->AutoPopulateInstanceProperties();
