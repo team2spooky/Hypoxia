@@ -24,5 +24,6 @@ public:
 private:
 	UMaterialInstanceDynamic* DynamicMaterial;
 	UParticleSystemComponent* Particles;
+	UPointLightComponent* GlowLight;
 	
 };

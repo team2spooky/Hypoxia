@@ -22,7 +22,7 @@ UComplexAudioComponent::UComplexAudioComponent() : Super() {
 	VirtualAudioComponent->SetWorldLocation(this->GetComponentLocation());
 	VirtualAudioComponent->RegisterComponent();
 
-	InfluenceSphere = CreateDefaultSubobject<USphereComponent>(TEXT("Influence Sphere"));
+	InfluenceSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InfluenceSphereComplexAudio"));
 	InfluenceSphere->bAutoActivate = true;
 	InfluenceSphere->SetWorldLocation(this->GetComponentLocation());
 	//InfluenceSphere->SetupAttachment(this);
@@ -43,7 +43,8 @@ UComplexAudioComponent::UComplexAudioComponent() : Super() {
 }
 
 void UComplexAudioComponent::BeginPlay() {
-	SetSound(this->Sound);
+	if(this->Sound)
+		SetSound(this->Sound);
 	bool AutoDestroy = this->bAutoDestroy;
 	this->bAutoDestroy = false;
 	this->Stop();
@@ -106,10 +107,13 @@ void UComplexAudioComponent::TickComponent(float deltaSeconds, ELevelTick type, 
 		}
 		TSubclassOf<AHypoxiaMonster> Monster = AHypoxiaMonster::StaticClass();
 		InfluenceSphere->GetOverlappingActors(OverlappingActors, Monster);
+		if (!bListenToSelf) {
+			OverlappingActors.Remove(this->GetAttachmentRootActor());
+		}
 		for (TSet<AActor*>::TConstIterator Itr = OverlappingActors.CreateConstIterator(); Itr; ++Itr) {
 			AHypoxiaMonster* M = Cast<AHypoxiaMonster>(*Itr);
-			if (GetWorld()->LineTraceTestByChannel(this->GetComponentLocation(), M->GetActorLocation(), ECC_GameTraceChannel2))
-				continue;
+			/*if (GetWorld()->LineTraceTestByChannel(this->GetComponentLocation(), M->GetActorLocation(), ECC_GameTraceChannel2))
+				continue;*/
 			Cast<AHypoxiaAIController>(M->GetController())->HearSound(InfluenceSphere->GetComponentLocation(), ProjectedVolume);
 		}
 	}
