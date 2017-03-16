@@ -42,6 +42,7 @@ public:
 private:
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
 	UAudioComponent* VirtualAudioComponent;
+
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
 	USphereComponent* InfluenceSphere;
 

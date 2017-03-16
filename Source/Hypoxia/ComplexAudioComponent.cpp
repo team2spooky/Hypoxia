@@ -25,7 +25,7 @@ UComplexAudioComponent::UComplexAudioComponent() : Super() {
 	InfluenceSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InfluenceSphereComplexAudio"));
 	InfluenceSphere->bAutoActivate = true;
 	InfluenceSphere->SetWorldLocation(this->GetComponentLocation());
-	//InfluenceSphere->SetupAttachment(this);
+	//InfluenceSphere->SetupAttachment(GetAttachParent());
 	InfluenceSphere->RegisterComponent();
 
 #if AUDIO_DEBUG
@@ -49,7 +49,7 @@ void UComplexAudioComponent::BeginPlay() {
 	this->bAutoDestroy = false;
 	this->Stop();
 
-	InfluenceSphere->SetWorldLocation(this->GetComponentLocation());
+	InfluenceSphere->SetWorldLocation(GetComponentLocation());
 	InfluenceSphere->AttachToComponent(this, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
 
 	// Copy Attenuation settings
