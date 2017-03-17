@@ -37,7 +37,7 @@ UVoiceCaptureComponent::UVoiceCaptureComponent() : Super()
 	VoiceCaptureSoundWaveProcedural->Volume = 5.f;
 	*/
 
-	InfluenceSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InfluenceSphereVoice"));
+	InfluenceSphere = CreateDefaultSubobject<USphereComponent>(TEXT("Influence Sphere"));
 	InfluenceSphere->SetSphereRadius(200.0f);
 #if VOICE_DEBUG
 	InfluenceSphere->bHiddenInGame = false;
@@ -105,7 +105,7 @@ void UVoiceCaptureComponent::TickComponent( float DeltaTime, ELevelTick TickType
 
 		//UE_LOG(LogTemp, Warning, TEXT("Volume = %f"), VoiceCaptureFinalVolume);
 
-		if (VoiceCaptureFinalVolume > 5) {
+		if (VoiceCaptureFinalVolume > 10) {
 			TriggerObjects(VoiceCaptureFinalVolume);
 		}
 	}
@@ -128,8 +128,8 @@ void UVoiceCaptureComponent::TriggerObjects(float volume) {
 	InfluenceSphere->GetOverlappingActors(OverlappingActors, Monster);
 	for (TSet<AActor*>::TConstIterator Itr = OverlappingActors.CreateConstIterator(); Itr; ++Itr) {
 		AHypoxiaMonster* M = Cast<AHypoxiaMonster>(*Itr);
-		/*if (GetWorld()->LineTraceTestByChannel(InfluenceSphere->GetComponentLocation(), M->GetActorLocation(), ECC_GameTraceChannel2))
-			continue;*/
+		if (GetWorld()->LineTraceTestByChannel(InfluenceSphere->GetComponentLocation(), M->GetActorLocation(), ECC_GameTraceChannel2))
+			continue;
 		Cast<AHypoxiaAIController>(M->GetController())->HearSound(InfluenceSphere->GetComponentLocation(), volume);
 	}
 }

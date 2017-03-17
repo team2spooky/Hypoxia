@@ -24,7 +24,7 @@ public:
 
 	void TriggerObjects(float volume);
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere)
 	USphereComponent* InfluenceSphere;
 
 private:

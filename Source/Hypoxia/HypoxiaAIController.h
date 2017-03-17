@@ -29,5 +29,6 @@ class HYPOXIA_API AHypoxiaAIController : public AAIController
 
 public:
 	void HearSound(FVector, float);
+	void ScriptEvent(FVector);
 
 };
