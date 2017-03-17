@@ -53,6 +53,11 @@ AHypoxiaCharacter::AHypoxiaCharacter() {
 	L_MotionTracker = CreateDefaultSubobject<USceneComponent>(TEXT("L_MotionTracker"));
 	L_MotionTracker->SetupAttachment(RootComponent);
 
+	LeftHand  = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("LeftHand"));
+	LeftHand ->SetupAttachment(L_MotionTracker);
+	RightHand = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RightHand"));
+	RightHand->SetupAttachment(R_MotionTracker);
+
 	// Create VR Controllers.
 	R_MotionController = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("R_MotionController"));
 	R_MotionController->Hand = EControllerHand::Right;
@@ -188,6 +193,8 @@ void AHypoxiaCharacter::ItemPickupRight() {
 		for (TActorIterator<AItem> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
 			if (ActorItr->Pickup(R_MotionTracker, EControllerHand::Right)) {
 				HeldRight = true;
+				//RightHand->SetRelativeLocation(FVector(0.0f, 0.0f, -100.0f));
+				RightHand->SetRenderInMainPass(false);
 				break;
 			}
 		}
@@ -195,6 +202,8 @@ void AHypoxiaCharacter::ItemPickupRight() {
 		HeldItemRight->Drop();
 		HeldItemRight = NULL;
 		HeldRight = false;
+		//RightHand->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+		RightHand->SetRenderInMainPass(true);
 	}
 }
 
@@ -204,6 +213,8 @@ void AHypoxiaCharacter::ItemPickupLeft() {
 		for (TActorIterator<AItem> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
 			if (ActorItr->Pickup(L_MotionTracker, EControllerHand::Left)) {
 				HeldLeft = true;
+				//LeftHand->SetRelativeLocation(FVector(0.0f, 0.0f, -100.0f));
+				LeftHand->SetRenderInMainPass(false);
 				break;
 			}
 		}
@@ -211,6 +222,8 @@ void AHypoxiaCharacter::ItemPickupLeft() {
 		HeldItemLeft->Drop();
 		HeldItemLeft = NULL;
 		HeldLeft = false;
+		//LeftHand->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+		LeftHand->SetRenderInMainPass(true);
 	}
 
 }
