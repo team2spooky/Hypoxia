@@ -33,6 +33,7 @@ void ALuminousPlant::BeginPlay() {
 }
 
 void ALuminousPlant::Tick(float deltaSeconds) {
+	Super::Tick(deltaSeconds);
 	float Glow;
 	DynamicMaterial->GetScalarParameterValue(FName("GlowIntensity"), Glow);
 	DynamicMaterial->SetScalarParameterValue(FName("GlowIntensity"), FMath::Max(Glow - 50 * deltaSeconds, 1.f));

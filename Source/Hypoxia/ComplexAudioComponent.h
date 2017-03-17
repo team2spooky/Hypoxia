@@ -43,7 +43,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
 	UAudioComponent* VirtualAudioComponent;
 
-	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
 	USphereComponent* InfluenceSphere;
 
 	float TestOcclusion();
