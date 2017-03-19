@@ -22,14 +22,14 @@ UComplexAudioComponent::UComplexAudioComponent() : Super() {
 	VirtualAudioComponent->SetWorldLocation(this->GetComponentLocation());
 	VirtualAudioComponent->RegisterComponent();
 
-	InfluenceSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InfluenceSphereComplexAudio"));
-	InfluenceSphere->bAutoActivate = true;
-	InfluenceSphere->SetWorldLocation(this->GetComponentLocation());
-	//InfluenceSphere->SetupAttachment(GetAttachParent());
-	InfluenceSphere->RegisterComponent();
+	InfluenceSphereAudio = CreateDefaultSubobject<USphereComponent>(TEXT("InfluenceSphereAudio"));
+	InfluenceSphereAudio->bAutoActivate = true;
+	InfluenceSphereAudio->SetWorldLocation(this->GetComponentLocation());
+	//InfluenceSphereAudio->SetupAttachment(GetAttachParent());
+	InfluenceSphereAudio->RegisterComponent();
 
 #if AUDIO_DEBUG
-	InfluenceSphere->bHiddenInGame = false;
+	InfluenceSphereAudio->bHiddenInGame = false;
 	// Debug Sphere
 	UStaticMeshComponent* VirtualDebugSphere = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DEBUGVIRTUAL"));
 	VirtualDebugSphere->SetupAttachment(VirtualAudioComponent);
@@ -49,8 +49,8 @@ void UComplexAudioComponent::BeginPlay() {
 	this->bAutoDestroy = false;
 	this->Stop();
 
-	InfluenceSphere->SetWorldLocation(GetComponentLocation());
-	InfluenceSphere->AttachToComponent(this, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
+	InfluenceSphereAudio->SetWorldLocation(GetComponentLocation());
+	InfluenceSphereAudio->AttachToComponent(this, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
 
 	// Copy Attenuation settings
 	if (this->AttenuationSettings != nullptr) {
@@ -59,16 +59,17 @@ void UComplexAudioComponent::BeginPlay() {
 		VirtualAudioComponent->AttenuationOverrides = this->AttenuationSettings->Attenuation;
 
 		// Setup Influence Sphere
-		InfluenceSphere->SetSphereRadius(this->GetAttenuationSettingsToApply()->GetMaxDimension() * ProjectedVolume / 100.f);
+		InfluenceSphereAudio->SetSphereRadius(this->GetAttenuationSettingsToApply()->GetMaxDimension() * ProjectedVolume / 100.f);
 	}
 
 	this->bAutoDestroy = AutoDestroy;
 	this->Play();
 
-	//UE_LOG(LogTemp, Warning, TEXT("%d"), InfluenceSphere->IsWelded());
+	//UE_LOG(LogTemp, Warning, TEXT("%d"), InfluenceSphereAudio->IsWelded());
 }
 
-void UComplexAudioComponent::TickComponent(float deltaSeconds, ELevelTick type, FActorComponentTickFunction* tickFunction) {
+void UComplexAudioComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) {
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	FVector Loc = this->GetComponentLocation();
 	float Vol = 0.0f;
 	float Occlusion = 0.f;
@@ -94,7 +95,7 @@ void UComplexAudioComponent::TickComponent(float deltaSeconds, ELevelTick type, 
 		TSet<AActor*> OverlappingActors;
 		TSubclassOf<AListeningItem> Filter = AListeningItem::StaticClass();
 		float MaxDist = this->GetAttenuationSettingsToApply()->GetMaxDimension();
-		InfluenceSphere->GetOverlappingActors(OverlappingActors, Filter);
+		InfluenceSphereAudio->GetOverlappingActors(OverlappingActors, Filter);
 		if (!bListenToSelf) {
 			OverlappingActors.Remove(this->GetAttachmentRootActor());
 		}
@@ -106,7 +107,7 @@ void UComplexAudioComponent::TickComponent(float deltaSeconds, ELevelTick type, 
 			Item->Hear(FMath::Lerp(1.f, 0.f, Dist / MaxDist) * ProjectedVolume);
 		}
 		TSubclassOf<AHypoxiaMonster> Monster = AHypoxiaMonster::StaticClass();
-		InfluenceSphere->GetOverlappingActors(OverlappingActors, Monster);
+		InfluenceSphereAudio->GetOverlappingActors(OverlappingActors, Monster);
 		if (!bListenToSelf) {
 			OverlappingActors.Remove(this->GetAttachmentRootActor());
 		}
@@ -114,14 +115,14 @@ void UComplexAudioComponent::TickComponent(float deltaSeconds, ELevelTick type, 
 			AHypoxiaMonster* M = Cast<AHypoxiaMonster>(*Itr);
 			/*if (GetWorld()->LineTraceTestByChannel(this->GetComponentLocation(), M->GetActorLocation(), ECC_GameTraceChannel2))
 				continue;*/
-			Cast<AHypoxiaAIController>(M->GetController())->HearSound(InfluenceSphere->GetComponentLocation(), ProjectedVolume);
+			Cast<AHypoxiaAIController>(M->GetController())->HearSound(InfluenceSphereAudio->GetComponentLocation(), ProjectedVolume);
 		}
 	}
 }
 
 void UComplexAudioComponent::DestroyComponent(bool bPromoteChildren) {
 	VirtualAudioComponent->DestroyComponent(false);
-	InfluenceSphere->DestroyComponent(false);
+	InfluenceSphereAudio->DestroyComponent(false);
 	Super::DestroyComponent(bPromoteChildren);
 }
 
@@ -145,7 +146,7 @@ void UComplexAudioComponent::SetAttenuationSettings(USoundAttenuation* newAttenu
 	VirtualAudioComponent->AttenuationSettings = this->AttenuationSettings;
 
 	// Setup Influence Sphere
-	InfluenceSphere->SetSphereRadius(this->GetAttenuationSettingsToApply()->GetMaxDimension());
+	InfluenceSphereAudio->SetSphereRadius(this->GetAttenuationSettingsToApply()->GetMaxDimension());
 }
 
 float UComplexAudioComponent::TestOcclusion() {

@@ -24,27 +24,27 @@ public:
 	void SetSound(USoundBase*);
 	void SetAttenuationSettings(USoundAttenuation*);
 
-	UPROPERTY(EditAnywhere, Category = Sound)
+	UPROPERTY(EditAnywhere, Category = "Sound|Complex")
 	bool bAdvancedOcclusion;
 	
-	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.f), Category = Sound)
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.f), Category = "Sound|Complex")
 	float Radius;
 
-	UPROPERTY(EditAnywhere, Category = Sound)
+	UPROPERTY(EditAnywhere, Category = "Sound|Complex")
 	bool bListenToSelf;
 
-	UPROPERTY(EditAnywhere, Category = Sound)
+	UPROPERTY(EditAnywhere, Category = "Sound|Complex")
 	bool bAmbientSound;
 
-	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.f, ClampMax = 100.f), Category = Sound)
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.f, ClampMax = 100.f), Category = "Sound|Complex")
 	float ProjectedVolume;
 
 private:
-	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
 	UAudioComponent* VirtualAudioComponent;
 
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
-	USphereComponent* InfluenceSphere;
+	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"))
+	USphereComponent* InfluenceSphereAudio;
 
 	float TestOcclusion();
 	void DiffractSound(FVector goalLoc, FVector& out_Loc, float& out_Vol);
