@@ -22,7 +22,8 @@ void AComplexAmbientSound::BeginPlay()
 	Super::BeginPlay();
 	
 	Origin = GetActorLocation();
-	SpawnBox = FBox(Origin - BoxExtent, Origin + BoxExtent);
+	FVector HalfBox = BoxExtent / 2;
+	SpawnBox = FBox(Origin - HalfBox, Origin + HalfBox);
 
 	DelayTimer = Delay + FMath::RandRange(-0.5 * DelayRandomness, DelayRandomness);
 
