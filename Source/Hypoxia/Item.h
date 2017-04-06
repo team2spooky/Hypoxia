@@ -47,7 +47,7 @@ protected:
 public:
 	// Sets default values for this actor's properties
 
-	void Drop();
+	virtual void Drop();
 
 	UStaticMeshComponent* GetItem();
 
