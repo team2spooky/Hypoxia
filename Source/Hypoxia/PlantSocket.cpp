@@ -23,8 +23,6 @@ void APlantSocket::BeginPlay()
 void APlantSocket::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-	if (Conductor) {
-		Conductor->Hear(100.f);
-	}
+
 }
 

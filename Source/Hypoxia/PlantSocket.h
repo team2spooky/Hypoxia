@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "PlantConductor.h"
 #include "GameFramework/Actor.h"
 #include "PlantSocket.generated.h"
 
@@ -20,7 +19,5 @@ public:
 	
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
-
-	APlantConductor* Conductor;
 	
 };

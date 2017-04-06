@@ -3,6 +3,7 @@
 #pragma once
 
 #include "ListeningItem.h"
+#include "PlantSocket.h"
 #include "PlantConductor.generated.h"
 
 /**
@@ -20,6 +21,7 @@ public:
 	virtual void Tick(float) override;
 
 	virtual void Drop() override;
+	virtual bool Pickup(USceneComponent*, EControllerHand) override;
 
 	virtual void Hear(float volume) override;
 
@@ -30,4 +32,5 @@ private:
 	UParticleSystemComponent* Particles;
 	UPointLightComponent* GlowLight;
 
+	APlantSocket* Socket;
 };

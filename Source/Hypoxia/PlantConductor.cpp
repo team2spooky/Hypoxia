@@ -2,7 +2,6 @@
 
 #include "Hypoxia.h"
 #include "PlantConductor.h"
-#include "PlantSocket.h"
 
 APlantConductor::APlantConductor() {
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshObject(TEXT("/Game/Hypoxia/Meshes/luminous_plant.luminous_plant"));
@@ -26,7 +25,7 @@ APlantConductor::APlantConductor() {
 
 void APlantConductor::BeginPlay() {
 	Super::BeginPlay();
-	Particles->DetachFromParent();
+	Particles->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 	Particles->AttachToComponent(Item, FAttachmentTransformRules(EAttachmentRule::KeepRelative, EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, true));
 	DynamicMaterial = Item->CreateAndSetMaterialInstanceDynamic(0);
 	Particles->CreateAndSetMaterialInstanceDynamic(0);
@@ -35,6 +34,9 @@ void APlantConductor::BeginPlay() {
 
 void APlantConductor::Tick(float deltaSeconds) {
 	Super::Tick(deltaSeconds);
+	if (IsValid(Socket)) {
+		GlowIntensity = 100.f;
+	}
 	GlowIntensity = FMath::Max(GlowIntensity - 50 * deltaSeconds, 1.f);
 	DynamicMaterial->SetScalarParameterValue(FName("GlowIntensity"), GlowIntensity);
 	Particles->SetFloatParameter("SpawnRate", FMath::Max(GlowIntensity / 7.5f, 0.1f));
@@ -45,12 +47,20 @@ void APlantConductor::Drop() {
 	Super::Drop();
 	TArray<AActor*> Sockets;
 	UGameplayStatics::GetAllActorsOfClass(this->GetWorld(), APlantSocket::StaticClass(), Sockets);
-	for (AActor* Socket : Sockets) {
-		if (FVector::Dist(Socket->GetActorLocation(), Item->GetComponentLocation()) < 50) {
-			Cast<APlantSocket>(Socket)->Conductor = this;
+	for (AActor* S : Sockets) {
+		if (FVector::Dist(S->GetActorLocation(), Item->GetComponentLocation()) < 50) {
+			this->Socket = Cast<APlantSocket>(S);
 			return;
 		}
 	}
+}
+
+bool APlantConductor::Pickup(USceneComponent* SceneComponent, EControllerHand ControllerHand) {
+	bool returnValue = Super::Pickup(SceneComponent, ControllerHand);
+	if (returnValue) {
+		this->Socket = NULL;
+	}
+	return returnValue;
 }
 
 void APlantConductor::Hear(float volume) {
