@@ -9,10 +9,20 @@
 /**
  * 
  */
+
+UENUM(BlueprintType)
+enum class EGoal : uint8 {
+	Idle,    
+	Wander,
+	Player,
+	Sound
+};
+
 UCLASS(abstract)
 class HYPOXIA_API AHypoxiaAIController : public AAIController
 {
 	GENERATED_BODY()
+
 
 	//UPROPERTY(VisibleDefaultsOnly, Category = AI)
 	//class UBlackboardComponent* MotionTracker;
@@ -30,4 +40,14 @@ class HYPOXIA_API AHypoxiaAIController : public AAIController
 public:
 	void HearSound(FVector, float);
 
+private:
+	bool AtGoal();
+
+	void SetGoal(EGoal);
+
+	void CheckForPlayer();
+
+	FVector NextWanderPoint();
+
 };
+
