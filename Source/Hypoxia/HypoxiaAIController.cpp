@@ -12,11 +12,12 @@ FVector GoalPoint;
 FVector SoundPoint;
 bool HeardSound;
 float InvestigateTime;
+float WanderTime;
+float WanderDistance;
 
 AHypoxiaAIController::AHypoxiaAIController() {
 	//Blackboard = CreateDefaultSubobject<UBlackboardComponent>(TEXT("Blackboard"));
 	//Blackboard->SetupAttachment(Item_Base);
-
 }
 
 void AHypoxiaAIController::BeginPlay() {
@@ -33,6 +34,8 @@ void AHypoxiaAIController::BeginPlay() {
 	SoundPoint = FVector(0.0f, 0.0f, 0.0f);
 	HeardSound = false;
 	InvestigateTime = 0.0f;
+	WanderTime = 0.0f;
+	WanderDistance = 1000.0f;
 
 	//UE_LOG(LogTemp, Warning, TEXT("LoS %d"), LineOfSightTo(HypoxiaCharacter));
 
@@ -53,9 +56,10 @@ void AHypoxiaAIController::Tick(float DeltaTime) {
 	case EGoal::Idle:
 		break;
 	case EGoal::Wander:
-		if (AtGoal()) {
+		if (AtGoal() || WanderTime <= 0.0f) {
 			GoalPoint = NextWanderPoint();
-			UE_LOG(LogTemp, Error, TEXT("WANDERING"));
+		} else {
+			WanderTime -= DeltaTime;
 		}
 		break;
 	case EGoal::Sound:
@@ -179,12 +183,24 @@ void AHypoxiaAIController::SetGoal(EGoal NewGoal) {
 }
 
 bool AHypoxiaAIController::AtGoal() {
-	return FVector::Dist(GoalPoint, GetPawn()->GetActorLocation()) < 5.0f;
+	return FVector::Dist(GoalPoint, GetPawn()->GetActorLocation()) < 200.0f;
 }
 
 FVector AHypoxiaAIController::NextWanderPoint() {
-	FVector Loca = GetPawn()->GetActorLocation();
-	FVector NewWanderPoint = HypoxiaCharacter->GetActorLocation();
+	FVector MonsterLocation = GetPawn()->GetActorLocation();
+	FVector PlayerLocation  = HypoxiaCharacter->GetActorLocation();
+	
+	float PointAngle = FMath::RandRange(-180, 180);
+	float XDist = FMath::Sin(PointAngle) * WanderDistance;
+	float YDist = FMath::Cos(PointAngle) * WanderDistance;
+
+	FVector NewWanderPoint = FVector(PlayerLocation.X + XDist, PlayerLocation.Y + YDist, MonsterLocation.Z);
+
+	UE_LOG(LogTemp, Warning, TEXT("XPoint %f"), PlayerLocation.X + XDist);
+	UE_LOG(LogTemp, Warning, TEXT("YPoint %f"), PlayerLocation.Y + YDist);
+
+	WanderTime = 10.0f;
+
 	return NewWanderPoint;
 }
 
