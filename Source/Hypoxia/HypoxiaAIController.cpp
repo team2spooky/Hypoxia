@@ -171,6 +171,8 @@ void AHypoxiaAIController::Tick(float DeltaTime) {
 void AHypoxiaAIController::CheckForPlayer() {
 	if (FVector::Dist(HypoxiaCharacter->GetActorLocation(), GetPawn()->GetActorLocation()) < 200.0f) {
 		SetGoal(EGoal::Player);
+		FVector MonsterLocation = GetPawn()->GetActorLocation();
+		GetPawn()->SetActorLocation(FVector(MonsterLocation.X, MonsterLocation.Y, 75.0f));
 	}
 }
 
@@ -190,11 +192,13 @@ FVector AHypoxiaAIController::NextWanderPoint() {
 	FVector MonsterLocation = GetPawn()->GetActorLocation();
 	FVector PlayerLocation  = HypoxiaCharacter->GetActorLocation();
 	
+	GetPawn()->SetActorLocation(FVector(MonsterLocation.X, MonsterLocation.Y, 450.0f));
+
 	float PointAngle = FMath::RandRange(-180, 180);
 	float XDist = FMath::Sin(PointAngle) * WanderDistance;
 	float YDist = FMath::Cos(PointAngle) * WanderDistance;
 
-	FVector NewWanderPoint = FVector(PlayerLocation.X + XDist, PlayerLocation.Y + YDist, MonsterLocation.Z);
+	FVector NewWanderPoint = FVector(PlayerLocation.X + XDist, PlayerLocation.Y + YDist, 450.0f);
 
 	UE_LOG(LogTemp, Warning, TEXT("XPoint %f"), PlayerLocation.X + XDist);
 	UE_LOG(LogTemp, Warning, TEXT("YPoint %f"), PlayerLocation.Y + YDist);
@@ -214,14 +218,8 @@ void AHypoxiaAIController::HearSound(FVector Location, float Amplitude) {
 
 	InvestigateTime = 18.0f;
 
-	/*UBlackboardComponent* AIBlackboard = UAIBlueprintHelperLibrary::GetBlackboard(this);
+	FVector MonsterLocation = GetPawn()->GetActorLocation();
 
-	if (!AIBlackboard->GetValueAsBool(FName("SeenPlayer"))) {
+	GetPawn()->SetActorLocation(FVector(MonsterLocation.X, MonsterLocation.Y, 75.0f));
 
-		UBlackboardComponent* AIBlackboard = UAIBlueprintHelperLibrary::GetBlackboard(this);
-		AIBlackboard->SetValueAsBool(FName("HeardSound"), true);
-		AIBlackboard->SetValueAsVector(FName("SoundLocation"), Location);
-
-		Looktime = 4.0f;
-	}*/
 }
