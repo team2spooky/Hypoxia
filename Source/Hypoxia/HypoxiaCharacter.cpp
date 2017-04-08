@@ -71,12 +71,12 @@ AHypoxiaCharacter::AHypoxiaCharacter() {
 	L_MotionController->bAbsoluteLocation = true;
 	L_MotionController->bAbsoluteRotation = true;
 
-	FootstepAudioComponent = CreateDefaultSubobject<UComplexAudioComponent>(TEXT("FootstepAudio"));
+	/*FootstepAudioComponent = CreateDefaultSubobject<UComplexAudioComponent>(TEXT("FootstepAudio"));
 	FootstepAudioComponent->SetupAttachment(RootComponent);
 	FootstepAudioComponent->bAmbientSound = true;
 	static ConstructorHelpers::FObjectFinder<USoundAttenuation> AttenuationAsset((TEXT("/Game/DefaultAttenuation.DefaultAttenuation")));
 	if (AttenuationAsset.Succeeded())
-		FootstepAudioComponent->SetAttenuationSettings(AttenuationAsset.Object);
+		FootstepAudioComponent->SetAttenuationSettings(AttenuationAsset.Object);*/
 }
 
 void AHypoxiaCharacter::BeginPlay() {
@@ -124,9 +124,9 @@ void AHypoxiaCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerI
 	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
 	// "turn" handles devices that provide an absolute delta, such as a mouse.
 	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
-	//PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
+	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	//PlayerInputComponent->BindAxis("TurnRate", this, &AHypoxiaCharacter::TurnAtRate);
-	//PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
+	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	//PlayerInputComponent->BindAxis("LookUpRate", this, &AHypoxiaCharacter::LookUpAtRate);
 
 	PlayerInputComponent->BindAction("Pickup_Right", IE_Pressed, this, &AHypoxiaCharacter::ItemPickupRight);
@@ -158,7 +158,7 @@ void AHypoxiaCharacter::MoveForward(float Value) {
 		AddMovementInput(GetActorForwardVector(), Value);
 		StepTimer += FMath::Abs(Value);
 		if (StepTimer > STEP_TIME) {
-			FootstepAudioComponent->Play();
+			//FootstepAudioComponent->Play();
 			StepTimer = 0.f;
 		}
 	}
@@ -181,7 +181,7 @@ void AHypoxiaCharacter::MoveRight(float Value) {
 		//AddMovementInput(FRotator(FirstPersonCameraComponent->RelativeRotation.Pitch, FirstPersonCameraComponent->RelativeRotation.Roll, GetCapsuleComponent()->RelativeRotation.Yaw).RotateVector(GetActorRightVector()), Value);
 		StepTimer += FMath::Abs(Value);
 		if (StepTimer > STEP_TIME) {
-			FootstepAudioComponent->Play();
+			//FootstepAudioComponent->Play();
 			StepTimer = 0.f;
 		}
 	}
@@ -290,7 +290,7 @@ void AHypoxiaCharacter::Tick(float DeltaTime) {
 
 	//FirstPersonCameraComponent->SetWorldLocation(GetCapsuleComponent()->GetComponentLocation());
 	
-	FirstPersonCameraComponent->SetWorldLocation(FVector(FirstPersonCameraComponent->GetComponentLocation().X, FirstPersonCameraComponent->GetComponentLocation().Y, DevicePosition.Z));
+	//FirstPersonCameraComponent->SetWorldLocation(FVector(FirstPersonCameraComponent->GetComponentLocation().X, FirstPersonCameraComponent->GetComponentLocation().Y, DevicePosition.Z));
 	
 	//UE_LOG(LogTemp, Error, TEXT("Camera X: %f"), FirstPersonCameraComponent->GetComponentLocation().X);
 

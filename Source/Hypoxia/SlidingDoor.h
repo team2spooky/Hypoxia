@@ -2,12 +2,11 @@
 
 #pragma once
 
-#include "SlidingDoor.h"
 #include "GameFramework/Actor.h"
-#include "PlantSocket.generated.h"
+#include "SlidingDoor.generated.h"
 
 UCLASS()
-class HYPOXIA_API APlantSocket : public AActor
+class HYPOXIA_API ASlidingDoor : public AActor
 {
 	GENERATED_BODY()
 
@@ -17,7 +16,7 @@ protected:
 	
 public:	
 	// Sets default values for this actor's properties
-	APlantSocket();
+	ASlidingDoor();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -25,13 +24,18 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
-	void Power(float Percentage);
-	
-	UPROPERTY(EditAnywhere)
-	float SnapDistance = 100.f;
+	void Open(float Percentage = 1.f);
 
-	UPROPERTY(EditAnywhere)
-	float AngleTolerance = 45.f;
+	void Close(float Percentage = 1.f);
 
-	ASlidingDoor* Door;
+	UPROPERTY()
+	bool Locked = false;
+
+	float Opened = 0.f;
+
+private:
+	// Value between 0 and 1 inclusive
+	float TargetPosition = 0.f;
+
+	FVector ClosedPosition;
 };

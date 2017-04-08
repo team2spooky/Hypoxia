@@ -30,13 +30,14 @@ void APlantConductor::BeginPlay() {
 	DynamicMaterial = Item->CreateAndSetMaterialInstanceDynamic(0);
 	Particles->CreateAndSetMaterialInstanceDynamic(0);
 	Particles->AutoPopulateInstanceProperties();
+	Drop();
 }
 
 void APlantConductor::Tick(float deltaSeconds) {
 	Super::Tick(deltaSeconds);
-	if (IsValid(Socket)) {
+	/*if (IsValid(Socket)) {
 		GlowIntensity = 100.f;
-	}
+	}*/
 	GlowIntensity = FMath::Max(GlowIntensity - 50 * deltaSeconds, 1.f);
 	DynamicMaterial->SetScalarParameterValue(FName("GlowIntensity"), GlowIntensity);
 	Particles->SetFloatParameter("SpawnRate", FMath::Max(GlowIntensity / 7.5f, 0.1f));
@@ -48,9 +49,15 @@ void APlantConductor::Drop() {
 	TArray<AActor*> Sockets;
 	UGameplayStatics::GetAllActorsOfClass(this->GetWorld(), APlantSocket::StaticClass(), Sockets);
 	for (AActor* S : Sockets) {
-		if (FVector::Dist(S->GetActorLocation(), Item->GetComponentLocation()) < 50) {
-			this->Socket = Cast<APlantSocket>(S);
-			return;
+		APlantSocket* socket = Cast<APlantSocket>(S);
+		if (FVector::Dist(socket->GetActorLocation(), Item->GetComponentLocation()) < socket->SnapDistance) {
+			FRotator RotationDiff = socket->GetActorRotation() - Item->GetComponentRotation();
+			if (FMath::Abs(RotationDiff.Pitch) < socket->AngleTolerance && FMath::Abs(RotationDiff.Roll) < socket->AngleTolerance) {
+				Item->SetWorldLocation(socket->GetActorLocation());
+				Item->SetWorldRotation(socket->GetActorRotation());
+				this->Socket = socket;
+				return;
+			}
 		}
 	}
 }
@@ -66,6 +73,9 @@ bool APlantConductor::Pickup(USceneComponent* SceneComponent, EControllerHand Co
 void APlantConductor::Hear(float volume) {
 	GlowIntensity = FMath::Max(GlowIntensity, volume * 1.5f);
 	Particles->ActivateSystem();
+	if (IsValid(this->Socket)) {
+		this->Socket->Power(FMath::Min(1.f, volume / 60.f));
+	}
 }
 
 
