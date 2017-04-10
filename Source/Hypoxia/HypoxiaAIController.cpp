@@ -6,6 +6,7 @@
 #include "EngineUtils.h"
 #include "Runtime/AIModule/Classes/Blueprint/AIBlueprintHelperLibrary.h"
 #include "Runtime/AIModule/Classes/BehaviorTree/BlackboardComponent.h"
+#include "Runtime/Engine/Classes/Engine/TriggerBox.h"
 
 EGoal Goal;
 FVector GoalPoint;
@@ -14,6 +15,9 @@ bool HeardSound;
 float InvestigateTime;
 float WanderTime;
 float WanderDistance;
+
+TArray<FVector> TriggerArray;
+TArray<TArray<FVector>> TriggerData;
 
 AHypoxiaAIController::AHypoxiaAIController() {
 	//Blackboard = CreateDefaultSubobject<UBlackboardComponent>(TEXT("Blackboard"));
@@ -26,6 +30,54 @@ void AHypoxiaAIController::BeginPlay() {
 	for (TActorIterator<AHypoxiaCharacter> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
 		//This may need adjusting to ensure it gets the right one
 		HypoxiaCharacter = *ActorItr;
+	}
+
+	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
+		
+		if (ActorItr->ActorHasTag(TEXT("Trigger"))) {
+			
+			AActor *Trigger = *ActorItr;
+			//TriggerArray.Add(Trigger->GetActorLocation());
+			TArray<FVector> Data;
+			auto Comps = Trigger->GetComponents().Array();
+			UE_LOG(LogTemp, Warning, TEXT("Comps %i"), Comps.Num());
+			for (auto CompItr(Comps.CreateIterator()); CompItr; ++CompItr) {
+				auto Comp = Cast<USceneComponent>(*CompItr);
+				if (Comp->ComponentHasTag(TEXT("Base"))) {
+					TriggerArray.Add(Comp->GetComponentLocation());
+					UE_LOG(LogTemp, Warning, TEXT("CompsLocBase %f"), Comp->GetComponentLocation().X);
+					break;
+				}
+			}
+			for (auto CompItr(Comps.CreateIterator()); CompItr; ++CompItr) {
+				auto Comp = Cast<USceneComponent>(*CompItr);
+				if (Comp->ComponentHasTag(TEXT("Start"))) {
+					Data.Add(Comp->GetComponentLocation());
+					UE_LOG(LogTemp, Warning, TEXT("CompsLocStart %f"), Comp->GetComponentLocation().X);
+					break;
+				}
+			}
+			for (auto CompItr(Comps.CreateIterator()); CompItr; ++CompItr) {
+				auto Comp = Cast<USceneComponent>(*CompItr);
+				if (Comp->ComponentHasTag(TEXT("End"))) {
+					Data.Add(Comp->GetComponentLocation());
+					UE_LOG(LogTemp, Warning, TEXT("CompsLocEnd %f"), Comp->GetComponentLocation().X);
+					break;
+				}
+			}
+			//Data.Add(Comp->GetComponentLocation());
+			//Data.Add(Comps[0]->get)
+			//Data.Add(Trigger->GetComponents[1].GetComponentLocation());
+			TriggerData.Add(Data);
+			//UE_LOG(LogTemp, Warning, TEXT("CompsLoc %f"), TriggerData[0][1].X);
+			//UE_LOG(LogTemp, Warning, TEXT("CompsLoc %f"), TriggerData[0][1].X);
+		}
+		
+		/*ATriggerBox *Trigger = *ActorItr;
+		TriggerArray.Add(Trigger->GetActorLocation());
+		TArray<float> Data;
+		Data.Init(Trigger->Tags);
+		TriggerData.Add(Data);*/
 	}
 
 	Goal = EGoal::Wander;
@@ -46,6 +98,20 @@ void AHypoxiaAIController::BeginPlay() {
 
 }
 
+void AHypoxiaAIController::TriggerEvent() {
+
+}
+
+//void AHypoxiaAIController::RegisterDelegate()
+//{
+//	
+//}
+//
+//void AMyActorWhichRegisteresWithABox::OnBeginTriggerOverlap(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+//{
+//	// This gets called when an actor begins to overlap with MyBoxComponent
+//}
+
 void AHypoxiaAIController::Tick(float DeltaTime) {
 
 	Super::Tick(DeltaTime);
@@ -54,6 +120,7 @@ void AHypoxiaAIController::Tick(float DeltaTime) {
 
 	switch (Goal) {
 	case EGoal::Idle:
+		CheckTrigger();
 		break;
 	case EGoal::Wander:
 		if (AtGoal() || WanderTime <= 0.0f) {
@@ -174,6 +241,10 @@ void AHypoxiaAIController::CheckForPlayer() {
 		FVector MonsterLocation = GetPawn()->GetActorLocation();
 		GetPawn()->SetActorLocation(FVector(MonsterLocation.X, MonsterLocation.Y, 75.0f));
 	}
+}
+
+void AHypoxiaAIController::CheckTrigger() {
+
 }
 
 void AHypoxiaAIController::SetGoal(EGoal NewGoal) {
