@@ -25,7 +25,7 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
-	void Power(float Percentage);
+	void Power(float Volume);
 	
 	UPROPERTY(EditAnywhere)
 	float SnapDistance = 100.f;
@@ -34,4 +34,5 @@ public:
 	float AngleTolerance = 45.f;
 
 	ASlidingDoor* Door;
+	float DoorPercentage;
 };

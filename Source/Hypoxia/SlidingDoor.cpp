@@ -25,17 +25,18 @@ void ASlidingDoor::BeginPlay()
 void ASlidingDoor::Tick( float DeltaTime )
 {
 	Super::Tick(DeltaTime);
-	Opened += 0.02f * FMath::Sign(TargetPosition);
-	TargetPosition = 0;
+	if (FMath::Abs(Opened - TargetPosition) > 0.02) {
+		Opened += 0.005f * FMath::Sign(TargetPosition - Opened);
+	}
 	this->SetActorLocation(ClosedPosition + this->GetActorForwardVector() * 200.f * Opened);
 }
 
 void ASlidingDoor::Open(float Percentage)
 {
-	TargetPosition = Percentage - Opened;
+	TargetPosition = Percentage;
 }
 
 void ASlidingDoor::Close(float Percentage)
 {
-	TargetPosition = Opened - Percentage;
+	TargetPosition = Percentage;
 }

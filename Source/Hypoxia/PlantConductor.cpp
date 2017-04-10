@@ -35,9 +35,6 @@ void APlantConductor::BeginPlay() {
 
 void APlantConductor::Tick(float deltaSeconds) {
 	Super::Tick(deltaSeconds);
-	/*if (IsValid(Socket)) {
-		GlowIntensity = 100.f;
-	}*/
 	GlowIntensity = FMath::Max(GlowIntensity - 50 * deltaSeconds, 1.f);
 	DynamicMaterial->SetScalarParameterValue(FName("GlowIntensity"), GlowIntensity);
 	Particles->SetFloatParameter("SpawnRate", FMath::Max(GlowIntensity / 7.5f, 0.1f));
@@ -74,7 +71,7 @@ void APlantConductor::Hear(float volume) {
 	GlowIntensity = FMath::Max(GlowIntensity, volume * 1.5f);
 	Particles->ActivateSystem();
 	if (IsValid(this->Socket)) {
-		this->Socket->Power(FMath::Min(1.f, volume / 60.f));
+		this->Socket->Power(volume);
 	}
 }
 
