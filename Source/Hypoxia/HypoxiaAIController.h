@@ -40,7 +40,7 @@ class HYPOXIA_API AHypoxiaAIController : public AAIController
 public:
 	void HearSound(FVector, float);
 
-	void TriggerEvent();
+	//void TriggerEvent();
 
 private:
 	bool AtGoal();

@@ -12,6 +12,7 @@ EGoal Goal;
 FVector GoalPoint;
 FVector SoundPoint;
 bool HeardSound;
+bool EventRunning;
 float InvestigateTime;
 float WanderTime;
 float WanderDistance;
@@ -80,11 +81,12 @@ void AHypoxiaAIController::BeginPlay() {
 		TriggerData.Add(Data);*/
 	}
 
-	Goal = EGoal::Wander;
+	Goal = EGoal::Idle;
 
 	GoalPoint = GetPawn()->GetActorLocation();
 	SoundPoint = FVector(0.0f, 0.0f, 0.0f);
 	HeardSound = false;
+	EventRunning = false;
 	InvestigateTime = 0.0f;
 	WanderTime = 0.0f;
 	WanderDistance = 1000.0f;
@@ -98,20 +100,6 @@ void AHypoxiaAIController::BeginPlay() {
 
 }
 
-void AHypoxiaAIController::TriggerEvent() {
-
-}
-
-//void AHypoxiaAIController::RegisterDelegate()
-//{
-//	
-//}
-//
-//void AMyActorWhichRegisteresWithABox::OnBeginTriggerOverlap(class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-//{
-//	// This gets called when an actor begins to overlap with MyBoxComponent
-//}
-
 void AHypoxiaAIController::Tick(float DeltaTime) {
 
 	Super::Tick(DeltaTime);
@@ -124,7 +112,14 @@ void AHypoxiaAIController::Tick(float DeltaTime) {
 		break;
 	case EGoal::Wander:
 		if (AtGoal() || WanderTime <= 0.0f) {
-			GoalPoint = NextWanderPoint();
+			if (!EventRunning) {
+				GoalPoint = NextWanderPoint();
+			} else {
+				EventRunning = false;
+				Goal = EGoal::Idle;
+				FVector MonsterLocation = GetPawn()->GetActorLocation();
+				GetPawn()->SetActorLocation(FVector(MonsterLocation.X, MonsterLocation.Y, 450.0f));
+			}
 		} else {
 			WanderTime -= DeltaTime;
 		}
@@ -244,7 +239,21 @@ void AHypoxiaAIController::CheckForPlayer() {
 }
 
 void AHypoxiaAIController::CheckTrigger() {
-
+	for (auto TriggerItr(TriggerArray.CreateIterator()); TriggerItr; ++TriggerItr) {
+		auto Trigger = *TriggerItr;
+		if (FVector::Dist(Trigger, HypoxiaCharacter->GetActorLocation()) < 300.0f) {
+			FVector Start = TriggerData[TriggerItr.GetIndex()][0];
+			FVector End   = TriggerData[TriggerItr.GetIndex()][1];
+			GetPawn()->SetActorLocation(Start);
+			GoalPoint = End;
+			WanderTime = 600.0f;
+			EventRunning = true;
+			SetGoal(EGoal::Wander);
+			TriggerArray.RemoveAt(TriggerItr.GetIndex(), 1, true);
+			TriggerData.RemoveAt(TriggerItr.GetIndex(), 1, true);
+			break;
+		}
+	}
 }
 
 void AHypoxiaAIController::SetGoal(EGoal NewGoal) {
