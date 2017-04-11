@@ -38,8 +38,8 @@ void APlantSocket::Tick( float DeltaTime )
 
 void APlantSocket::Power(float Volume)
 {
-	if (Volume > 35.0f) {
+	//if (Volume > 35.0f) {
 		DoorPercentage = FMath::Min(1.f, DoorPercentage + 0.05f);
 		Door->Open(DoorPercentage);
-	}
+	//}
 }

@@ -18,7 +18,8 @@ public:
 	
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float, ELevelTick, FActorComponentTickFunction*) override;
-	void DestroyComponent(bool bPromoteChildren = false);
+	virtual void OnRegister() override;
+	virtual void DestroyComponent(bool bPromoteChildren = false) override;
 	void Play(float startTime = 0.f);
 	void Stop();
 	void SetSound(USoundBase*);

@@ -71,12 +71,12 @@ AHypoxiaCharacter::AHypoxiaCharacter() {
 	L_MotionController->bAbsoluteLocation = true;
 	L_MotionController->bAbsoluteRotation = true;
 
-	/*FootstepAudioComponent = CreateDefaultSubobject<UComplexAudioComponent>(TEXT("FootstepAudio"));
+	FootstepAudioComponent = CreateDefaultSubobject<UComplexAudioComponent>(TEXT("FootstepAudio"));
 	FootstepAudioComponent->SetupAttachment(RootComponent);
 	FootstepAudioComponent->bAmbientSound = true;
 	static ConstructorHelpers::FObjectFinder<USoundAttenuation> AttenuationAsset((TEXT("/Game/DefaultAttenuation.DefaultAttenuation")));
 	if (AttenuationAsset.Succeeded())
-		FootstepAudioComponent->SetAttenuationSettings(AttenuationAsset.Object);*/
+		FootstepAudioComponent->SetAttenuationSettings(AttenuationAsset.Object);
 }
 
 void AHypoxiaCharacter::BeginPlay() {
@@ -290,7 +290,7 @@ void AHypoxiaCharacter::Tick(float DeltaTime) {
 
 	//FirstPersonCameraComponent->SetWorldLocation(GetCapsuleComponent()->GetComponentLocation());
 	
-	//FirstPersonCameraComponent->SetWorldLocation(FVector(FirstPersonCameraComponent->GetComponentLocation().X, FirstPersonCameraComponent->GetComponentLocation().Y, DevicePosition.Z));
+	FirstPersonCameraComponent->SetWorldLocation(FVector(FirstPersonCameraComponent->GetComponentLocation().X, FirstPersonCameraComponent->GetComponentLocation().Y, DevicePosition.Z));
 	
 	//UE_LOG(LogTemp, Error, TEXT("Camera X: %f"), FirstPersonCameraComponent->GetComponentLocation().X);
 

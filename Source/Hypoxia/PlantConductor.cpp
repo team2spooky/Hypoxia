@@ -50,6 +50,7 @@ void APlantConductor::Drop() {
 		if (FVector::Dist(socket->GetActorLocation(), Item->GetComponentLocation()) < socket->SnapDistance) {
 			FRotator RotationDiff = socket->GetActorRotation() - Item->GetComponentRotation();
 			if (FMath::Abs(RotationDiff.Pitch) < socket->AngleTolerance && FMath::Abs(RotationDiff.Roll) < socket->AngleTolerance) {
+				Item->SetSimulatePhysics(false);
 				Item->SetWorldLocation(socket->GetActorLocation());
 				Item->SetWorldRotation(socket->GetActorRotation());
 				this->Socket = socket;
@@ -62,6 +63,7 @@ void APlantConductor::Drop() {
 bool APlantConductor::Pickup(USceneComponent* SceneComponent, EControllerHand ControllerHand) {
 	bool returnValue = Super::Pickup(SceneComponent, ControllerHand);
 	if (returnValue) {
+		Item->SetSimulatePhysics(true);
 		this->Socket = NULL;
 	}
 	return returnValue;
