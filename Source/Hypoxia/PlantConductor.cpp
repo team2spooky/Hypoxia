@@ -47,12 +47,12 @@ void APlantConductor::Drop() {
 	UGameplayStatics::GetAllActorsOfClass(this->GetWorld(), APlantSocket::StaticClass(), Sockets);
 	for (AActor* S : Sockets) {
 		APlantSocket* socket = Cast<APlantSocket>(S);
-		if (FVector::Dist(socket->GetActorLocation(), Item->GetComponentLocation()) < socket->SnapDistance) {
-			FRotator RotationDiff = socket->GetActorRotation() - Item->GetComponentRotation();
+		if (FVector::Dist(socket->SnapSpot->GetComponentLocation(), Item->GetComponentLocation()) < socket->SnapDistance) {
+			FRotator RotationDiff = socket->SnapSpot->GetComponentRotation() - Item->GetComponentRotation();
 			if (FMath::Abs(RotationDiff.Pitch) < socket->AngleTolerance && FMath::Abs(RotationDiff.Roll) < socket->AngleTolerance) {
 				Item->SetSimulatePhysics(false);
-				Item->SetWorldLocation(socket->GetActorLocation());
-				Item->SetWorldRotation(socket->GetActorRotation());
+				Item->SetWorldLocation(socket->SnapSpot->GetComponentLocation());
+				Item->SetWorldRotation(socket->SnapSpot->GetComponentRotation());
 				this->Socket = socket;
 				return;
 			}

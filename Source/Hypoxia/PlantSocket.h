@@ -27,6 +27,9 @@ public:
 
 	void Power(float Volume);
 	
+	UPROPERTY(VisibleAnywhere)
+	class USceneComponent* SnapSpot;
+
 	UPROPERTY(EditAnywhere)
 	float SnapDistance = 100.f;
 

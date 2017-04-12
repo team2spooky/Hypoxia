@@ -12,6 +12,9 @@ APlantSocket::APlantSocket()
 
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	RootComponent = StaticMesh;
+
+	SnapSpot = CreateDefaultSubobject<USceneComponent>(TEXT("SnapSpot"));
+	SnapSpot->SetupAttachment(StaticMesh);
 }
 
 // Called when the game starts or when spawned
