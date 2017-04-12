@@ -2,27 +2,28 @@
 
 #pragma once
 
-#include "GameFramework/Actor.h"
+#include "PowerableObject.h"
 #include "SlidingDoor.generated.h"
 
+/**
+ * 
+ */
 UCLASS()
-class HYPOXIA_API ASlidingDoor : public AActor
+class HYPOXIA_API ASlidingDoor : public APowerableObject
 {
 	GENERATED_BODY()
 
-protected:
-	UPROPERTY(VisibleAnywhere, Category = Mesh)
-	class UStaticMeshComponent* StaticMesh;
-	
-public:	
+public:
 	// Sets default values for this actor's properties
 	ASlidingDoor();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
+
 	// Called every frame
-	virtual void Tick( float DeltaSeconds ) override;
+	virtual void Tick(float DeltaSeconds) override;
+
+	virtual void Power(float Strength) override;
 
 	void Open(float Percentage = 1.f);
 
@@ -38,4 +39,5 @@ private:
 	float TargetPosition = 0.f;
 
 	FVector ClosedPosition;
+	
 };

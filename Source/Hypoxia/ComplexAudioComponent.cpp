@@ -117,8 +117,12 @@ void UComplexAudioComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 void UComplexAudioComponent::OnRegister() {
 	Super::OnRegister();
-	VirtualAudioComponent->RegisterComponent();
-	InfluenceSphereAudio->RegisterComponent();
+	if (IsValid(VirtualAudioComponent)) {
+		VirtualAudioComponent->RegisterComponent();
+	}
+	if (IsValid(InfluenceSphereAudio)) {
+		InfluenceSphereAudio->RegisterComponent();
+	}
 }
 
 void UComplexAudioComponent::DestroyComponent(bool bPromoteChildren) {

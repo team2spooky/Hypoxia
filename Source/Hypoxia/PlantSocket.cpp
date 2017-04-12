@@ -25,8 +25,8 @@ void APlantSocket::BeginPlay()
 	TArray<AActor*> matches;
 	UGameplayStatics::GetAllActorsWithTag(this->GetWorld(), this->Tags[0], matches);
 	for (AActor* match : matches) {
-		if (match->IsA(ASlidingDoor::StaticClass())) {
-			Door = Cast<ASlidingDoor>(match);
+		if (match->IsA(APowerableObject::StaticClass())) {
+			TargetObject = Cast<APowerableObject>(match);
 			return;
 		}
 	}
@@ -41,8 +41,10 @@ void APlantSocket::Tick( float DeltaTime )
 
 void APlantSocket::Power(float Volume)
 {
-	//if (Volume > 35.0f) {
-		DoorPercentage = FMath::Min(1.f, DoorPercentage + 0.05f);
-		Door->Open(DoorPercentage);
-	//}
+	if (Volume == 0.f) {
+		ObjectPower = 0;
+	} else {
+		ObjectPower = FMath::Min(1.f, ObjectPower + 0.05f);
+	}
+	TargetObject->Power(ObjectPower);
 }

@@ -2,12 +2,11 @@
 
 #pragma once
 
-#include "PowerableObject.h"
 #include "GameFramework/Actor.h"
-#include "PlantSocket.generated.h"
+#include "PowerableObject.generated.h"
 
-UCLASS()
-class HYPOXIA_API APlantSocket : public AActor
+UCLASS(abstract)
+class HYPOXIA_API APowerableObject : public AActor
 {
 	GENERATED_BODY()
 
@@ -17,7 +16,7 @@ protected:
 	
 public:	
 	// Sets default values for this actor's properties
-	APlantSocket();
+	APowerableObject();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -25,17 +24,6 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
-	void Power(float Volume);
+	virtual void Power(float Strength);
 	
-	UPROPERTY(VisibleAnywhere)
-	class USceneComponent* SnapSpot;
-
-	UPROPERTY(EditAnywhere)
-	float SnapDistance = 100.f;
-
-	UPROPERTY(EditAnywhere)
-	float AngleTolerance = 45.f;
-
-	APowerableObject* TargetObject;
-	float ObjectPower;
 };

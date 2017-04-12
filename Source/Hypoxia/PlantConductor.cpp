@@ -63,6 +63,7 @@ void APlantConductor::Drop() {
 bool APlantConductor::Pickup(USceneComponent* SceneComponent, EControllerHand ControllerHand) {
 	bool returnValue = Super::Pickup(SceneComponent, ControllerHand);
 	if (returnValue) {
+		this->Socket->Power(0.f);
 		Item->SetSimulatePhysics(true);
 		this->Socket = NULL;
 	}
