@@ -9,5 +9,5 @@ APoweredLight::APoweredLight() {
 }
 
 void APoweredLight::Power(float Strength) {
-	Light->SetIntensity(Strength * 10000);
+	Light->SetIntensity(Strength * 100);
 }

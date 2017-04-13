@@ -41,10 +41,13 @@ void APlantSocket::Tick( float DeltaTime )
 
 void APlantSocket::Power(float Volume)
 {
+	UE_LOG(LogTemp,Warning,TEXT("%f"), Volume);
 	if (Volume == 0.f) {
 		ObjectPower = 0;
 	} else {
 		ObjectPower = FMath::Min(1.f, ObjectPower + 0.05f);
 	}
-	TargetObject->Power(ObjectPower);
+	if (IsValid(TargetObject)) {
+		TargetObject->Power(ObjectPower);
+	}
 }

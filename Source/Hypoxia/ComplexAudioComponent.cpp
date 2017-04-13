@@ -96,10 +96,13 @@ void UComplexAudioComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		}
 		for (TSet<AActor*>::TConstIterator Itr = OverlappingActors.CreateConstIterator(); Itr; ++Itr) {
 			AListeningItem* Item = Cast<AListeningItem>(*Itr);
+			float Dist = FVector::Dist(Item->GetItem()->GetComponentLocation(), this->GetComponentLocation());
+			float Alpha = Dist / MaxDist;
+			if (Alpha < 0 || Alpha > 1)
+				continue;
 			if (GetWorld()->LineTraceTestByChannel(this->GetComponentLocation(), Item->GetItem()->GetComponentLocation(), ECC_GameTraceChannel2))
 				continue;
-			float Dist = FVector::Dist(Item->GetItem()->GetComponentLocation(), this->GetComponentLocation());
-			Item->Hear(FMath::Lerp(1.f, 0.f, Dist / MaxDist) * ProjectedVolume);
+			Item->Hear(FMath::Lerp(1.f, 0.f, Alpha) * ProjectedVolume);
 		}
 		TSubclassOf<AHypoxiaMonster> Monster = AHypoxiaMonster::StaticClass();
 		InfluenceSphereAudio->GetOverlappingActors(OverlappingActors, Monster);

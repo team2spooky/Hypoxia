@@ -119,10 +119,13 @@ void UVoiceCaptureComponent::TriggerObjects(float volume) {
 	InfluenceSphere->GetOverlappingActors(OverlappingActors, Filter);
 	for (TSet<AActor*>::TConstIterator Itr = OverlappingActors.CreateConstIterator(); Itr; ++Itr) {
 		AListeningItem* Item = Cast<AListeningItem>(*Itr);
+		float Dist = FVector::Dist(Item->GetItem()->GetComponentLocation(), InfluenceSphere->GetComponentLocation());
+		float Alpha = Dist / MaxDist;
+		if (Alpha < 0 || Alpha > 1)
+			continue;
 		if (GetWorld()->LineTraceTestByChannel(InfluenceSphere->GetComponentLocation(), Item->GetItem()->GetComponentLocation(), ECC_GameTraceChannel2))
 			continue;
-		float Dist = FVector::Dist(Item->GetActorLocation(), InfluenceSphere->GetComponentLocation());
-		Item->Hear(FMath::Lerp(1.f, 0.f, Dist / MaxDist) * volume);
+		Item->Hear(FMath::Lerp(1.f, 0.f, Alpha) * volume);
 	}
 	TSubclassOf<AHypoxiaMonster> Monster = AHypoxiaMonster::StaticClass();
 	InfluenceSphere->GetOverlappingActors(OverlappingActors, Monster);
