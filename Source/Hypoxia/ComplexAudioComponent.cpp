@@ -15,11 +15,13 @@ UComplexAudioComponent::UComplexAudioComponent() {
 
 	VirtualAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("VirtualAudioComponent"));
 	VirtualAudioComponent->bAutoActivate = true;
+	VirtualAudioComponent->SetupAttachment(this);
 	//VirtualAudioComponent->SetWorldLocation(this->GetComponentLocation());
 	//VirtualAudioComponent->RegisterComponent();
 
 	InfluenceSphereAudio = CreateDefaultSubobject<USphereComponent>(TEXT("InfluenceSphereAudio"));
 	InfluenceSphereAudio->bAutoActivate = true;
+	InfluenceSphereAudio->SetupAttachment(this);
 	//InfluenceSphereAudio->SetWorldLocation(this->GetComponentLocation());
 	//InfluenceSphereAudio->RegisterComponent();
 
@@ -44,8 +46,10 @@ void UComplexAudioComponent::BeginPlay() {
 	this->bAutoDestroy = false;
 	this->Stop();
 
+	VirtualAudioComponent->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+
 	InfluenceSphereAudio->SetWorldLocation(GetComponentLocation());
-	InfluenceSphereAudio->AttachToComponent(this, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
+	//InfluenceSphereAudio->AttachToComponent(this, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
 
 	// Copy Attenuation settings
 	if (this->AttenuationSettings != nullptr) {
