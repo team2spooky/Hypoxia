@@ -29,8 +29,20 @@ public:
 
 	void Close(float Percentage = 1.f);
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, Category="Door")
 	bool Locked = false;
+
+	/* Speed at which the door opens */
+	UPROPERTY(EditAnywhere, Category = "Door")
+	float Speed = 0.005;
+
+	/* Width of the door */
+	UPROPERTY(EditAnywhere, Category = "Door")
+	float OpenDistance = 160.f;
+
+	/* Where along its position will the door start. 0 is closed and 1 is open. */
+	UPROPERTY(EditAnywhere, Category = "Door")
+	float StartingPoint = 0.f;
 
 	float Opened = 0.f;
 

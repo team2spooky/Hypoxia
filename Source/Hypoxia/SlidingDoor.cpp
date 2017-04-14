@@ -16,6 +16,8 @@ void ASlidingDoor::BeginPlay()
 {
 	Super::BeginPlay();
 	ClosedPosition = this->GetActorLocation();
+	Opened = StartingPoint;
+	TargetPosition = StartingPoint;
 }
 
 // Called every frame
@@ -23,9 +25,9 @@ void ASlidingDoor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	if (FMath::Abs(Opened - TargetPosition) > 0.02) {
-		Opened += 0.005f * FMath::Sign(TargetPosition - Opened);
+		Opened += Speed * FMath::Sign(TargetPosition - Opened);
 	}
-	this->SetActorLocation(ClosedPosition + this->GetActorForwardVector() * 160.f * Opened);
+	this->SetActorLocation(ClosedPosition + this->GetActorForwardVector() * OpenDistance * Opened);
 }
 
 void ASlidingDoor::Power(float Strength) {
@@ -38,11 +40,13 @@ void ASlidingDoor::Power(float Strength) {
 
 void ASlidingDoor::Open(float Percentage)
 {
-	TargetPosition = Percentage;
+	if (!Locked)
+		TargetPosition = Percentage;
 }
 
 void ASlidingDoor::Close(float Percentage)
 {
-	TargetPosition = 1 - Percentage;
+	if (!Locked)
+		TargetPosition = 1 - Percentage;
 }
 
