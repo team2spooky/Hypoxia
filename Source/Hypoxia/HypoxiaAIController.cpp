@@ -76,7 +76,7 @@ void AHypoxiaAIController::BeginPlay() {
 		
 	}
 
-	Goal = EGoal::Idle;
+	Goal = EGoal::Wander;
 
 	GoalPoint = GetPawn()->GetActorLocation();
 	SoundPoint = FVector(0.0f, 0.0f, 0.0f);
