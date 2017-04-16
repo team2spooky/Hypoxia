@@ -224,7 +224,7 @@ void AItem::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimit
 }
 
 UComplexAudioComponent* AItem::GenerateOnHitSound() {
-	UComplexAudioComponent* HitSoundComponent = NewObject<UComplexAudioComponent>(Item, FName("DynamicSound"));
+	UComplexAudioComponent* HitSoundComponent = NewObject<UComplexAudioComponent>(Item);
 	HitSoundComponent->bAutoDestroy = true;
 	HitSoundComponent->bAdvancedOcclusion = true;
 	HitSoundComponent->bAmbientSound = this->bAmbientSound;

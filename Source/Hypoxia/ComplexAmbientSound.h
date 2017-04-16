@@ -11,7 +11,7 @@ class HYPOXIA_API AComplexAmbientSound : public AActor
 {
 	GENERATED_BODY()
 
-private:
+public:
 	UPROPERTY(VisibleAnywhere, NoClear)
 	UComplexAudioComponent* ComplexAudioComponent;
 

@@ -25,7 +25,7 @@ public:
 	void TriggerObjects(float volume);
 
 private:
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, NoClear)
 	USphereComponent* InfluenceSphere;
 
 	TSharedPtr<IVoiceCapture> VoiceCapture;

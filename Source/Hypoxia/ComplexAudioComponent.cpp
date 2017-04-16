@@ -10,23 +10,20 @@
 
 #define AUDIO_DEBUG 0
 
-UComplexAudioComponent::UComplexAudioComponent() : Super() {
+UComplexAudioComponent::UComplexAudioComponent() {
 	PrimaryComponentTick.bCanEverTick = true;
-
-	//static ConstructorHelpers::FObjectFinder<USoundAttenuation> AttenuationAsset((TEXT("/Game/TestAttenuation.TestAttenuation")));
 
 	VirtualAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("VirtualAudioComponent"));
 	VirtualAudioComponent->bAutoActivate = true;
-	//VirtualAudioComponent->AttenuationSettings = AttenuationAsset.Object; // Old way of applying attenuation
-	//VirtualAudioComponent->AttenuationSettings = this->AttenuationSettings; // Does not work
-	VirtualAudioComponent->SetWorldLocation(this->GetComponentLocation());
-	VirtualAudioComponent->RegisterComponent();
+	VirtualAudioComponent->SetupAttachment(this);
+	//VirtualAudioComponent->SetWorldLocation(this->GetComponentLocation());
+	//VirtualAudioComponent->RegisterComponent();
 
 	InfluenceSphereAudio = CreateDefaultSubobject<USphereComponent>(TEXT("InfluenceSphereAudio"));
 	InfluenceSphereAudio->bAutoActivate = true;
-	InfluenceSphereAudio->SetWorldLocation(this->GetComponentLocation());
-	//InfluenceSphereAudio->SetupAttachment(GetAttachParent());
-	InfluenceSphereAudio->RegisterComponent();
+	InfluenceSphereAudio->SetupAttachment(this);
+	//InfluenceSphereAudio->SetWorldLocation(this->GetComponentLocation());
+	//InfluenceSphereAudio->RegisterComponent();
 
 #if AUDIO_DEBUG
 	InfluenceSphereAudio->bHiddenInGame = false;
@@ -49,8 +46,10 @@ void UComplexAudioComponent::BeginPlay() {
 	this->bAutoDestroy = false;
 	this->Stop();
 
+	VirtualAudioComponent->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+
 	InfluenceSphereAudio->SetWorldLocation(GetComponentLocation());
-	InfluenceSphereAudio->AttachToComponent(this, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
+	//InfluenceSphereAudio->AttachToComponent(this, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
 
 	// Copy Attenuation settings
 	if (this->AttenuationSettings != nullptr) {
@@ -101,10 +100,13 @@ void UComplexAudioComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		}
 		for (TSet<AActor*>::TConstIterator Itr = OverlappingActors.CreateConstIterator(); Itr; ++Itr) {
 			AListeningItem* Item = Cast<AListeningItem>(*Itr);
+			float Dist = FVector::Dist(Item->GetItem()->GetComponentLocation(), this->GetComponentLocation());
+			float Alpha = Dist / MaxDist;
+			if (Alpha < 0 || Alpha > 1)
+				continue;
 			if (GetWorld()->LineTraceTestByChannel(this->GetComponentLocation(), Item->GetItem()->GetComponentLocation(), ECC_GameTraceChannel2))
 				continue;
-			float Dist = FVector::Dist(Item->GetItem()->GetComponentLocation(), this->GetComponentLocation());
-			Item->Hear(FMath::Lerp(1.f, 0.f, Dist / MaxDist) * ProjectedVolume);
+			Item->Hear(FMath::Lerp(1.f, 0.f, Alpha) * ProjectedVolume);
 		}
 		TSubclassOf<AHypoxiaMonster> Monster = AHypoxiaMonster::StaticClass();
 		InfluenceSphereAudio->GetOverlappingActors(OverlappingActors, Monster);
@@ -117,6 +119,16 @@ void UComplexAudioComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 				continue;*/
 			Cast<AHypoxiaAIController>(M->GetController())->HearSound(InfluenceSphereAudio->GetComponentLocation(), ProjectedVolume);
 		}
+	}
+}
+
+void UComplexAudioComponent::OnRegister() {
+	Super::OnRegister();
+	if (IsValid(VirtualAudioComponent)) {
+		VirtualAudioComponent->RegisterComponent();
+	}
+	if (IsValid(InfluenceSphereAudio)) {
+		InfluenceSphereAudio->RegisterComponent();
 	}
 }
 

@@ -158,7 +158,7 @@ void AHypoxiaCharacter::MoveForward(float Value) {
 		AddMovementInput(GetActorForwardVector(), Value);
 		StepTimer += FMath::Abs(Value);
 		if (StepTimer > STEP_TIME) {
-			FootstepAudioComponent->Play();
+			//FootstepAudioComponent->Play();
 			StepTimer = 0.f;
 		}
 	}
@@ -181,7 +181,7 @@ void AHypoxiaCharacter::MoveRight(float Value) {
 		//AddMovementInput(FRotator(FirstPersonCameraComponent->RelativeRotation.Pitch, FirstPersonCameraComponent->RelativeRotation.Roll, GetCapsuleComponent()->RelativeRotation.Yaw).RotateVector(GetActorRightVector()), Value);
 		StepTimer += FMath::Abs(Value);
 		if (StepTimer > STEP_TIME) {
-			FootstepAudioComponent->Play();
+			//FootstepAudioComponent->Play();
 			StepTimer = 0.f;
 		}
 	}
