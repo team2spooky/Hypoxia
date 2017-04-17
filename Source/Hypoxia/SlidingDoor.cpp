@@ -50,3 +50,6 @@ void ASlidingDoor::Close(float Percentage)
 		TargetPosition = 1 - Percentage;
 }
 
+void ASlidingDoor::SetLocked(bool NewState) {
+	Locked = NewState;
+}
