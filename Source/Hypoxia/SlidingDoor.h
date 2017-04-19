@@ -25,11 +25,16 @@ public:
 
 	virtual void Power(float Strength) override;
 
+	UFUNCTION(BlueprintCallable, Category = "Door")
 	void Open(float Percentage = 1.f);
 
+	UFUNCTION(BlueprintCallable, Category = "Door")
 	void Close(float Percentage = 1.f);
 
-	UPROPERTY(EditAnywhere, Category="Door")
+	UFUNCTION(BlueprintCallable, Category = "Door")
+	void SetLocked(bool NewState);
+
+	UPROPERTY(EditAnywhere, Category = "Door")
 	bool Locked = false;
 
 	/* Speed at which the door opens */
