@@ -206,6 +206,6 @@ void AHypoxiaAIController::HearSound(FVector Location, float Amplitude) {
 
 	FVector MonsterLocation = GetPawn()->GetActorLocation();
 
-	GetPawn()->SetActorLocation(FVector(MonsterLocation.X, MonsterLocation.Y, 75.0f));
+	//GetPawn()->SetActorLocation(FVector(MonsterLocation.X, MonsterLocation.Y, 75.0f));
 
 }
