@@ -16,6 +16,8 @@ class HYPOXIA_API ASlidingSwitch : public AItem
 	
 public:
 	ASlidingSwitch();
+
+	virtual void BeginPlay() override;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, Category = Mesh)

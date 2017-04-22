@@ -13,6 +13,14 @@ ASlidingSwitch::ASlidingSwitch() {
 	Constraint->bAutoActivate = true;
 	Constraint->SetConstrainedComponents(this->Base, NAME_None, this->Item, NAME_None);
 	Constraint->InitComponentConstraint();
+
+	Item->GetBodyInstance()->bLockRotation = true;
+}
+
+void ASlidingSwitch::BeginPlay() {
+	Super::BeginPlay();
+
+	Base->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 }
 
 
