@@ -18,6 +18,8 @@ public:
 	ASlidingSwitch();
 
 	virtual void BeginPlay() override;
+
+	virtual void Drop() override;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, Category = Mesh)
@@ -25,4 +27,7 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere)
 	class UPhysicsConstraintComponent* Constraint;
+
+private:
+	float TravelDistance = 25.f;
 };

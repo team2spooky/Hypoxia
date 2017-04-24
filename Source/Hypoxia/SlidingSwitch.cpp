@@ -14,6 +14,11 @@ ASlidingSwitch::ASlidingSwitch() {
 	Constraint->SetConstrainedComponents(this->Base, NAME_None, this->Item, NAME_None);
 	Constraint->InitComponentConstraint();
 
+	Constraint->SetLinearYLimit(ELinearConstraintMotion::LCM_Limited, TravelDistance);
+	Constraint->SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Locked, 45.0);
+	Constraint->SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Locked, 45.0);
+	Constraint->SetAngularTwistLimit(EAngularConstraintMotion::ACM_Locked, 45.0);
+
 	Item->GetBodyInstance()->bLockRotation = true;
 }
 
@@ -21,6 +26,11 @@ void ASlidingSwitch::BeginPlay() {
 	Super::BeginPlay();
 
 	Base->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+	Drop();
 }
 
-
+void ASlidingSwitch::Drop() {
+	Super::Drop();
+	float Direction = Item->GetComponentLocation().Y - Constraint->GetComponentLocation().Y;
+	Item->SetWorldLocation(Item->GetComponentLocation() + FVector(0.f, FMath::Sign(Direction) * TravelDistance, 0.f), true);
+}
