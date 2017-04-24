@@ -4,6 +4,8 @@
 #include "Flashlight.h"
 #include "Runtime/Engine/Classes/Components/TextRenderComponent.h"
 #include "MotionControllerComponent.h"
+#include "EngineUtils.h"
+#include "Engine/StaticMeshActor.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 
 AFlashlight::AFlashlight()
@@ -16,6 +18,22 @@ AFlashlight::AFlashlight()
 
 	//Text = CreateDefaultSubobject<UTextRenderComponent>(TEXT("Text"));
 	//Text->SetupAttachment(Item_Base);
+}
+
+void AFlashlight::BeginPlay() {
+
+	Super::BeginPlay();
+
+	for (TActorIterator<ADoor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	{
+		if (ActorItr->ActorHasTag(Tags[0])) {
+
+			Door = *ActorItr;
+			UE_LOG(LogTemp, Warning, TEXT("Child: %s"), *ActorItr->GetName());
+			UE_LOG(LogTemp, Warning, TEXT("Parent: %s"), *GetName());
+			break;
+		}
+	}
 }
 
 void AFlashlight::Use() {
@@ -44,12 +62,14 @@ void AFlashlight::Use() {
 	//Item->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f), false, (FHitResult*)nullptr, ETeleportType::TeleportPhysics);
 }
 
-//void AFlashlight::Tick(float DeltaTime) {
-//	
-//	Super::Tick(DeltaTime);
-//
-//	/*if (Rotation_Time >= 0) {
-//		Rotation_Time--;
-//		Item->SetRelativeRotation(FRotator(Item->GetComponentRotation().Pitch + 1.0f, 0.0f, 0.0f), false, (FHitResult*)nullptr, ETeleportType::TeleportPhysics);
-//	}*/
-//}
+bool AFlashlight::Pickup(USceneComponent* Controller, EControllerHand Hand) {
+	//UE_LOG(LogTemp, Warning, TEXT("Dist %f"), FVector::Dist(Controller->GetComponentLocation(), Item_Base->GetComponentLocation()));
+
+	bool RetVal = Super::Pickup(Controller, Hand);
+
+	Door->Unlock();
+
+	return RetVal;
+
+}
+
