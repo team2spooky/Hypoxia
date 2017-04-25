@@ -20,6 +20,15 @@ public:
 	virtual void BeginPlay() override;
 
 	virtual void Drop() override;
+
+	UFUNCTION(BlueprintNativeEvent)
+	void EventOn();
+	virtual void EventOn_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent)
+	void EventOff();
+	virtual void EventOff_Implementation();
+
 	
 protected:
 	UPROPERTY(VisibleAnywhere, Category = Mesh)
@@ -30,4 +39,7 @@ protected:
 
 private:
 	float TravelDistance = 25.f;
+
+	UPROPERTY(EditAnywhere)
+	bool bOn = false;
 };

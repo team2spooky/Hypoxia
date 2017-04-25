@@ -18,6 +18,8 @@ ASlidingSwitch::ASlidingSwitch() {
 	Constraint->SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Locked, 45.0);
 	Constraint->SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Locked, 45.0);
 	Constraint->SetAngularTwistLimit(EAngularConstraintMotion::ACM_Locked, 45.0);
+	Constraint->SetLinearPositionDrive(false, true, false);
+	Constraint->SetLinearDriveParams(500.f, 500.f, 0.f);
 
 	Item->GetBodyInstance()->bLockRotation = true;
 }
@@ -26,11 +28,31 @@ void ASlidingSwitch::BeginPlay() {
 	Super::BeginPlay();
 
 	Base->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-	Drop();
+
+	if (bOn) {
+		Constraint->SetLinearPositionTarget(FVector(0.f, 1 * TravelDistance, 0.f));
+	} else {
+		Constraint->SetLinearPositionTarget(FVector(0.f, -1 * TravelDistance, 0.f));
+	}
 }
 
 void ASlidingSwitch::Drop() {
 	Super::Drop();
-	float Direction = Item->GetComponentLocation().Y - Constraint->GetComponentLocation().Y;
-	Item->SetWorldLocation(Item->GetComponentLocation() + FVector(0.f, FMath::Sign(Direction) * TravelDistance, 0.f), true);
+	FVector A = Item->GetComponentLocation() - Constraint->GetComponentLocation();
+	float Direction = FVector::DotProduct(A, Constraint->GetRightVector());
+	Constraint->SetLinearPositionTarget(FVector(0.f, -1 * FMath::Sign(Direction) * TravelDistance, 0.f));
+	bool temp = bOn;
+	bOn = Direction < 0;
+	if (temp == bOn) return;
+	if (bOn) {
+		EventOn();
+	} else {
+		EventOff();
+	}
+}
+
+void ASlidingSwitch::EventOn_Implementation() {
+}
+
+void ASlidingSwitch::EventOff_Implementation() {
 }
