@@ -24,16 +24,16 @@ void AFlashlight::BeginPlay() {
 
 	Super::BeginPlay();
 
-	for (TActorIterator<ADoor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
-	{
-		if (ActorItr->ActorHasTag(Tags[0])) {
+	//for (TActorIterator<ADoor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+	//{
+	//	if (ActorItr->ActorHasTag(Tags[0])) {
 
-			Door = *ActorItr;
-			UE_LOG(LogTemp, Warning, TEXT("Child: %s"), *ActorItr->GetName());
-			UE_LOG(LogTemp, Warning, TEXT("Parent: %s"), *GetName());
-			break;
-		}
-	}
+	//		Door = *ActorItr;
+	//		UE_LOG(LogTemp, Warning, TEXT("Child: %s"), *ActorItr->GetName());
+	//		UE_LOG(LogTemp, Warning, TEXT("Parent: %s"), *GetName());
+	//		break;
+	//	}
+	//}
 }
 
 void AFlashlight::Use() {
@@ -67,7 +67,7 @@ bool AFlashlight::Pickup(USceneComponent* Controller, EControllerHand Hand) {
 
 	bool RetVal = Super::Pickup(Controller, Hand);
 
-	Door->Unlock();
+	//Door->Unlock();
 
 	return RetVal;
 
