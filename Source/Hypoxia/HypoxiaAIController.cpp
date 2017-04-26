@@ -106,12 +106,12 @@ void AHypoxiaAIController::Tick(float DeltaTime) {
 				EventRunning = false;
 				if (TriggerArray.Num() >= 0) {
 					Goal = EGoal::Idle;
+					FVector MonsterLocation = GetPawn()->GetActorLocation();
+					GetPawn()->SetActorLocation(FVector(MonsterLocation.X, MonsterLocation.Y, 450.0f));
 				} else {
 					GoalPoint = NextWanderPoint();
 					WanderTime = 0.0f;
 				}
-				FVector MonsterLocation = GetPawn()->GetActorLocation();
-				GetPawn()->SetActorLocation(FVector(MonsterLocation.X, MonsterLocation.Y, 450.0f));
 			}
 		} else {
 			WanderTime -= DeltaTime;
@@ -152,7 +152,7 @@ void AHypoxiaAIController::CheckForPlayer() {
 void AHypoxiaAIController::CheckTrigger() {
 	for (auto TriggerItr(TriggerArray.CreateIterator()); TriggerItr; ++TriggerItr) {
 		auto Trigger = *TriggerItr;
-		if (FVector::Dist(Trigger, HypoxiaCharacter->GetActorLocation()) < 300.0f) {
+		if (FVector::Dist(Trigger, HypoxiaCharacter->GetActorLocation()) < 200.0f) {
 			FVector Start = TriggerData[TriggerItr.GetIndex()][0];
 			FVector End   = TriggerData[TriggerItr.GetIndex()][1];
 			TriggerArray.RemoveAt(TriggerItr.GetIndex(), 1, true);
@@ -201,7 +201,7 @@ FVector AHypoxiaAIController::NextWanderPoint() {
 
 void AHypoxiaAIController::HearSound(FVector Location, float Amplitude) {
 
-	if (Goal != EGoal::Idle) {
+	if (Goal != EGoal::Idle && !EventRunning) {
 
 		HeardSound = true;
 
@@ -209,7 +209,7 @@ void AHypoxiaAIController::HearSound(FVector Location, float Amplitude) {
 
 		SoundPoint = Location;
 
-		InvestigateTime = 18.0f;
+		InvestigateTime = 6.0f;
 
 		FVector MonsterLocation = GetPawn()->GetActorLocation();
 
