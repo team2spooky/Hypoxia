@@ -41,7 +41,6 @@ void APlantSocket::Tick( float DeltaTime )
 
 void APlantSocket::Power(float Volume)
 {
-	UE_LOG(LogTemp,Warning,TEXT("%f"), Volume);
 	if (Volume == 0.f) {
 		ObjectPower = 0;
 	} else {

@@ -103,7 +103,7 @@ void AItem::Drop() {
 
 	if (Held) {
 		Held = false;
-		UE_LOG(LogTemp, Warning, TEXT("Dropped"));
+		//UE_LOG(LogTemp, Warning, TEXT("Dropped"));
 		Item->SetEnableGravity(bHasGravity);
 		//Item->SetPhysicsLinearVelocity(MotionController->GetPhysicsLinearVelocity());
 		Item_Base->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
