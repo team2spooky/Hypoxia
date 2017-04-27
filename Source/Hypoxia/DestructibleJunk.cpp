@@ -9,7 +9,14 @@ ADestructibleJunk::ADestructibleJunk() {
 }
 
 void ADestructibleJunk::DoHit(FVector ImpactPoint, FVector NormalImpulse) {
-	DestructibleMesh->SetCollisionProfileName(FName("Item"));
-	DestructibleMesh->ApplyDamage(100.f, ImpactPoint, NormalImpulse, NormalImpulse.Size() / 100);
+	if (!Held) {
+		DestructibleMesh->DetachFromParent(true);
+		DestructibleMesh->SetCollisionProfileName(FName("Destructible"));
+		DestructibleMesh->ApplyDamage(100.f, ImpactPoint, NormalImpulse * FMath::VRandCone(NormalImpulse, PI / 16), NormalImpulse.Size() / 100);
+		Broken = true;
+	}
 }
 
+
+bool ADestructibleJunk::Pickup(USceneComponent*, EControllerHand) {
+}

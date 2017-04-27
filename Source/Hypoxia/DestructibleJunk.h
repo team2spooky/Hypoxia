@@ -25,9 +25,12 @@ public:
 
 	/*virtual void Tick(float) override;
 
-	virtual bool Pickup(USceneComponent*, EControllerHand) override;
-
 	virtual void Drop() override;*/
 
+	virtual bool Pickup(USceneComponent*, EControllerHand) override;
+
 	virtual void DoHit(FVector ImpactPoint, FVector NormalImpulse) override;
+
+private:
+	bool Broken = false;
 };
