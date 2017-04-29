@@ -30,14 +30,17 @@ void ALuminousPlant::BeginPlay() {
 	DynamicMaterial = Item->CreateAndSetMaterialInstanceDynamic(0);
 	Particles->CreateAndSetMaterialInstanceDynamic(0);
 	Particles->AutoPopulateInstanceProperties();
+	if (Static) {
+		Item->SetSimulatePhysics(false);
+	}
 }
 
 void ALuminousPlant::Tick(float deltaSeconds) {
 	Super::Tick(deltaSeconds);
 	float Glow;
 	DynamicMaterial->GetScalarParameterValue(FName("GlowIntensity"), Glow);
-	DynamicMaterial->SetScalarParameterValue(FName("GlowIntensity"), FMath::Max(Glow - 50 * deltaSeconds, 1.f));
-	Particles->SetFloatParameter("SpawnRate", FMath::Max(Glow / 7.5f, 0.1f));
+	DynamicMaterial->SetScalarParameterValue(FName("GlowIntensity"), FMath::Max(Glow - 50 * deltaSeconds, MinGlow));
+	Particles->SetFloatParameter("SpawnRate", FMath::Max(Glow / 7.5f, MinGlow));
 	GlowLight->SetIntensity(Glow);
 }
 
@@ -47,6 +50,11 @@ void ALuminousPlant::Hear(float volume) {
 	float NewGlow = FMath::Max(CurrentGlow, volume * 1.5f);
 	DynamicMaterial->SetScalarParameterValue(FName("GlowIntensity"), NewGlow);
 	Particles->ActivateSystem();
+}
+
+bool ALuminousPlant::Pickup(USceneComponent* SceneComponent, EControllerHand ControllerHand) {
+	if (Static) return false;
+	return Super::Pickup(SceneComponent, ControllerHand);
 }
 
 
