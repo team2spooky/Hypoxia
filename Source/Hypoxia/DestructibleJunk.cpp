@@ -9,14 +9,25 @@ ADestructibleJunk::ADestructibleJunk() {
 }
 
 void ADestructibleJunk::DoHit(FVector ImpactPoint, FVector NormalImpulse) {
-	if (!Held) {
-		DestructibleMesh->DetachFromParent(true);
-		DestructibleMesh->SetCollisionProfileName(FName("Destructible"));
-		DestructibleMesh->ApplyDamage(100.f, ImpactPoint, NormalImpulse * FMath::VRandCone(NormalImpulse, PI / 16), NormalImpulse.Size() / 100);
+	if (!Held && !Broken) {
+		DestructibleMesh->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+		DestructibleMesh->ApplyDamage(10.f, DestructibleMesh->GetComponentLocation(), NormalImpulse, NormalImpulse.Size() / 50);
 		Broken = true;
 	}
 }
 
+bool ADestructibleJunk::Pickup(USceneComponent* SceneComponent, EControllerHand ControllerHand) {
+	if (Broken) return false;
+	return Super::Pickup(SceneComponent, ControllerHand);
+}
 
-bool ADestructibleJunk::Pickup(USceneComponent*, EControllerHand) {
+void ADestructibleJunk::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit) {
+	if ((Item->GetPhysicsLinearVelocity() - LastVelocity).Size() > 150 && !Broken) {
+		LastVelocity = Item->GetPhysicsLinearVelocity();
+		if (OnHitSound) {
+			UComplexAudioComponent* HitSound = GenerateOnHitSound();
+			HitSound->Play();
+		}
+		DoHit(Hit.ImpactPoint, NormalImpulse);
+	}
 }

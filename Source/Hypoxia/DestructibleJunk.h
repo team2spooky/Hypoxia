@@ -31,6 +31,8 @@ public:
 
 	virtual void DoHit(FVector ImpactPoint, FVector NormalImpulse) override;
 
+	virtual void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit) override;
+
 private:
 	bool Broken = false;
 };

@@ -80,6 +80,5 @@ protected:
 
 	void SelfDrop();
 
-private:
 	FVector LastVelocity;
 };

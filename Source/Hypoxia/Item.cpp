@@ -219,8 +219,8 @@ void AItem::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimit
 		if (OnHitSound) {
 			UComplexAudioComponent* HitSound = GenerateOnHitSound();
 			HitSound->Play();
-			DoHit(Hit.ImpactPoint, NormalImpulse);
 		}
+		DoHit(Hit.ImpactPoint, NormalImpulse);
 	}
 }
 
