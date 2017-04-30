@@ -20,10 +20,17 @@ public:
 	virtual void Tick(float) override;
 
 	virtual void Hear(float volume) override;
+
+	virtual bool Pickup(USceneComponent*, EControllerHand) override;
 	
 private:
 	UMaterialInstanceDynamic* DynamicMaterial;
 	UParticleSystemComponent* Particles;
 	UPointLightComponent* GlowLight;
 	
+	UPROPERTY(EditAnywhere)
+	bool Static = false;
+
+	UPROPERTY(EditAnywhere)
+	float MinGlow = 1.f;
 };

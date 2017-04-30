@@ -220,8 +220,11 @@ void AItem::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimit
 			UComplexAudioComponent* HitSound = GenerateOnHitSound();
 			HitSound->Play();
 		}
+		DoHit(Hit.ImpactPoint, NormalImpulse);
 	}
 }
+
+void AItem::DoHit(FVector ImpactPoint, FVector NormalImpulse) {}
 
 UComplexAudioComponent* AItem::GenerateOnHitSound() {
 	UComplexAudioComponent* HitSoundComponent = NewObject<UComplexAudioComponent>(Item);
