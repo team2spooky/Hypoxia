@@ -71,6 +71,14 @@ AHypoxiaCharacter::AHypoxiaCharacter() {
 	L_MotionController->bAbsoluteLocation = true;
 	L_MotionController->bAbsoluteRotation = true;
 
+	RightCollider = CreateDefaultSubobject<USphereComponent>(TEXT("R_Collider"));
+	RightCollider->SetupAttachment(R_MotionTracker);
+	RightCollider->SetSphereRadius(50.f);
+
+	LeftCollider = CreateDefaultSubobject<USphereComponent>(TEXT("L_Collider"));
+	LeftCollider->SetupAttachment(L_MotionTracker);
+	LeftCollider->SetSphereRadius(50.f);
+
 	FootstepAudioComponent = CreateDefaultSubobject<UComplexAudioComponent>(TEXT("FootstepAudio"));
 	FootstepAudioComponent->SetupAttachment(RootComponent);
 	FootstepAudioComponent->bAmbientSound = true;
@@ -190,14 +198,27 @@ void AHypoxiaCharacter::MoveRight(float Value) {
 void AHypoxiaCharacter::ItemPickupRight() {
 
 	if (!HeldRight) {
-		for (TActorIterator<AItem> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
+		/*IF SOMETHING GOES WRONG THESE SWITCH THESE CODES AROUND*/
+		TSet<AActor*> OverlappingActors;
+		TSubclassOf<AItem> Filter = AItem::StaticClass();
+		RightCollider->GetOverlappingActors(OverlappingActors, Filter);
+		auto OverlapArray = OverlappingActors.Array();
+		OverlapArray.Sort([](AActor& LHS, AActor& RHS) { AHypoxiaCharacter* C = Cast<AHypoxiaCharacter>(UGameplayStatics::GetPlayerCharacter(LHS.GetWorld(), 0)); return FVector::DistSquared(C->RightCollider->GetComponentLocation(), Cast<AItem>(&LHS)->GetItem()->GetComponentLocation()) < FVector::DistSquared(C->RightCollider->GetComponentLocation(), Cast<AItem>(&RHS)->GetItem()->GetComponentLocation()); });
+		for (int i = 0; i < OverlapArray.Num(); i++) {
+			if (Cast<AItem>(OverlapArray[i])->Pickup(R_MotionTracker, EControllerHand::Right)) {
+				HeldRight = true;
+				RightHand->SetRenderInMainPass(false);
+				break;
+			}
+		}
+		/*for (TActorIterator<AItem> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
 			if (ActorItr->Pickup(R_MotionTracker, EControllerHand::Right)) {
 				HeldRight = true;
 				//RightHand->SetRelativeLocation(FVector(0.0f, 0.0f, -100.0f));
 				RightHand->SetRenderInMainPass(false);
 				break;
 			}
-		}
+		}*/
 	} else {
 		HeldItemRight->Drop();
 		HeldItemRight = NULL;
@@ -210,14 +231,27 @@ void AHypoxiaCharacter::ItemPickupRight() {
 void AHypoxiaCharacter::ItemPickupLeft() {
 
 	if (!HeldLeft) {
-		for (TActorIterator<AItem> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
+		/*IF SOMETHING GOES WRONG THESE SWITCH THESE CODES AROUND*/
+		TSet<AActor*> OverlappingActors;
+		TSubclassOf<AItem> Filter = AItem::StaticClass();
+		LeftCollider->GetOverlappingActors(OverlappingActors, Filter);
+		auto OverlapArray = OverlappingActors.Array();
+		OverlapArray.Sort([](AActor& LHS, AActor& RHS) { AHypoxiaCharacter* C = Cast<AHypoxiaCharacter>(UGameplayStatics::GetPlayerCharacter(LHS.GetWorld(), 0)); return FVector::DistSquared(C->LeftCollider->GetComponentLocation(), Cast<AItem>(&LHS)->GetItem()->GetComponentLocation()) < FVector::DistSquared(C->LeftCollider->GetComponentLocation(), Cast<AItem>(&RHS)->GetItem()->GetComponentLocation()); });
+		for (int i = 0; i < OverlapArray.Num(); i++) {
+			if (Cast<AItem>(OverlapArray[i])->Pickup(L_MotionTracker, EControllerHand::Left)) {
+				HeldLeft = true;
+				LeftHand->SetRenderInMainPass(false);
+				break;
+			}
+		}
+		/*for (TActorIterator<AItem> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
 			if (ActorItr->Pickup(L_MotionTracker, EControllerHand::Left)) {
 				HeldLeft = true;
 				//LeftHand->SetRelativeLocation(FVector(0.0f, 0.0f, -100.0f));
 				LeftHand->SetRenderInMainPass(false);
 				break;
 			}
-		}
+		}*/
 	} else {
 		HeldItemLeft->Drop();
 		HeldItemLeft = NULL;

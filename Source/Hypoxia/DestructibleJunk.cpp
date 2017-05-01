@@ -6,6 +6,8 @@
 ADestructibleJunk::ADestructibleJunk() {
 	DestructibleMesh = CreateDefaultSubobject<UDestructibleComponent>(TEXT("Destructible"));
 	DestructibleMesh->SetupAttachment(Item);
+
+	Item->SetVisibility(false);
 }
 
 void ADestructibleJunk::DoHit(FVector ImpactPoint, FVector NormalImpulse) {

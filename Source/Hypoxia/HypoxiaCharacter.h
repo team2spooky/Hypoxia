@@ -80,6 +80,12 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* RightHand;
+
+	UPROPERTY(VisibleAnywhere)
+	USphereComponent* LeftCollider;
+
+	UPROPERTY(VisibleAnywhere)
+	USphereComponent* RightCollider;
 	
 protected:
 	
