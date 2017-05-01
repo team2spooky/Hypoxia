@@ -26,12 +26,15 @@ ALuminousPlant::ALuminousPlant() {
 void ALuminousPlant::BeginPlay() {
 	Super::BeginPlay();
 	Particles->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-	Particles->AttachToComponent(Item, FAttachmentTransformRules(EAttachmentRule::KeepRelative, EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, true));
+	Particles->AttachToComponent(Item, FAttachmentTransformRules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, true));
 	DynamicMaterial = Item->CreateAndSetMaterialInstanceDynamic(0);
 	Particles->CreateAndSetMaterialInstanceDynamic(0);
 	Particles->AutoPopulateInstanceProperties();
 	if (Static) {
 		Item->SetSimulatePhysics(false);
+	}
+	if (NoParticles) {
+		Particles->DestroyComponent();
 	}
 }
 
@@ -40,7 +43,9 @@ void ALuminousPlant::Tick(float deltaSeconds) {
 	float Glow;
 	DynamicMaterial->GetScalarParameterValue(FName("GlowIntensity"), Glow);
 	DynamicMaterial->SetScalarParameterValue(FName("GlowIntensity"), FMath::Max(Glow - 50 * deltaSeconds, MinGlow));
-	Particles->SetFloatParameter("SpawnRate", FMath::Max(Glow / 7.5f, MinGlow));
+	if (!NoParticles) {
+		Particles->SetFloatParameter("SpawnRate", FMath::Max(Glow / 7.5f, 0.1f));
+	}
 	GlowLight->SetIntensity(Glow);
 }
 
@@ -49,7 +54,9 @@ void ALuminousPlant::Hear(float volume) {
 	DynamicMaterial->GetScalarParameterValue(FName("GlowIntensity"), CurrentGlow);
 	float NewGlow = FMath::Max(CurrentGlow, volume * 1.5f);
 	DynamicMaterial->SetScalarParameterValue(FName("GlowIntensity"), NewGlow);
-	Particles->ActivateSystem();
+	if (!NoParticles) {
+		Particles->ActivateSystem();
+	}
 }
 
 bool ALuminousPlant::Pickup(USceneComponent* SceneComponent, EControllerHand ControllerHand) {

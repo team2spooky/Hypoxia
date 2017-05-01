@@ -32,5 +32,8 @@ private:
 	bool Static = false;
 
 	UPROPERTY(EditAnywhere)
+	bool NoParticles = false;
+
+	UPROPERTY(EditAnywhere)
 	float MinGlow = 1.f;
 };
