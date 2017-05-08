@@ -150,7 +150,7 @@ void AHypoxiaAIController::Tick(float DeltaTime) {
 }
 
 void AHypoxiaAIController::CheckForPlayer() {
-	if (FVector::Dist(HypoxiaCharacter->GetActorLocation(), GetPawn()->GetActorLocation()) < 200.0f) {
+	if (FVector::Dist(HypoxiaCharacter->GetActorLocation(), GetPawn()->GetActorLocation()) < 75.0f) {
 		SetGoal(EGoal::Player);
 		FVector MonsterLocation = GetPawn()->GetActorLocation();
 		GetPawn()->SetActorLocation(FVector(MonsterLocation.X, MonsterLocation.Y, 0.0f));
@@ -216,19 +216,21 @@ FVector AHypoxiaAIController::NextWanderPoint() {
 
 void AHypoxiaAIController::HearSound(FVector Location, float Amplitude) {
 
+	UE_LOG(LogTemp, Warning, TEXT("%d"), (int)Goal);
+
 	if (Goal != EGoal::Idle && !EventRunning) {
 
-		//HeardSound = true;
+		HeardSound = true;
 
-		//SetGoal(EGoal::Sound);
+		SetGoal(EGoal::Sound);
 
-		//SoundPoint = Location;
+		SoundPoint = Location;
 
-		//InvestigateTime = 6.0f;
+		InvestigateTime = 3.0f;
 
-		//FVector MonsterLocation = GetPawn()->GetActorLocation();
+		FVector MonsterLocation = GetPawn()->GetActorLocation();
 
-		//GetPawn()->SetActorLocation(FVector(MonsterLocation.X, MonsterLocation.Y, 75.0f));
+		GetPawn()->SetActorLocation(FVector(MonsterLocation.X, MonsterLocation.Y, 75.0f));
 	}
 
 }

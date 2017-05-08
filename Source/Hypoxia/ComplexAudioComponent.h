@@ -37,6 +37,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Sound|Complex")
 	bool bAmbientSound;
 
+	UPROPERTY(EditAnywhere, Category = "Sound|Complex")
+	bool bAlertMonster = false;
+
 	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.f, ClampMax = 100.f), Category = "Sound|Complex")
 	float ProjectedVolume;
 
