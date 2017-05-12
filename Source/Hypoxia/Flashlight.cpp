@@ -24,6 +24,9 @@ void AFlashlight::BeginPlay() {
 
 	Super::BeginPlay();
 
+	Alive = true;
+
+	DynamicMaterial = Item->CreateAndSetMaterialInstanceDynamic(0);
 	//for (TActorIterator<ADoor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	//{
 	//	if (ActorItr->ActorHasTag(Tags[0])) {
@@ -38,18 +41,21 @@ void AFlashlight::BeginPlay() {
 
 void AFlashlight::Use() {
 	
-	float intensity = Light->Intensity;
-	if (intensity == 0.0f) {
-		Light->SetIntensity(6000.0f);
-		// Play a sound when the flashlight is clicked on
-		if (ClickOnSound != NULL) {
-			UGameplayStatics::PlaySoundAtLocation(GetWorld(), ClickOnSound, GetActorLocation());
-		}
-	} else {
-		Light->SetIntensity(0.0f);
-		// Play a sound when the flashlight is clicked off
-		if (ClickOffSound != NULL) {
-			UGameplayStatics::PlaySoundAtLocation(GetWorld(), ClickOffSound, GetActorLocation());
+	if (Alive) {
+
+		float intensity = Light->Intensity;
+		if (intensity == 0.0f) {
+			Light->SetIntensity(6000.0f);
+			// Play a sound when the flashlight is clicked on
+			if (ClickOnSound != NULL) {
+				UGameplayStatics::PlaySoundAtLocation(GetWorld(), ClickOnSound, GetActorLocation());
+			}
+		} else {
+			Light->SetIntensity(0.0f);
+			// Play a sound when the flashlight is clicked off
+			if (ClickOffSound != NULL) {
+				UGameplayStatics::PlaySoundAtLocation(GetWorld(), ClickOffSound, GetActorLocation());
+			}
 		}
 	}
 
@@ -71,5 +77,11 @@ bool AFlashlight::Pickup(USceneComponent* Controller, EControllerHand Hand) {
 
 	return RetVal;
 
+}
+
+void AFlashlight::KillLight() {
+	Light->SetIntensity(0.0f);
+	Alive = false;
+	DynamicMaterial->SetScalarParameterValue(FName("FlashlightGlow"), 0.f);
 }
 
