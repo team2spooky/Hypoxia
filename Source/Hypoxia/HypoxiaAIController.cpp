@@ -114,8 +114,9 @@ void AHypoxiaAIController::Tick(float DeltaTime) {
 				EventRunning = false;
 				if (TriggerArray.Num() > 0) {
 					Goal = EGoal::Idle;
+					GetPawn()->SetActorLocation(FVector(2860.0f, 405.0f, 450.0f));
 					FVector MonsterLocation = GetPawn()->GetActorLocation();
-					GetPawn()->SetActorLocation(FVector(MonsterLocation.X, MonsterLocation.Y, 450.0f));
+					GoalPoint = MonsterLocation;
 				} else {
 					GoalPoint = NextWanderPoint();
 					WanderTime = 5.0f;
