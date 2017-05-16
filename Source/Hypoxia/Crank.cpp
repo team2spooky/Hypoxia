@@ -3,7 +3,7 @@
 #include "Hypoxia.h"
 #include "Crank.h"
 #include "Kismet/HeadMountedDisplayFunctionLibrary.h"
-#include "DrawDebugHelpers.h"
+//#include "DrawDebugHelpers.h"
 
 ACrank::ACrank() {
 	Base = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base"));
@@ -58,42 +58,54 @@ void ACrank::Tick(float DeltaTime) {
 		UHeadMountedDisplayFunctionLibrary::GetOrientationAndPosition(DeviceRotation, DevicePosition);
 
 		MotionTracker->SetWorldLocation(MotionController->GetComponentLocation() + RootComponent->GetComponentLocation() - DevicePosition + FVector(0.0f, 0.0f, DevicePosition.Z - 100.f), false, (FHitResult*)nullptr, ETeleportType::None);
-		
 
-		DrawDebugLine(GetWorld(), Base->GetComponentLocation(), Base->GetComponentLocation() + Base->GetRightVector() * 100.f, FColor::Red, false, -1.0f, (uint8)'\000', 0.1f);
-		DrawDebugLine(GetWorld(), Base->GetComponentLocation(), Base->GetComponentLocation() + Base->GetForwardVector() * 100.f, FColor::Green, false, -1.0f, (uint8)'\000', 0.1f);
-		DrawDebugLine(GetWorld(), Base->GetComponentLocation(), Base->GetComponentLocation() + Base->GetUpVector() * 100.f, FColor::Blue, false, -1.0f, (uint8)'\000', 0.1f);
+		float prevAngle = Angle;
+
+		//DrawDebugLine(GetWorld(), Base->GetComponentLocation(), Base->GetComponentLocation() + Base->GetRightVector() * 100.f, FColor::Red, false, -1.0f, (uint8)'\000', 0.1f);
+		//DrawDebugLine(GetWorld(), Base->GetComponentLocation(), Base->GetComponentLocation() + Base->GetForwardVector() * 100.f, FColor::Green, false, -1.0f, (uint8)'\000', 0.1f);
+		//DrawDebugLine(GetWorld(), Base->GetComponentLocation(), Base->GetComponentLocation() + Base->GetUpVector() * 100.f, FColor::Blue, false, -1.0f, (uint8)'\000', 0.1f);
 
 		FVector Direction = Constraint->GetComponentLocation() - MotionTracker->GetComponentLocation();
-		DrawDebugLine(GetWorld(), Constraint->GetComponentLocation(), MotionTracker->GetComponentLocation(), FColor::Purple, false, -1.0f, (uint8)'\000', 0.1f);
+		//DrawDebugLine(GetWorld(), Constraint->GetComponentLocation(), MotionTracker->GetComponentLocation(), FColor::Purple, false, -1.0f, (uint8)'\000', 0.1f);
 		Direction = FVector::VectorPlaneProject(Direction, Base->GetRightVector());
 		Direction = Direction.GetSafeNormal();
 		Direction *= -1.f;
-		DrawDebugLine(GetWorld(), Constraint->GetComponentLocation(), Constraint->GetComponentLocation() + Direction * 50.f, FColor::Purple, false, -1.0f, (uint8)'\000', 0.1f);
+		//DrawDebugLine(GetWorld(), Constraint->GetComponentLocation(), Constraint->GetComponentLocation() + Direction * 50.f, FColor::Purple, false, -1.0f, (uint8)'\000', 0.1f);
 
 		float dot = Direction | Base->GetForwardVector();
 		float det = FMatrix(Direction, Base->GetForwardVector(), Base->GetRightVector(), FVector::ZeroVector).RotDeterminant();
 		Angle = FMath::Atan2(det, dot);
-		UE_LOG(LogTemp, Warning, TEXT("%f"), FMath::RadiansToDegrees(Angle));
 
 		//Item->SetWorldRotation(FQuat(Base->GetRightVector() * -1.f, TestAngle).Rotator());
-		Constraint->SetAngularOrientationTarget(FRotator(-1 * FMath::RadiansToDegrees(Angle), 0.f, 0.f));
+		if (FMath::RadiansToDegrees(Angle) + Rev * 360.f >= MaxAngle) {
+			Constraint->SetAngularOrientationTarget(FRotator(-1 * FMath::RadiansToDegrees(MaxAngle), 0.f, 0.f));
+		} else {
+			Constraint->SetAngularOrientationTarget(FRotator(-1 * FMath::RadiansToDegrees(Angle), 0.f, 0.f));
+		}
+
+		if (prevAngle < 0.f && Angle >= 0.f && FMath::Abs(Angle - prevAngle) > PI) {
+			Rev--;
+		}
+		if (prevAngle > 0.f && Angle <= 0.f && FMath::Abs(Angle - prevAngle) > PI) {
+			Rev++;
+		}
 
 		//Fallback
 		/*Item->SetWorldRotation(Item->GetComponentRotation().Add(0.f, 0.f, 10.f), true);
 		Angle += 10.f;*/
 
-		if (FVector::Dist(MotionTracker->GetComponentLocation(), GrabSpot->GetComponentLocation()) > 250.0f) {
+		if (FVector::Dist(MotionTracker->GetComponentLocation(), GrabSpot->GetComponentLocation()) > 30.0f) {
 			SelfDrop();
 		}
 	}
-	/*
-	if(Angle >= 1080.f) {
+
+	if(FMath::RadiansToDegrees(Angle) + Rev * 360.f >= MaxAngle) {
 		EventOn();
-	}*/
+	}
 }
 
 void ACrank::EventOn_Implementation() {
+	UE_LOG(LogTemp, Warning, TEXT("OPEN SESAME!!!!"));
 }
 
 void ACrank::EventOff_Implementation() {

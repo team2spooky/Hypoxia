@@ -41,5 +41,13 @@ protected:
 
 private:
 	float Angle = 0.f;
+	int Rev = 0;
+
+
+	UPROPERTY(EditAnywhere)
+	float MinAngle = -360.f;
+
+	UPROPERTY(EditAnywhere)
+	float MaxAngle = 360.f;
 	
 };
