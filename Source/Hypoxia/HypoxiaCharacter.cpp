@@ -219,7 +219,7 @@ void AHypoxiaCharacter::ItemPickupRight() {
 		for (int i = 0; i < OverlapArray.Num(); i++) {
 			if (Cast<AItem>(OverlapArray[i])->Pickup(R_MotionTracker, EControllerHand::Right)) {
 				HeldRight = true;
-				RightHand->SetRenderInMainPass(false);
+				RightHand->SetVisibility(false, true);
 				break;
 			}
 		}
@@ -236,7 +236,7 @@ void AHypoxiaCharacter::ItemPickupRight() {
 		HeldItemRight = NULL;
 		HeldRight = false;
 		//RightHand->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
-		RightHand->SetRenderInMainPass(true);
+		RightHand->SetVisibility(true, true);
 	}
 }
 
@@ -252,7 +252,7 @@ void AHypoxiaCharacter::ItemPickupLeft() {
 		for (int i = 0; i < OverlapArray.Num(); i++) {
 			if (Cast<AItem>(OverlapArray[i])->Pickup(L_MotionTracker, EControllerHand::Left)) {
 				HeldLeft = true;
-				LeftHand->SetRenderInMainPass(false);
+				LeftHand->SetVisibility(false, true);
 				break;
 			}
 		}
@@ -269,7 +269,7 @@ void AHypoxiaCharacter::ItemPickupLeft() {
 		HeldItemLeft = NULL;
 		HeldLeft = false;
 		//LeftHand->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
-		LeftHand->SetRenderInMainPass(true);
+		LeftHand->SetVisibility(true, true);
 	}
 
 }
