@@ -14,7 +14,13 @@ class HYPOXIA_API ATerminal : public AInteractiveItem
 	GENERATED_BODY()
 	
 public:
+	ATerminal();
+
 	void Use() override;
+
+protected:
+	UPROPERTY(BlueprintReadOnly)
+	UAudioComponent* AudioPlayer;
 	
 private:
 	UPROPERTY(EditAnywhere, Category = Sound)

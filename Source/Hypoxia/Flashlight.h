@@ -9,11 +9,15 @@
 /**
  * 
  */
+
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMyBindableEvent);
+
 UCLASS()
 class HYPOXIA_API AFlashlight : public AItem
 {
 	GENERATED_BODY()
-	
+
 	UPROPERTY(VisibleAnywhere, Category = Light)
 	class USpotLightComponent* Light;
 
@@ -39,6 +43,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Flashlight)
 	void KillLight();
+
+	UPROPERTY(BlueprintAssignable)
+	FMyBindableEvent OnPickUp;
 
 protected:
 

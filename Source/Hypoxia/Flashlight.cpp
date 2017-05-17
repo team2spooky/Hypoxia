@@ -73,6 +73,8 @@ bool AFlashlight::Pickup(USceneComponent* Controller, EControllerHand Hand) {
 
 	bool RetVal = Super::Pickup(Controller, Hand);
 
+	OnPickUp.Broadcast();
+
 	//Door->Unlock();
 
 	return RetVal;
