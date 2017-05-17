@@ -37,8 +37,14 @@ public:
 
 	virtual bool Pickup(USceneComponent*, EControllerHand);
 
+	UFUNCTION(BlueprintCallable, Category = Flashlight)
+	void KillLight();
+
 protected:
 
 	ADoor *Door;
 
+	bool Alive;
+
+	UMaterialInstanceDynamic* DynamicMaterial;
 };

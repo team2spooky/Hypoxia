@@ -14,7 +14,7 @@ ALuminousPlant::ALuminousPlant() {
 	//Particles->SetAutoAttachmentParameters(Item, NAME_None, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, EAttachmentRule::KeepWorld);
 	Particles->SetupAttachment(Item);
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystem(TEXT("/Game/Hypoxia/Effects/P_Luminous_Plant.P_Luminous_Plant"));
-	if(ParticleSystem.Succeeded())
+	if (ParticleSystem.Succeeded())
 		Particles->SetTemplate(ParticleSystem.Object);
 
 	GlowLight = CreateDefaultSubobject<UPointLightComponent>(FName("GlowLight"));
@@ -25,20 +25,34 @@ ALuminousPlant::ALuminousPlant() {
 
 void ALuminousPlant::BeginPlay() {
 	Super::BeginPlay();
-	Particles->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-	Particles->AttachToComponent(Item, FAttachmentTransformRules(EAttachmentRule::KeepRelative, EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, true));
 	DynamicMaterial = Item->CreateAndSetMaterialInstanceDynamic(0);
-	Particles->CreateAndSetMaterialInstanceDynamic(0);
-	Particles->AutoPopulateInstanceProperties();
+	if (!NoParticles) {
+		Particles->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+		Particles->AttachToComponent(Item, FAttachmentTransformRules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, true));
+		Particles->CreateAndSetMaterialInstanceDynamic(0);
+		Particles->AutoPopulateInstanceProperties();
+	} else {
+		Particles->DestroyComponent();
+	}
+	if (NoLight) {
+		GlowLight->DestroyComponent();
+	}
+	if (Static) {
+		Item->SetSimulatePhysics(false);
+	}
 }
 
 void ALuminousPlant::Tick(float deltaSeconds) {
 	Super::Tick(deltaSeconds);
 	float Glow;
 	DynamicMaterial->GetScalarParameterValue(FName("GlowIntensity"), Glow);
-	DynamicMaterial->SetScalarParameterValue(FName("GlowIntensity"), FMath::Max(Glow - 50 * deltaSeconds, 1.f));
-	Particles->SetFloatParameter("SpawnRate", FMath::Max(Glow / 7.5f, 0.1f));
-	GlowLight->SetIntensity(Glow);
+	DynamicMaterial->SetScalarParameterValue(FName("GlowIntensity"), FMath::Max(Glow - 50 * deltaSeconds, MinGlow));
+	if (!NoParticles) {
+		Particles->SetFloatParameter("SpawnRate", FMath::Max(Glow / 7.5f, 0.1f));
+	}
+	if (!NoLight) {
+		GlowLight->SetIntensity(Glow);
+	}
 }
 
 void ALuminousPlant::Hear(float volume) {
@@ -46,7 +60,14 @@ void ALuminousPlant::Hear(float volume) {
 	DynamicMaterial->GetScalarParameterValue(FName("GlowIntensity"), CurrentGlow);
 	float NewGlow = FMath::Max(CurrentGlow, volume * 1.5f);
 	DynamicMaterial->SetScalarParameterValue(FName("GlowIntensity"), NewGlow);
-	Particles->ActivateSystem();
+	if (!NoParticles) {
+		Particles->ActivateSystem();
+	}
+}
+
+bool ALuminousPlant::Pickup(USceneComponent* SceneComponent, EControllerHand ControllerHand) {
+	if (Static) return false;
+	return Super::Pickup(SceneComponent, ControllerHand);
 }
 
 

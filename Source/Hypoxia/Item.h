@@ -70,6 +70,8 @@ protected:
 	UFUNCTION()
 	virtual void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 
+	virtual void DoHit(FVector ImpactPoint, FVector NormalImpulse);
+
 	virtual UComplexAudioComponent* GenerateOnHitSound();
 	
 	virtual void UpdatePosition(FVector);
@@ -78,6 +80,5 @@ protected:
 
 	void SelfDrop();
 
-private:
 	FVector LastVelocity;
 };

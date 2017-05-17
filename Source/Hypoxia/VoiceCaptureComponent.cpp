@@ -112,9 +112,9 @@ void UVoiceCaptureComponent::TickComponent( float DeltaTime, ELevelTick TickType
 }
 
 void UVoiceCaptureComponent::TriggerObjects(float volume) {
-	InfluenceSphere->SetSphereRadius(FMath::Lerp(0, 2000, volume / 100.0f));
+	float MaxDist = 4000;
+	InfluenceSphere->SetSphereRadius(FMath::Lerp(0.f, MaxDist, volume / 100.0f));
 	TSet<AActor*> OverlappingActors;
-	float MaxDist = 2000;
 	TSubclassOf<AListeningItem> Filter = AListeningItem::StaticClass();
 	InfluenceSphere->GetOverlappingActors(OverlappingActors, Filter);
 	for (TSet<AActor*>::TConstIterator Itr = OverlappingActors.CreateConstIterator(); Itr; ++Itr) {
