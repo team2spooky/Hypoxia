@@ -75,6 +75,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	uint32 bUsingMotionControllers : 1;
 
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* LeftHand;
+
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* RightHand;
+
+	UPROPERTY(VisibleAnywhere)
+	USphereComponent* LeftCollider;
+
+	UPROPERTY(VisibleAnywhere)
+	USphereComponent* RightCollider;
+	
 protected:
 	
 	/** Fires a projectile. */
@@ -146,7 +158,7 @@ public:
 	FORCEINLINE class UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
 public:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	UComplexAudioComponent* FootstepAudioComponent;
 
 private:

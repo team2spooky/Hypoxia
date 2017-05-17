@@ -204,9 +204,9 @@ void ADoor::Tick(float DeltaTime) {
 		Super::Tick(DeltaTime);
 		if (Moving) {
 			FVector DoorLocation = Door->GetActorLocation();
-			Door->SetActorLocation(FVector(DoorLocation.X + 0.2f, DoorLocation.Y, DoorLocation.Z));
+			Door->SetActorLocation(FVector(DoorLocation.X + 0.4f, DoorLocation.Y, DoorLocation.Z));
 			MoveTime += DeltaTime;
-			if (MoveTime > 6.0f) {
+			if (MoveTime > 10.0f) {
 				Moving = false;
 			}
 		}

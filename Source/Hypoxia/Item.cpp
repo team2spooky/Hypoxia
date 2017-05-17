@@ -103,7 +103,7 @@ void AItem::Drop() {
 
 	if (Held) {
 		Held = false;
-		UE_LOG(LogTemp, Warning, TEXT("Dropped"));
+		//UE_LOG(LogTemp, Warning, TEXT("Dropped"));
 		Item->SetEnableGravity(bHasGravity);
 		//Item->SetPhysicsLinearVelocity(MotionController->GetPhysicsLinearVelocity());
 		Item_Base->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
@@ -220,11 +220,14 @@ void AItem::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimit
 			UComplexAudioComponent* HitSound = GenerateOnHitSound();
 			HitSound->Play();
 		}
+		DoHit(Hit.ImpactPoint, NormalImpulse);
 	}
 }
 
+void AItem::DoHit(FVector ImpactPoint, FVector NormalImpulse) {}
+
 UComplexAudioComponent* AItem::GenerateOnHitSound() {
-	UComplexAudioComponent* HitSoundComponent = NewObject<UComplexAudioComponent>(Item, FName("DynamicSound"));
+	UComplexAudioComponent* HitSoundComponent = NewObject<UComplexAudioComponent>(Item);
 	HitSoundComponent->bAutoDestroy = true;
 	HitSoundComponent->bAdvancedOcclusion = true;
 	HitSoundComponent->bAmbientSound = this->bAmbientSound;

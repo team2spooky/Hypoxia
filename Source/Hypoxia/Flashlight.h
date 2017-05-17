@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Item.h"
+#include "Door.h"
 #include "Flashlight.generated.h"
 
 /**
@@ -32,8 +33,12 @@ public:
 
 	virtual void Use();
 
+	virtual void BeginPlay() override;
+
+	virtual bool Pickup(USceneComponent*, EControllerHand);
+
 protected:
 
-	//virtual void Tick(float) override;
+	ADoor *Door;
 
 };

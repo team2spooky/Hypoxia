@@ -37,7 +37,7 @@ UVoiceCaptureComponent::UVoiceCaptureComponent() : Super()
 	VoiceCaptureSoundWaveProcedural->Volume = 5.f;
 	*/
 
-	InfluenceSphere = CreateDefaultSubobject<USphereComponent>(TEXT("Influence Sphere"));
+	InfluenceSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InfluenceSphereVoice"));
 	InfluenceSphere->SetSphereRadius(200.0f);
 #if VOICE_DEBUG
 	InfluenceSphere->bHiddenInGame = false;
@@ -105,31 +105,34 @@ void UVoiceCaptureComponent::TickComponent( float DeltaTime, ELevelTick TickType
 
 		//UE_LOG(LogTemp, Warning, TEXT("Volume = %f"), VoiceCaptureFinalVolume);
 
-		if (VoiceCaptureFinalVolume > 10) {
+		if (VoiceCaptureFinalVolume > 5) {
 			TriggerObjects(VoiceCaptureFinalVolume);
 		}
 	}
 }
 
 void UVoiceCaptureComponent::TriggerObjects(float volume) {
-	InfluenceSphere->SetSphereRadius(FMath::Lerp(0, 2000, volume / 100.0f));
+	float MaxDist = 4000;
+	InfluenceSphere->SetSphereRadius(FMath::Lerp(0.f, MaxDist, volume / 100.0f));
 	TSet<AActor*> OverlappingActors;
-	float MaxDist = 2000;
 	TSubclassOf<AListeningItem> Filter = AListeningItem::StaticClass();
 	InfluenceSphere->GetOverlappingActors(OverlappingActors, Filter);
 	for (TSet<AActor*>::TConstIterator Itr = OverlappingActors.CreateConstIterator(); Itr; ++Itr) {
 		AListeningItem* Item = Cast<AListeningItem>(*Itr);
+		float Dist = FVector::Dist(Item->GetItem()->GetComponentLocation(), InfluenceSphere->GetComponentLocation());
+		float Alpha = Dist / MaxDist;
+		if (Alpha < 0 || Alpha > 1)
+			continue;
 		if (GetWorld()->LineTraceTestByChannel(InfluenceSphere->GetComponentLocation(), Item->GetItem()->GetComponentLocation(), ECC_GameTraceChannel2))
 			continue;
-		float Dist = FVector::Dist(Item->GetActorLocation(), InfluenceSphere->GetComponentLocation());
-		Item->Hear(FMath::Lerp(1.f, 0.f, Dist / MaxDist) * volume);
+		Item->Hear(FMath::Lerp(1.f, 0.f, Alpha) * volume);
 	}
 	TSubclassOf<AHypoxiaMonster> Monster = AHypoxiaMonster::StaticClass();
 	InfluenceSphere->GetOverlappingActors(OverlappingActors, Monster);
 	for (TSet<AActor*>::TConstIterator Itr = OverlappingActors.CreateConstIterator(); Itr; ++Itr) {
 		AHypoxiaMonster* M = Cast<AHypoxiaMonster>(*Itr);
-		if (GetWorld()->LineTraceTestByChannel(InfluenceSphere->GetComponentLocation(), M->GetActorLocation(), ECC_GameTraceChannel2))
-			continue;
+		/*if (GetWorld()->LineTraceTestByChannel(InfluenceSphere->GetComponentLocation(), M->GetActorLocation(), ECC_GameTraceChannel2))
+			continue;*/
 		Cast<AHypoxiaAIController>(M->GetController())->HearSound(InfluenceSphere->GetComponentLocation(), volume);
 	}
 }

@@ -18,33 +18,34 @@ public:
 	
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float, ELevelTick, FActorComponentTickFunction*) override;
-	void DestroyComponent(bool bPromoteChildren = false);
+	virtual void OnRegister() override;
+	virtual void DestroyComponent(bool bPromoteChildren = false) override;
 	void Play(float startTime = 0.f);
 	void Stop();
 	void SetSound(USoundBase*);
 	void SetAttenuationSettings(USoundAttenuation*);
 
-	UPROPERTY(EditAnywhere, Category = Sound)
+	UPROPERTY(EditAnywhere, Category = "Sound|Complex")
 	bool bAdvancedOcclusion;
 	
-	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.f), Category = Sound)
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.f), Category = "Sound|Complex")
 	float Radius;
 
-	UPROPERTY(EditAnywhere, Category = Sound)
+	UPROPERTY(EditAnywhere, Category = "Sound|Complex")
 	bool bListenToSelf;
 
-	UPROPERTY(EditAnywhere, Category = Sound)
+	UPROPERTY(EditAnywhere, Category = "Sound|Complex")
 	bool bAmbientSound;
 
-	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.f, ClampMax = 100.f), Category = Sound)
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.f, ClampMax = 100.f), Category = "Sound|Complex")
 	float ProjectedVolume;
 
 private:
-
-	UPROPERTY(EditAnywhere)
+	//UPROPERTY(VisibleAnywhere)
 	UAudioComponent* VirtualAudioComponent;
-	UPROPERTY(EditAnywhere)
-	USphereComponent* InfluenceSphere;
+
+	//UPROPERTY(VisibleAnywhere)
+	USphereComponent* InfluenceSphereAudio;
 
 	float TestOcclusion();
 	void DiffractSound(FVector goalLoc, FVector& out_Loc, float& out_Vol);

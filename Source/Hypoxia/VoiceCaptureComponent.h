@@ -24,10 +24,10 @@ public:
 
 	void TriggerObjects(float volume);
 
-	UPROPERTY(EditAnywhere)
+private:
+	UPROPERTY(VisibleAnywhere, NoClear)
 	USphereComponent* InfluenceSphere;
 
-private:
 	TSharedPtr<IVoiceCapture> VoiceCapture;
 	TArray<uint8> VoiceCaptureBuffer;
 	// voice playback variables

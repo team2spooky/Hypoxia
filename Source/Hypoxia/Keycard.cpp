@@ -28,8 +28,6 @@ void AKeycard::Tick(float DeltaTime) {
 
 	if (Held) {
 		if (FVector::Dist(Door->GetActorLocation(), Item->GetComponentLocation()) < 50.0f) {
-			//UnlockLock();
-			//Door->SetActorLocation(FVector(800.0f, 100.0f, 400.0f));
 			Door->Unlock();
 			UE_LOG(LogTemp, Warning, TEXT("Unlocking"));
 		}
