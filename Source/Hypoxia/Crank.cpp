@@ -17,7 +17,7 @@ ACrank::ACrank() {
 	Constraint->InitComponentConstraint();
 
 	Constraint->SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Locked, 45.0);
-	Constraint->SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Locked, 45.0);
+	Constraint->SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Free, 45.0);
 	Constraint->SetAngularTwistLimit(EAngularConstraintMotion::ACM_Locked, 45.0);
 }
 
@@ -26,28 +26,33 @@ void ACrank::BeginPlay() {
 
 	Base->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 
-	/*if (bOn) {
-		Constraint->SetLinearPositionTarget(FVector(0.f, 0.f, -1 * TravelDistance));
+	if (bOn) {
+		Constraint->SetAngularOrientationTarget(FRotator(-1 * MaxAngle, 0.f, 0.f));
+		Rev = MaxAngle / 360.0f;
+		Angle = FMath::DegreesToRadians(FMath::Fmod(MaxAngle, 360.0f));
+	} else {
+		Constraint->SetAngularOrientationTarget(FRotator(-1 * MinAngle, 0.f, 0.f));
+		Rev = MinAngle / 360.0f;
+		Angle = FMath::DegreesToRadians(FMath::Fmod(MinAngle, 360.0f));
 	}
-	else {
-		Constraint->SetLinearPositionTarget(FVector(0.f, 0.f, TravelDistance));
-	}*/
 }
 
 void ACrank::Drop() {
 	Super::Drop();
-	/*FVector A = Item->GetComponentLocation() - Constraint->GetComponentLocation();
-	float Direction = FVector::DotProduct(A, Constraint->GetUpVector());
-	Constraint->SetLinearPositionTarget(FVector(0.f, 0.f, -1 * FMath::Sign(Direction) * TravelDistance));
-	bool temp = bOn;
-	bOn = Direction > 0;
-	if (temp == bOn) return;
+	if (FMath::RadiansToDegrees(Angle) + Rev * 360.f + AngleTolerance >= MaxAngle) {
+		Constraint->SetAngularOrientationTarget(FRotator(-1 * MaxAngle, 0.f, 0.f));
+		bOn = true;
+	} else if (FMath::RadiansToDegrees(Angle) + Rev * 360.f - AngleTolerance <= MinAngle) {
+		Constraint->SetAngularOrientationTarget(FRotator(-1 * MinAngle, 0.f, 0.f));
+		bOn = false;
+	} else {
+		return;
+	}
 	if (bOn) {
 		EventOn();
-	}
-	else {
+	} else {
 		EventOff();
-	}*/
+	}
 }
 
 void ACrank::Tick(float DeltaTime) {
@@ -77,17 +82,18 @@ void ACrank::Tick(float DeltaTime) {
 		Angle = FMath::Atan2(det, dot);
 
 		//Item->SetWorldRotation(FQuat(Base->GetRightVector() * -1.f, TestAngle).Rotator());
-		if (FMath::RadiansToDegrees(Angle) + Rev * 360.f >= MaxAngle) {
-			Constraint->SetAngularOrientationTarget(FRotator(-1 * FMath::RadiansToDegrees(MaxAngle), 0.f, 0.f));
+		if (FMath::RadiansToDegrees(Angle) + Rev * 360.f + AngleTolerance >= MaxAngle) {
+			Constraint->SetAngularOrientationTarget(FRotator(-1 * MaxAngle, 0.f, 0.f));
+		} else if (FMath::RadiansToDegrees(Angle) + Rev * 360.f - AngleTolerance <= MinAngle) {
+			Constraint->SetAngularOrientationTarget(FRotator(-1 * MinAngle, 0.f, 0.f));
 		} else {
 			Constraint->SetAngularOrientationTarget(FRotator(-1 * FMath::RadiansToDegrees(Angle), 0.f, 0.f));
-		}
-
-		if (prevAngle < 0.f && Angle >= 0.f && FMath::Abs(Angle - prevAngle) > PI) {
-			Rev--;
-		}
-		if (prevAngle > 0.f && Angle <= 0.f && FMath::Abs(Angle - prevAngle) > PI) {
-			Rev++;
+			if (prevAngle < 0.f && Angle >= 0.f && FMath::Abs(Angle - prevAngle) > PI) {
+				Rev--;
+			}
+			if (prevAngle > 0.f && Angle <= 0.f && FMath::Abs(Angle - prevAngle) > PI) {
+				Rev++;
+			}
 		}
 
 		//Fallback
@@ -97,10 +103,6 @@ void ACrank::Tick(float DeltaTime) {
 		if (FVector::Dist(MotionTracker->GetComponentLocation(), GrabSpot->GetComponentLocation()) > 30.0f) {
 			SelfDrop();
 		}
-	}
-
-	if(FMath::RadiansToDegrees(Angle) + Rev * 360.f >= MaxAngle) {
-		EventOn();
 	}
 }
 

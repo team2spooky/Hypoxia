@@ -43,11 +43,16 @@ private:
 	float Angle = 0.f;
 	int Rev = 0;
 
+	UPROPERTY(EditAnywhere)
+	bool bOn = false;
 
 	UPROPERTY(EditAnywhere)
 	float MinAngle = -360.f;
 
 	UPROPERTY(EditAnywhere)
 	float MaxAngle = 360.f;
+
+	UPROPERTY(EditAnywhere)
+	float AngleTolerance = 15.0f;
 	
 };
