@@ -26,7 +26,7 @@ void ACrank::BeginPlay() {
 
 	Base->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 
-	if (bOn) {
+	/*if (bOn) {
 		Constraint->SetAngularOrientationTarget(FRotator(-1 * MaxAngle, 0.f, 0.f));
 		Rev = MaxAngle / 360.0f;
 		Angle = FMath::DegreesToRadians(FMath::Fmod(MaxAngle, 360.0f));
@@ -34,24 +34,28 @@ void ACrank::BeginPlay() {
 		Constraint->SetAngularOrientationTarget(FRotator(-1 * MinAngle, 0.f, 0.f));
 		Rev = MinAngle / 360.0f;
 		Angle = FMath::DegreesToRadians(FMath::Fmod(MinAngle, 360.0f));
-	}
+	}*/
 }
 
 void ACrank::Drop() {
 	Super::Drop();
-	if (FMath::RadiansToDegrees(Angle) + Rev * 360.f + AngleTolerance >= MaxAngle) {
-		Constraint->SetAngularOrientationTarget(FRotator(-1 * MaxAngle, 0.f, 0.f));
+	bool prevOn = bOn;
+	if (FMath::RadiansToDegrees(Angle) + 180.f + Rev * 360.f + AngleTolerance >= MaxAngle) {
+		//Constraint->SetAngularOrientationTarget(FRotator(-1 * MaxAngle, 0.f, 0.f));
 		bOn = true;
-	} else if (FMath::RadiansToDegrees(Angle) + Rev * 360.f - AngleTolerance <= MinAngle) {
-		Constraint->SetAngularOrientationTarget(FRotator(-1 * MinAngle, 0.f, 0.f));
+	} else if (FMath::RadiansToDegrees(Angle) + 180.f + Rev * 360.f - AngleTolerance <= MinAngle) {
+		//Constraint->SetAngularOrientationTarget(FRotator(-1 * MinAngle, 0.f, 0.f));
 		bOn = false;
 	} else {
 		return;
 	}
-	if (bOn) {
-		EventOn();
-	} else {
-		EventOff();
+	if (prevOn != bOn) {
+		if (bOn) {
+			EventOn();
+		}
+		else {
+			EventOff();
+		}
 	}
 }
 
@@ -82,11 +86,11 @@ void ACrank::Tick(float DeltaTime) {
 		Angle = FMath::Atan2(det, dot);
 
 		//Item->SetWorldRotation(FQuat(Base->GetRightVector() * -1.f, TestAngle).Rotator());
-		if (FMath::RadiansToDegrees(Angle) + Rev * 360.f + AngleTolerance >= MaxAngle) {
+		/*if (FMath::RadiansToDegrees(Angle) + 180.f + Rev * 360.f + AngleTolerance >= MaxAngle) {
 			Constraint->SetAngularOrientationTarget(FRotator(-1 * MaxAngle, 0.f, 0.f));
-		} else if (FMath::RadiansToDegrees(Angle) + Rev * 360.f - AngleTolerance <= MinAngle) {
+		} else if (FMath::RadiansToDegrees(Angle) + 180.f + Rev * 360.f - AngleTolerance <= MinAngle) {
 			Constraint->SetAngularOrientationTarget(FRotator(-1 * MinAngle, 0.f, 0.f));
-		} else {
+		} else {*/
 			Constraint->SetAngularOrientationTarget(FRotator(-1 * FMath::RadiansToDegrees(Angle), 0.f, 0.f));
 			if (prevAngle < 0.f && Angle >= 0.f && FMath::Abs(Angle - prevAngle) > PI) {
 				Rev--;
@@ -94,7 +98,9 @@ void ACrank::Tick(float DeltaTime) {
 			if (prevAngle > 0.f && Angle <= 0.f && FMath::Abs(Angle - prevAngle) > PI) {
 				Rev++;
 			}
-		}
+		//}
+
+			UE_LOG(LogTemp, Warning, TEXT("Rev: %d, Angle: %f, Calculated Angle: %f"), Rev, Angle, Rev * 360.f + FMath::RadiansToDegrees(Angle));
 
 		//Fallback
 		/*Item->SetWorldRotation(Item->GetComponentRotation().Add(0.f, 0.f, 10.f), true);

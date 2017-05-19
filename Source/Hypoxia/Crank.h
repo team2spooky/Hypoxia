@@ -53,6 +53,6 @@ private:
 	float MaxAngle = 360.f;
 
 	UPROPERTY(EditAnywhere)
-	float AngleTolerance = 15.0f;
+	float AngleTolerance = 5.0f;
 	
 };
