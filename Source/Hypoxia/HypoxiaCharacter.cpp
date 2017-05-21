@@ -27,6 +27,8 @@ bool HeldLeft;
 FVector HMDPositionDelta;
 FVector LastHMDPosition;
 
+AActor *Monster;
+
 //////////////////////////////////////////////////////////////////////////
 // AHypoxiaCharacter
 
@@ -105,6 +107,14 @@ void AHypoxiaCharacter::BeginPlay() {
 	HeldItemLeft  = NULL;
 
 	StepTimer = 0.0f;
+
+	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
+
+		if (ActorItr->ActorHasTag(TEXT("Monster"))) {
+
+			Monster = *ActorItr;
+		}
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
