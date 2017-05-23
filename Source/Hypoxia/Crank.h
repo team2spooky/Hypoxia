@@ -40,8 +40,10 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 
 private:
+	float NormalizeAngle(float);
+
 	float Angle = 0.f;
-	int Rev = 0;
+	float AngleTraveled = 0.f;
 
 	UPROPERTY(EditAnywhere)
 	bool bOn = false;
