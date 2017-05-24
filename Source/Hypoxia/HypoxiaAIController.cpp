@@ -151,7 +151,7 @@ void AHypoxiaAIController::Tick(float DeltaTime) {
 }
 
 void AHypoxiaAIController::CheckForPlayer() {
-	if (FVector::Dist(HypoxiaCharacter->GetActorLocation(), GetPawn()->GetActorLocation()) < 75.0f) {
+	if (FVector::Dist(HypoxiaCharacter->GetActorLocation(), GetPawn()->GetActorLocation()) < 100.0f) {
 		SetGoal(EGoal::Player);
 		FVector MonsterLocation = GetPawn()->GetActorLocation();
 		GetPawn()->SetActorLocation(FVector(MonsterLocation.X, MonsterLocation.Y, 0.0f));

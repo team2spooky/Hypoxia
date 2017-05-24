@@ -23,6 +23,7 @@ AItem *HeldItemLeft;
 
 bool HeldRight;
 bool HeldLeft;
+bool Alive;
 
 FVector HMDPositionDelta;
 FVector LastHMDPosition;
@@ -102,6 +103,7 @@ void AHypoxiaCharacter::BeginPlay() {
 
 	HeldRight = false;
 	HeldLeft  = false;
+	Alive = true;
 
 	HeldItemRight = NULL;
 	HeldItemLeft  = NULL;
@@ -111,10 +113,10 @@ void AHypoxiaCharacter::BeginPlay() {
 	for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
 
 		if (ActorItr->ActorHasTag(TEXT("Monster"))) {
-
 			Monster = *ActorItr;
 		}
 	}
+
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -168,7 +170,7 @@ void AHypoxiaCharacter::MoveForward(float Value) {
 	//SetActorRotation(FirstPersonCameraComponent->RelativeRotation);
 	//GetCapsuleComponent()->SetRelativeRotation(FRotator(FirstPersonCameraComponent->RelativeRotation.Pitch, FirstPersonCameraComponent->RelativeRotation.Roll, GetCapsuleComponent()->RelativeRotation.Yaw));
 	//FirstPersonCameraComponent->RelativeRotation.Roll
-	if (Value != 0.0f)
+	if (Value != 0.0f && Alive)
 	{
 		// add movement in that direction		
 		//AddMovementInput(GetActorForwardVector(), Value);
@@ -189,7 +191,7 @@ void AHypoxiaCharacter::MoveRight(float Value) {
 	//SetActorRotation(FirstPersonCameraComponent->RelativeRotation);
 	//SetActorLocation(FRotator(FirstPersonCameraComponent->RelativeRotation.Pitch, FirstPersonCameraComponent->RelativeRotation.Yaw, FirstPersonCameraComponent->RelativeRotation.Roll));
 
-	if (Value != 0.0f)
+	if (Value != 0.0f && Alive)
 	{
 		// add movement in that direction
 
@@ -348,4 +350,12 @@ void AHypoxiaCharacter::Tick(float DeltaTime) {
 	//UE_LOG(LogTemp, Error, TEXT("RMotionLocation %f"), R_MotionController->GetComponentLocation().X);
 
 	//FirstPersonCameraComponent->SetWorldLocation(FVector(0.0f, 0.0f, 0.0f));
+
+	if (FVector::Dist(Monster->GetActorLocation(), GetActorLocation()) < 100.0f && Alive) {
+		UE_LOG(LogTemp, Error, TEXT("KILL_PLAYER"));
+		Alive = false;
+		class APlayerController* HypoxiaChar = Cast<APlayerController>(Controller);
+		HypoxiaChar->ClientSetCameraFade(true, FColor::Black, FVector2D(1.0, 1.0), 5.0, true);
+	}
+
 }
