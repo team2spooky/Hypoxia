@@ -26,25 +26,27 @@ void ACrank::BeginPlay() {
 
 	Base->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 
-	/*if (bOn) {
+	if (bOn) {
 		Constraint->SetAngularOrientationTarget(FRotator(-1 * MaxAngle, 0.f, 0.f));
-		Rev = MaxAngle / 360.0f;
+		AngleTraveled = MaxAngle;
 		Angle = FMath::DegreesToRadians(FMath::Fmod(MaxAngle, 360.0f));
 	} else {
 		Constraint->SetAngularOrientationTarget(FRotator(-1 * MinAngle, 0.f, 0.f));
-		Rev = MinAngle / 360.0f;
+		AngleTraveled = MinAngle;
 		Angle = FMath::DegreesToRadians(FMath::Fmod(MinAngle, 360.0f));
-	}*/
+	}
 }
 
 void ACrank::Drop() {
 	Super::Drop();
 	bool prevOn = bOn;
 	if (AngleTraveled + AngleTolerance >= MaxAngle) {
-		//Constraint->SetAngularOrientationTarget(FRotator(-1 * MaxAngle, 0.f, 0.f));
+		Constraint->SetAngularOrientationTarget(FRotator(-1 * MaxAngle, 0.f, 0.f));
+		AngleTraveled = MaxAngle;
 		bOn = true;
 	} else if (AngleTraveled - AngleTolerance <= MinAngle) {
-		//Constraint->SetAngularOrientationTarget(FRotator(-1 * MinAngle, 0.f, 0.f));
+		Constraint->SetAngularOrientationTarget(FRotator(-1 * MinAngle, 0.f, 0.f));
+		AngleTraveled = MinAngle;
 		bOn = false;
 	} else {
 		return;
@@ -96,7 +98,6 @@ void ACrank::Tick(float DeltaTime) {
 			AngleTraveled = MaxAngle;
 		} else if (AngleTraveled <= MinAngle) {
 			Constraint->SetAngularOrientationTarget(FRotator(-1 * MinAngle, 0.f, 0.f));
-
 			AngleTraveled = MinAngle;
 		} else {
 			Constraint->SetAngularOrientationTarget(FRotator(FMath::RadiansToDegrees(CalculatedAngle), 0.f, 0.f));
