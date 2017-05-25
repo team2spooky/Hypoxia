@@ -40,9 +40,9 @@ protected:
 
 	bool Held;
 
-	FVector OldLocation;
+	//FVector OldLocation;
 
-	FVector NewLocation;
+	//FVector NewLocation;
 	
 public:
 	// Sets default values for this actor's properties

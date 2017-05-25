@@ -17,7 +17,7 @@ DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 const float MOVEMENT_SCALE = 1.0f; //Scales along with movement speed
 const float CAMERA_HEIGHT_OFFSET = 60.0f;
 const float STEP_TIME = 100.0f;
-const float HOLD_TIME = 1.0f;
+const float HOLD_TIME = 0.5f;
 
 AItem *HeldItemRight;
 AItem *HeldItemLeft;
@@ -245,11 +245,13 @@ void AHypoxiaCharacter::ItemPickupRight() {
 }
 
 void AHypoxiaCharacter::RightRelease() {
-	if (RightHoldTimer <= 0) {
-		HeldItemRight->Drop();
-		HeldItemRight = NULL;
-		HeldRight = false;
-		RightHand->SetVisibility(true, true);
+	if (HeldRight) {
+		if (RightHoldTimer <= 0) {
+			HeldItemRight->Drop();
+			HeldItemRight = NULL;
+			HeldRight = false;
+			RightHand->SetVisibility(true, true);
+		}
 	}
 }
 
@@ -289,11 +291,13 @@ void AHypoxiaCharacter::ItemPickupLeft() {
 }
 
 void AHypoxiaCharacter::LeftRelease() {
-	if (LeftHoldTimer <= 0) {
-		HeldItemLeft->Drop();
-		HeldItemLeft = NULL;
-		HeldLeft = false;
-		LeftHand->SetVisibility(true, true);
+	if (HeldLeft) {
+		if (LeftHoldTimer <= 0) {
+			HeldItemLeft->Drop();
+			HeldItemLeft = NULL;
+			HeldLeft = false;
+			LeftHand->SetVisibility(true, true);
+		}
 	}
 }
 

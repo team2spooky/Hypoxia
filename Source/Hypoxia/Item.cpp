@@ -57,8 +57,8 @@ void AItem::BeginPlay() {
 
 	Held = false;
 
-	OldLocation = FVector();
-	NewLocation = FVector();
+	//OldLocation = FVector();
+	//NewLocation = FVector();
 
 	bHasGravity = Item->IsGravityEnabled();
 
@@ -105,10 +105,16 @@ void AItem::Drop() {
 		Held = false;
 		//UE_LOG(LogTemp, Warning, TEXT("Dropped"));
 		Item->SetEnableGravity(bHasGravity);
-		//Item->SetPhysicsLinearVelocity(MotionController->GetPhysicsLinearVelocity());
 		Item_Base->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 		Item->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-		Item->AddImpulse(FVector(((NewLocation - OldLocation) * ARM_STRENGTH).X, ((NewLocation - OldLocation) * ARM_STRENGTH).Y, ((NewLocation - OldLocation) * ARM_STRENGTH).Z));
+		if (MotionController->Hand == EControllerHand::Right) {
+			Item->SetPhysicsLinearVelocity(HypoxiaCharacter->RightCollider->GetPhysicsLinearVelocity());
+			Item->SetPhysicsAngularVelocity(HypoxiaCharacter->RightCollider->GetPhysicsAngularVelocity());
+		} else if (MotionController->Hand == EControllerHand::Left) {
+			Item->SetPhysicsLinearVelocity(HypoxiaCharacter->LeftCollider->GetPhysicsLinearVelocity());
+			Item->SetPhysicsAngularVelocity(HypoxiaCharacter->LeftCollider->GetPhysicsAngularVelocity());
+		}
+		//Item->AddImpulse(FVector(((NewLocation - OldLocation) * ARM_STRENGTH).X, ((NewLocation - OldLocation) * ARM_STRENGTH).Y, ((NewLocation - OldLocation) * ARM_STRENGTH).Z));
 	}
 }
 
@@ -128,8 +134,8 @@ void AItem::UpdatePosition(FVector DevicePosition) {
 
 	MotionTracker->SetWorldLocation(MotionController->GetComponentLocation() + RootComponent->GetComponentLocation() - DevicePosition + FVector(0.0f, 0.0f, DevicePosition.Z - 100.f), false, (FHitResult*)nullptr, ETeleportType::None);
 
-	OldLocation = NewLocation;
-	NewLocation = MotionTracker->GetComponentLocation();
+	//OldLocation = NewLocation;
+	//NewLocation = MotionTracker->GetComponentLocation();
 
 	if (!Item->GetBodyInstance()->bLockTranslation) {
 		Item->SetWorldLocation(MotionTracker->GetComponentLocation(), true, (FHitResult*)nullptr, ETeleportType::None);
