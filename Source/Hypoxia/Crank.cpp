@@ -3,7 +3,7 @@
 #include "Hypoxia.h"
 #include "Crank.h"
 #include "Kismet/HeadMountedDisplayFunctionLibrary.h"
-#include "DrawDebugHelpers.h"
+//#include "DrawDebugHelpers.h"
 
 ACrank::ACrank() {
 	Base = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base"));
@@ -35,6 +35,8 @@ void ACrank::BeginPlay() {
 		AngleTraveled = MinAngle;
 		Angle = FMath::DegreesToRadians(FMath::Fmod(MinAngle, 360.0f));
 	}
+	PrevUpdate = AngleTraveled;
+	NextUpdate = AngleTraveled + UpdateAngle;
 }
 
 void ACrank::Drop() {
@@ -53,10 +55,10 @@ void ACrank::Drop() {
 	}
 	if (prevOn != bOn) {
 		if (bOn) {
-			EventOn();
+			CrankOn();
 		}
 		else {
-			EventOff();
+			CrankOff();
 		}
 	}
 }
@@ -72,16 +74,16 @@ void ACrank::Tick(float DeltaTime) {
 
 		float prevAngle = Angle;
 
-		DrawDebugLine(GetWorld(), Base->GetComponentLocation(), Base->GetComponentLocation() + Base->GetRightVector() * 100.f, FColor::Red, false, -1.0f, (uint8)'\000', 0.1f);
-		DrawDebugLine(GetWorld(), Base->GetComponentLocation(), Base->GetComponentLocation() + Base->GetForwardVector() * 100.f, FColor::Green, false, -1.0f, (uint8)'\000', 0.1f);
-		DrawDebugLine(GetWorld(), Base->GetComponentLocation(), Base->GetComponentLocation() + Base->GetUpVector() * 100.f, FColor::Blue, false, -1.0f, (uint8)'\000', 0.1f);
+		//DrawDebugLine(GetWorld(), Base->GetComponentLocation(), Base->GetComponentLocation() + Base->GetRightVector() * 100.f, FColor::Red, false, -1.0f, (uint8)'\000', 0.1f);
+		//DrawDebugLine(GetWorld(), Base->GetComponentLocation(), Base->GetComponentLocation() + Base->GetForwardVector() * 100.f, FColor::Green, false, -1.0f, (uint8)'\000', 0.1f);
+		//DrawDebugLine(GetWorld(), Base->GetComponentLocation(), Base->GetComponentLocation() + Base->GetUpVector() * 100.f, FColor::Blue, false, -1.0f, (uint8)'\000', 0.1f);
 
 		FVector Direction = Constraint->GetComponentLocation() - MotionTracker->GetComponentLocation();
-		DrawDebugLine(GetWorld(), Constraint->GetComponentLocation(), MotionTracker->GetComponentLocation(), FColor::Purple, false, -1.0f, (uint8)'\000', 0.1f);
+		//DrawDebugLine(GetWorld(), Constraint->GetComponentLocation(), MotionTracker->GetComponentLocation(), FColor::Purple, false, -1.0f, (uint8)'\000', 0.1f);
 		Direction = FVector::VectorPlaneProject(Direction, Base->GetRightVector());
 		Direction = Direction.GetSafeNormal();
 		Direction *= -1.f;
-		DrawDebugLine(GetWorld(), Constraint->GetComponentLocation(), Constraint->GetComponentLocation() + Direction * 50.f, FColor::Purple, false, -1.0f, (uint8)'\000', 0.1f);
+		//DrawDebugLine(GetWorld(), Constraint->GetComponentLocation(), Constraint->GetComponentLocation() + Direction * 50.f, FColor::Purple, false, -1.0f, (uint8)'\000', 0.1f);
 
 		float dot = Direction | Base->GetForwardVector();
 		float det = FMatrix(Direction, Base->GetForwardVector(), Base->GetRightVector(), FVector::ZeroVector).RotDeterminant();
@@ -104,7 +106,19 @@ void ACrank::Tick(float DeltaTime) {
 			Angle = CalculatedAngle;
 		}
 
-		UE_LOG(LogTemp, Warning, TEXT("Angle: %f, Delta Angle: %f, Traveled Angle: %f"), NormalizeAngle(Angle), DeltaAngle, AngleTraveled);
+		if (AngleTraveled < PrevUpdate) {
+			PrevUpdate -= UpdateAngle;
+			NextUpdate -= UpdateAngle;
+			CrankTick();
+			OnCrankTick.Broadcast();
+		} else if (AngleTraveled > NextUpdate) {
+			PrevUpdate += UpdateAngle;
+			NextUpdate += UpdateAngle;
+			CrankTick();
+			OnCrankTick.Broadcast();
+		}
+
+		//UE_LOG(LogTemp, Warning, TEXT("Angle: %f, Delta Angle: %f, Traveled Angle: %f"), NormalizeAngle(Angle), DeltaAngle, AngleTraveled);
 
 		//Fallback
 		/*Item->SetWorldRotation(Item->GetComponentRotation().Add(0.f, 0.f, 10.f), true);
@@ -120,9 +134,15 @@ float ACrank::NormalizeAngle(float Theta) {
 	return Theta + (Theta < 0 ? 2 * PI : 0);
 }
 
-void ACrank::EventOn_Implementation() {
+void ACrank::CrankOn_Implementation() {
 }
 
-void ACrank::EventOff_Implementation() {
+void ACrank::CrankOff_Implementation() {
 }
 
+void ACrank::CrankTick_Implementation() {
+}
+
+float ACrank::GetPercent() {
+	return (AngleTraveled - MinAngle) / (MaxAngle - MinAngle);
+}

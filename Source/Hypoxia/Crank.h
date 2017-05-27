@@ -9,6 +9,9 @@
 /**
  * 
  */
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCrankTick);
+
 UCLASS()
 class HYPOXIA_API ACrank : public AItem
 {
@@ -22,13 +25,22 @@ public:
 	virtual void Drop() override;
 
 	UFUNCTION(BlueprintNativeEvent)
-		void EventOn();
-	virtual void EventOn_Implementation();
+	void CrankOn();
+	virtual void CrankOn_Implementation();
 
 	UFUNCTION(BlueprintNativeEvent)
-		void EventOff();
-	virtual void EventOff_Implementation();
+	void CrankOff();
+	virtual void CrankOff_Implementation();
 
+	UFUNCTION(BlueprintNativeEvent)
+	void CrankTick();
+	virtual void CrankTick_Implementation();
+
+	UFUNCTION(BlueprintCallable, Category = Crank)
+	float GetPercent();
+
+	UPROPERTY(BlueprintAssignable, Category = Crank)
+	FCrankTick OnCrankTick;
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = Mesh)
@@ -44,6 +56,12 @@ private:
 
 	float Angle = 0.f;
 	float AngleTraveled = 0.f;
+
+	float PrevUpdate = 0.f;
+	float NextUpdate = 0.f;
+
+	UPROPERTY(EditAnywhere)
+	float UpdateAngle = 15.0f;
 
 	UPROPERTY(EditAnywhere)
 	bool bOn = false;
