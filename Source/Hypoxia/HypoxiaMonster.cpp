@@ -18,7 +18,7 @@ void AHypoxiaMonster::BeginPlay()
 {
 	Super::BeginPlay();
 	MonsterSound->SetAttenuationSettings(SoundAttenuation);
-	IdleSoundTimer = IdleSoundDelay + FMath::RandRange(-0.5f, 1.0f) * IdleSoundDelayRandomness;
+	IdleSoundTimer = IdleSoundDelay + FMath::RandRange(0.f, 1.0f) * IdleSoundDelayRandomness;
 }
 
 // Called every frame
@@ -30,7 +30,7 @@ void AHypoxiaMonster::Tick( float DeltaTime )
 	if (IdleSoundTimer <= 0) {
 		MonsterSound->SetSound(IdleSound);
 		MonsterSound->Play();
-		IdleSoundTimer = IdleSoundDelay + FMath::RandRange(-0.5f, 1.0f) * IdleSoundDelayRandomness;
+		IdleSoundTimer = IdleSoundDelay + FMath::RandRange(0.f, 1.0f) * IdleSoundDelayRandomness;
 	}
 }
 

@@ -25,7 +25,7 @@ void AComplexAmbientSound::BeginPlay()
 	FVector HalfBox = BoxExtent / 2;
 	SpawnBox = FBox(Origin - HalfBox, Origin + HalfBox);
 
-	DelayTimer = Delay + FMath::RandRange(-0.5 * DelayRandomness, DelayRandomness);
+	DelayTimer = Delay + FMath::RandRange(0.f, DelayRandomness);
 
 	ComplexAudioComponent->Play();
 }
@@ -37,7 +37,7 @@ void AComplexAmbientSound::Tick( float DeltaTime )
 	if (DelayTimer < 0) {
 		SetActorLocation(FMath::RandPointInBox(SpawnBox));
 		ComplexAudioComponent->Play();
-		DelayTimer = Delay + FMath::RandRange(-0.5 * DelayRandomness, DelayRandomness);
+		DelayTimer = Delay + FMath::RandRange(0.f, DelayRandomness);
 	}
 	DelayTimer -= DeltaTime;
 }
