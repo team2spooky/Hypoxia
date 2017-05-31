@@ -9,6 +9,9 @@
 /**
  * 
  */
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMyBindableEvent);
+
 UCLASS()
 class HYPOXIA_API AFlashlight : public AItem
 {
@@ -39,6 +42,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Flashlight)
 	void KillLight();
+
+	UPROPERTY(BlueprintAssignable)
+	FMyBindableEvent OnPickUp;
 
 protected:
 
