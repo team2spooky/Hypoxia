@@ -17,6 +17,7 @@ DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 const float MOVEMENT_SCALE = 1.0f; //Scales along with movement speed
 const float CAMERA_HEIGHT_OFFSET = 60.0f;
 const float STEP_TIME = 100.0f;
+const float HOLD_TIME = 0.2f;
 
 AItem *HeldItemRight;
 AItem *HeldItemLeft;
@@ -150,7 +151,9 @@ void AHypoxiaCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerI
 	//PlayerInputComponent->BindAxis("LookUpRate", this, &AHypoxiaCharacter::LookUpAtRate);
 
 	PlayerInputComponent->BindAction("Pickup_Right", IE_Pressed, this, &AHypoxiaCharacter::ItemPickupRight);
+	PlayerInputComponent->BindAction("Pickup_Right", IE_Released, this, &AHypoxiaCharacter::RightRelease);
 	PlayerInputComponent->BindAction("Pickup_Left" , IE_Pressed, this, &AHypoxiaCharacter::ItemPickupLeft );
+	PlayerInputComponent->BindAction("Pickup_Left", IE_Released, this, &AHypoxiaCharacter::LeftRelease);
 
 	PlayerInputComponent->BindAction("Use_Right"   , IE_Pressed, this, &AHypoxiaCharacter::ItemUseRight);
 	PlayerInputComponent->BindAction("Use_Left"    , IE_Pressed, this, &AHypoxiaCharacter::ItemUseLeft);
@@ -219,7 +222,8 @@ void AHypoxiaCharacter::ItemPickupRight() {
 		for (int i = 0; i < OverlapArray.Num(); i++) {
 			if (Cast<AItem>(OverlapArray[i])->Pickup(R_MotionTracker, EControllerHand::Right)) {
 				HeldRight = true;
-				RightHand->SetRenderInMainPass(false);
+				RightHand->SetVisibility(false, true);
+				RightHoldTimer = HOLD_TIME;
 				break;
 			}
 		}
@@ -236,7 +240,18 @@ void AHypoxiaCharacter::ItemPickupRight() {
 		HeldItemRight = NULL;
 		HeldRight = false;
 		//RightHand->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
-		RightHand->SetRenderInMainPass(true);
+		RightHand->SetVisibility(true, true);
+	}
+}
+
+void AHypoxiaCharacter::RightRelease() {
+	if (HeldRight) {
+		if (RightHoldTimer <= 0) {
+			HeldItemRight->Drop();
+			HeldItemRight = NULL;
+			HeldRight = false;
+			RightHand->SetVisibility(true, true);
+		}
 	}
 }
 
@@ -252,7 +267,8 @@ void AHypoxiaCharacter::ItemPickupLeft() {
 		for (int i = 0; i < OverlapArray.Num(); i++) {
 			if (Cast<AItem>(OverlapArray[i])->Pickup(L_MotionTracker, EControllerHand::Left)) {
 				HeldLeft = true;
-				LeftHand->SetRenderInMainPass(false);
+				LeftHand->SetVisibility(false, true);
+				LeftHoldTimer = HOLD_TIME;
 				break;
 			}
 		}
@@ -269,9 +285,20 @@ void AHypoxiaCharacter::ItemPickupLeft() {
 		HeldItemLeft = NULL;
 		HeldLeft = false;
 		//LeftHand->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
-		LeftHand->SetRenderInMainPass(true);
+		LeftHand->SetVisibility(true, true);
 	}
 
+}
+
+void AHypoxiaCharacter::LeftRelease() {
+	if (HeldLeft) {
+		if (LeftHoldTimer <= 0) {
+			HeldItemLeft->Drop();
+			HeldItemLeft = NULL;
+			HeldLeft = false;
+			LeftHand->SetVisibility(true, true);
+		}
+	}
 }
 
 void AHypoxiaCharacter::ItemUseRight() {
@@ -358,4 +385,10 @@ void AHypoxiaCharacter::Tick(float DeltaTime) {
 		HypoxiaChar->ClientSetCameraFade(true, FColor::Black, FVector2D(1.0, 1.0), 5.0, true);
 	}
 
+	if (RightHoldTimer > 0) {
+		RightHoldTimer -= DeltaTime;
+	}
+	if (LeftHoldTimer > 0) {
+		LeftHoldTimer -= DeltaTime;
+	}
 }

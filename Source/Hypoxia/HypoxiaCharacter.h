@@ -151,6 +151,10 @@ public:
 
 	void ItemPickupLeft();
 
+	void RightRelease();
+
+	void LeftRelease();
+
 public:
 	/** Returns Mesh1P subobject **/
 	FORCEINLINE class USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
@@ -163,5 +167,9 @@ public:
 
 private:
 	float StepTimer;
+
+	float RightHoldTimer;
+
+	float LeftHoldTimer;
 };
 

@@ -9,6 +9,9 @@
 /**
  * 
  */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSwitchOn);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSwitchOff);
+
 UCLASS()
 class HYPOXIA_API ASlidingSwitch : public AItem
 {
@@ -22,13 +25,18 @@ public:
 	virtual void Drop() override;
 
 	UFUNCTION(BlueprintNativeEvent)
-	void EventOn();
-	virtual void EventOn_Implementation();
+	void SwitchOn();
+	virtual void SwitchOn_Implementation();
 
 	UFUNCTION(BlueprintNativeEvent)
-	void EventOff();
-	virtual void EventOff_Implementation();
+	void SwitchOff();
+	virtual void SwitchOff_Implementation();
 
+	UPROPERTY(BlueprintAssignable, Category = Switch)
+	FSwitchOn OnSwitchOn;
+
+	UPROPERTY(BlueprintAssignable, Category = Switch)
+	FSwitchOff OnSwitchOff;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, Category = Mesh)
