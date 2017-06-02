@@ -45,14 +45,16 @@ void ASlidingSwitch::Drop() {
 	bOn = Direction > 0;
 	if (temp == bOn) return;
 	if (bOn) {
-		EventOn();
+		SwitchOn();
+		OnSwitchOn.Broadcast();
 	} else {
-		EventOff();
+		SwitchOff();
+		OnSwitchOff.Broadcast();
 	}
 }
 
-void ASlidingSwitch::EventOn_Implementation() {
+void ASlidingSwitch::SwitchOn_Implementation() {
 }
 
-void ASlidingSwitch::EventOff_Implementation() {
+void ASlidingSwitch::SwitchOff_Implementation() {
 }
