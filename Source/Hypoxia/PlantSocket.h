@@ -36,6 +36,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	float AngleTolerance = 45.f;
 
+	UPROPERTY(EditAnywhere)
+		bool bDrainPower = false;
+
 	APowerableObject* TargetObject;
 	float ObjectPower;
 };

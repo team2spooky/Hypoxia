@@ -36,7 +36,12 @@ void APlantSocket::BeginPlay()
 void APlantSocket::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-
+	if (bDrainPower) {
+		ObjectPower = FMath::Max(0.f, ObjectPower - 0.04f);
+	}
+	if (IsValid(TargetObject)) {
+		TargetObject->Power(ObjectPower);
+	}
 }
 
 void APlantSocket::Power(float Volume)
@@ -45,8 +50,5 @@ void APlantSocket::Power(float Volume)
 		ObjectPower = 0;
 	} else {
 		ObjectPower = FMath::Min(1.f, ObjectPower + 0.05f);
-	}
-	if (IsValid(TargetObject)) {
-		TargetObject->Power(ObjectPower);
 	}
 }

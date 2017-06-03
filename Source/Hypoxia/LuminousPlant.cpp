@@ -46,7 +46,7 @@ void ALuminousPlant::Tick(float deltaSeconds) {
 	Super::Tick(deltaSeconds);
 	float Glow;
 	DynamicMaterial->GetScalarParameterValue(FName("GlowIntensity"), Glow);
-	DynamicMaterial->SetScalarParameterValue(FName("GlowIntensity"), FMath::Max(Glow - 50 * deltaSeconds, MinGlow));
+	DynamicMaterial->SetScalarParameterValue(FName("GlowIntensity"), FMath::Max(Glow - 25 * deltaSeconds, MinGlow));
 	if (!NoParticles) {
 		Particles->SetFloatParameter("SpawnRate", FMath::Max(Glow / 7.5f, 0.1f));
 	}
