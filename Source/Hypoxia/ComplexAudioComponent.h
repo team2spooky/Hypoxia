@@ -20,6 +20,7 @@ public:
 	virtual void TickComponent(float, ELevelTick, FActorComponentTickFunction*) override;
 	virtual void OnRegister() override;
 	virtual void DestroyComponent(bool bPromoteChildren = false) override;
+	UFUNCTION(BlueprintCallable, Category = "Complex")
 	void Play(float startTime = 0.f);
 	void Stop();
 	void SetSound(USoundBase*);

@@ -28,6 +28,8 @@ void APlantConductor::BeginPlay() {
 	Particles->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 	Particles->AttachToComponent(Item, FAttachmentTransformRules(EAttachmentRule::KeepRelative, EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, true));
 	DynamicMaterial = Item->CreateAndSetMaterialInstanceDynamic(0);
+	Item->SetMaterial(1, DynamicMaterial);
+	Item->SetMaterial(2, DynamicMaterial);
 	Particles->CreateAndSetMaterialInstanceDynamic(0);
 	Particles->AutoPopulateInstanceProperties();
 	Drop();
