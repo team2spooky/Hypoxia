@@ -28,6 +28,8 @@ bool Alive;
 
 FVector HMDPositionDelta;
 FVector LastHMDPosition;
+FRotator HMDRotationDelta;
+FRotator LastHMDRotation;
 
 AActor *Monster;
 
@@ -50,7 +52,7 @@ AHypoxiaCharacter::AHypoxiaCharacter() {
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	FirstPersonCameraComponent->SetupAttachment(Tripod);
 	//FirstPersonCameraComponent->RelativeLocation = FVector(-39.56f, 1.75f, 0.f); // Position the camera
-	FirstPersonCameraComponent->bUsePawnControlRotation = true;
+	//FirstPersonCameraComponent->bUsePawnControlRotation = true;
 
 	R_MotionTracker = CreateDefaultSubobject<USceneComponent>(TEXT("R_MotionTracker"));
 	R_MotionTracker->SetupAttachment(RootComponent);
@@ -335,7 +337,10 @@ void AHypoxiaCharacter::Tick(float DeltaTime) {
 	HMDPositionDelta = DevicePosition - LastHMDPosition;
 	LastHMDPosition  = DevicePosition;
 
-	AddMovementInput(HMDPositionDelta, MOVEMENT_SCALE);
+	HMDRotationDelta = DeviceRotation - LastHMDRotation;
+	LastHMDRotation = DeviceRotation;
+
+	//AddMovementInput(HMDPositionDelta, MOVEMENT_SCALE);
 
 	//FirstPersonCameraComponent->SetWorldRotation(DeviceRotation);
 	//FirstPersonCameraComponent->SetWorldLocation(FVector(FirstPersonCameraComponent->GetComponentLocation().X, FirstPersonCameraComponent->GetComponentLocation().Y, DevicePosition.Z + CAMERA_HEIGHT_OFFSET));
@@ -350,9 +355,9 @@ void AHypoxiaCharacter::Tick(float DeltaTime) {
 	UE_LOG(LogTemp, Error, TEXT("Component Y: %f"), R_MotionController->GetComponentLocation().Y);
 	UE_LOG(LogTemp, Error, TEXT("Component Z: %f"), R_MotionController->GetComponentLocation().Z);*/
 
-	R_MotionTracker->SetWorldLocation(R_MotionController->GetComponentLocation() + RootComponent->GetComponentLocation() - FVector(DevicePosition.X, DevicePosition.Y, 100.0f));
+	R_MotionTracker->SetWorldLocation(R_MotionController->GetComponentLocation() + RootComponent->GetComponentLocation() - FVector(DevicePosition.X, DevicePosition.Y, 100.0f - CAMERA_HEIGHT_OFFSET));
 	R_MotionTracker->SetWorldRotation(R_MotionController->GetComponentRotation() + RootComponent->GetComponentRotation() - FRotator(0.0f, DeviceRotation.Yaw, 0.0f));
-	L_MotionTracker->SetWorldLocation(L_MotionController->GetComponentLocation() + RootComponent->GetComponentLocation() - FVector(DevicePosition.X, DevicePosition.Y, 100.0f));
+	L_MotionTracker->SetWorldLocation(L_MotionController->GetComponentLocation() + RootComponent->GetComponentLocation() - FVector(DevicePosition.X, DevicePosition.Y, 100.0f - CAMERA_HEIGHT_OFFSET));
 	L_MotionTracker->SetWorldRotation(L_MotionController->GetComponentRotation() + RootComponent->GetComponentRotation() - FRotator(0.0f, DeviceRotation.Yaw, 0.0f));
 
 	//UE_LOG(LogTemp, Error, TEXT("Tracker %f"), R_MotionTracker->GetComponentLocation().Z);
@@ -363,16 +368,15 @@ void AHypoxiaCharacter::Tick(float DeltaTime) {
 
 	//FirstPersonCameraComponent->SetWorldLocation(GetCapsuleComponent()->GetComponentLocation());
 	
-	FirstPersonCameraComponent->SetWorldLocation(FVector(FirstPersonCameraComponent->GetComponentLocation().X, FirstPersonCameraComponent->GetComponentLocation().Y, DevicePosition.Z));
-	
+	//FirstPersonCameraComponent->SetWorldLocation(FVector(FirstPersonCameraComponent->GetComponentLocation().X, FirstPersonCameraComponent->GetComponentLocation().Y, DevicePosition.Z + CAMERA_HEIGHT_OFFSET));
+	//Tripod->SetWorldRotation(DeviceRotation);
+
 	//UE_LOG(LogTemp, Error, TEXT("Camera X: %f"), FirstPersonCameraComponent->GetComponentLocation().X);
 
 	//UE_LOG(LogTemp, Error, TEXT("Camera X: %f"), FirstPersonCameraComponent->GetComponentLocation().X);
 
 	//UE_LOG(LogTemp, Error, TEXT("Root Name: %s"), *RootComponent->GetName());
 	//UE_LOG(LogTemp, Error, TEXT("Coom Name: %s"), *GetCapsuleComponent()->GetName());
-
-	//SetActorRotation(DeviceRotation);
 
 	//UE_LOG(LogTemp, Error, TEXT("RMotionLocation %f"), R_MotionController->GetComponentLocation().X);
 

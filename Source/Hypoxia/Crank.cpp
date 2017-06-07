@@ -89,7 +89,7 @@ void ACrank::Tick(float DeltaTime) {
 		float det = FMatrix(Direction, Base->GetForwardVector(), Base->GetRightVector(), FVector::ZeroVector).RotDeterminant();
 		float CalculatedAngle = -1 * FMath::Atan2(det, dot);
 
-		float DeltaAngle = CalculatedAngle - prevAngle;
+		float DeltaAngle = .1f; // CalculatedAngle - prevAngle;
 		if (DeltaAngle <= -1 * PI) DeltaAngle += 2 * PI;
 		else if (DeltaAngle > PI) DeltaAngle -= 2 * PI;
 
@@ -121,10 +121,10 @@ void ACrank::Tick(float DeltaTime) {
 		//UE_LOG(LogTemp, Warning, TEXT("Angle: %f, Delta Angle: %f, Traveled Angle: %f"), NormalizeAngle(Angle), DeltaAngle, AngleTraveled);
 
 		//Fallback
-		/*Item->SetWorldRotation(Item->GetComponentRotation().Add(0.f, 0.f, 10.f), true);
-		Angle += 10.f;*/
+		Item->SetWorldRotation(Item->GetComponentRotation().Add(0.f, 0.f, DeltaAngle), true);
+		AngleTraveled += 10.f;
 
-		if (FVector::Dist(MotionTracker->GetComponentLocation(), GrabSpot->GetComponentLocation()) > 30.0f) {
+		if (FVector::Dist(MotionTracker->GetComponentLocation(), GrabSpot->GetComponentLocation()) > 50.0f) {
 			SelfDrop();
 		}
 	}
