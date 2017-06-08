@@ -382,7 +382,8 @@ void AHypoxiaCharacter::Tick(float DeltaTime) {
 		UE_LOG(LogTemp, Error, TEXT("KILL_PLAYER"));
 		Alive = false;
 		class APlayerController* HypoxiaChar = Cast<APlayerController>(Controller);
-		HypoxiaChar->ClientSetCameraFade(true, FColor::Black, FVector2D(1.0, 1.0), 5.0, true);
+		HypoxiaChar->ClientSetCameraFade(true, FColor::Black, FVector2D(1.0, 1.0), 2.0, true);
+		SetActorLocation(FVector(13130.0f, -170.0f, 30.0f));
 	}
 
 	if (RightHoldTimer > 0) {
